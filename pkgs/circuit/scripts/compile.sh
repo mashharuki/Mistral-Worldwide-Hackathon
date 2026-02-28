@@ -2,7 +2,7 @@
 
 # Variable to store the name of the circuit
 # CIRCUIT=PasswordHash
-CIRCUIT=LicensePlateCommitment
+CIRCUIT=VoiceCommitment
 
 # In case there is a circuit name as input
 if [ "$1" ]; then

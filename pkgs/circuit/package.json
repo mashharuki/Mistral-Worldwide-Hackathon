@@ -10,9 +10,9 @@
     "generateWitness": "./scripts/generateWitness.sh",
     "executeGroth16": "./scripts/executeGroth16.sh",
     "generateInput": "node ./scripts/generateInput.js",
-    "test:LicensePlateCommitment": "node ./test/LicensePlateCommitment.test.js",
-    "cp:verifier": "cp LicensePlateCommitmentVerifier.sol ../backend/contracts",
-    "cp:zk": "cp LicensePlateCommitment_js/LicensePlateCommitment.wasm ../backend/zk && cp zkey/LicensePlateCommitment_final.zkey ../backend/zk && cp LicensePlateCommitment_js/LicensePlateCommitment.wasm ../frontend/zk && cp zkey/LicensePlateCommitment_final.zkey ../frontend/zk"
+    "test": "node ./test/VoiceCommitment.test.js",
+    "cp:verifier": "cp VoiceCommitmentVerifier.sol ../backend/contracts",
+    "cp:zk": "cp VoiceCommitment_js/VoiceCommitment.wasm ../backend/zk && cp zkey/VoiceCommitment_final.zkey ../backend/zk && cp VoiceCommitment_js/VoiceCommitment.wasm ../frontend/zk && cp zkey/VoiceCommitment_final.zkey ../frontend/zk"
   },
   "keywords": [],
   "author": "",

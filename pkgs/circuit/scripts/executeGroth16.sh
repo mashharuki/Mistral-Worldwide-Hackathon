@@ -2,7 +2,7 @@
 
 # Variable to store the name of the circuit
 # CIRCUIT=PasswordHash
-CIRCUIT=LicensePlateCommitment
+CIRCUIT=VoiceCommitment
 
 # Variable to store the number of the ptau file
 PTAU=14
