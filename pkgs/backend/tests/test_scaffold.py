@@ -1,7 +1,6 @@
 import pathlib
 import unittest
 
-
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 
@@ -34,7 +33,7 @@ class BackendScaffoldTest(unittest.TestCase):
         self.assertTrue(http_file.exists(), "api.http is missing")
 
         content = http_file.read_text(encoding="utf-8")
-        self.assertIn("GET http://localhost:8080/health", content)
+        self.assertIn("GET {{base_url}}/health", content)
         self.assertIn("POST http://localhost:8080/extract-features", content)
         self.assertIn("POST http://localhost:8080/generate-proof", content)
         self.assertIn("POST http://localhost:8080/generate-commitment", content)

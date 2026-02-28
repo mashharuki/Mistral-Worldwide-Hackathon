@@ -1,5 +1,4 @@
-#@base_url = http://0.0.0.0:8080
-@base_url = https://voice-zk-wallet-backend-429380797965.us-central1.run.app
+@base_url = http://0.0.0.0:8080
 
 ### Health check
 GET {{base_url}}/health
