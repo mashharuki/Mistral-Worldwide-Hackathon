@@ -1,3 +1,5 @@
+/// <reference lib="WebWorker" />
+
 declare const self: ServiceWorkerGlobalScope & {
   __WB_MANIFEST: Array<string | { url: string; revision?: string | null }>;
 };
@@ -6,7 +8,7 @@ self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
-self.addEventListener("activate", (event) => {
+self.addEventListener("activate", (event: ExtendableEvent) => {
   event.waitUntil(self.clients.claim());
 });
 

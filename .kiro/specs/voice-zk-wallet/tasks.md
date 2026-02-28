@@ -88,7 +88,7 @@
   - MCP Inspector でサーバーの基本接続をテストする
   - _Requirements: 7.1, 7.3, 7.4_
 
-- [ ] 4.2 (P) 声の特徴量抽出とウォレット生成ツールの実装
+- [x] 4.2 (P) 声の特徴量抽出とウォレット生成ツールの実装
   - `extract_voice_features` ツールを実装し、音声データを Backend の /extract-features エンドポイントに転送して特徴量を返却する
   - `generate_zk_wallet` ツールを実装し、特徴量から Backend の /generate-proof を呼び出して ZK 証明を生成し、VoiceWalletFactory の getAddress でウォレットアドレスを算出して返却する
   - 各ツールの入力スキーマを Zod で定義する

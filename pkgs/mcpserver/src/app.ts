@@ -9,6 +9,8 @@ import {
   showWalletQrcodeInput,
   transferTokensInput,
 } from "./lib/schemas.js";
+import { handleExtractVoiceFeatures } from "./tools/extractVoiceFeatures.js";
+import { handleGenerateZkWallet } from "./tools/generateZkWallet.js";
 
 /**
  * 6 ツールを登録した McpServer を生成する
@@ -28,15 +30,7 @@ export function createMcpServer(): McpServer {
         "音声データから話者の特徴量を抽出し、二値化したバイナリベクトルを返却します",
       inputSchema: extractVoiceFeaturesInput,
     },
-    async ({ audio }) => {
-      // TODO: Task 4.2 で実装
-      return {
-        content: [
-          { type: "text" as const, text: "Not implemented yet" },
-        ],
-        isError: true,
-      };
-    },
+    async ({ audio }) => handleExtractVoiceFeatures({ audio }),
   );
 
   // --- Tool 2: generate_zk_wallet ---
@@ -48,15 +42,8 @@ export function createMcpServer(): McpServer {
         "声の特徴量から ZK 証明を生成し、決定論的にウォレットアドレスを算出します",
       inputSchema: generateZkWalletInput,
     },
-    async ({ features, salt }) => {
-      // TODO: Task 4.2 で実装
-      return {
-        content: [
-          { type: "text" as const, text: "Not implemented yet" },
-        ],
-        isError: true,
-      };
-    },
+    async ({ features, salt }) =>
+      handleGenerateZkWallet({ features, salt }),
   );
 
   // --- Tool 3: get_wallet_balance ---
