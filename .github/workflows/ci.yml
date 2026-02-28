@@ -90,8 +90,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
         working-directory: .
-      - name: Install circom
-        run: npm install -g circom@2.1.9
+      - name: Download circom binary
+        run: |
+          wget https://github.com/iden3/circom/releases/download/v2.1.9/circom-linux-amd64 -O /usr/local/bin/circom
+          chmod +x /usr/local/bin/circom
       - name: Compile circuit
         run: pnpm run compile
       - name: Test circuit
