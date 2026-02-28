@@ -1,10 +1,19 @@
 /// <reference lib="WebWorker" />
 
-import { clientsClaim } from 'workbox-core'
-import { precacheAndRoute } from 'workbox-precaching'
+export {}
 
-declare let self: ServiceWorkerGlobalScope
+declare const self: ServiceWorkerGlobalScope & {
+  __WB_MANIFEST: Array<string | { url: string; revision?: string | null }>
+}
 
-self.skipWaiting()
-clientsClaim()
-precacheAndRoute(self.__WB_MANIFEST)
+self.addEventListener('install', () => {
+  self.skipWaiting()
+})
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim())
+})
+
+// `injectManifest.injectionPoint` でこの値にプリキャッシュ対象が注入される。
+const precacheManifest = self.__WB_MANIFEST
+void precacheManifest

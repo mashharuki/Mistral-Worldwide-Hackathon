@@ -7,7 +7,7 @@
   "author": "Haruki Kondo",
   "license": "MIT",
   "engines": {
-    "node": ">=24"
+    "node": ">=23"
   },
   "scripts": {
     "format": "npx solhint --fix --noPrompt 'contracts/**/*.sol'",
@@ -34,7 +34,7 @@
     "@typechain/hardhat": "^9.0.0",
     "@types/chai": "^4.3.20",
     "@types/mocha": "^10.0.10",
-    "@types/node": ">=24.0.0",
+    "@types/node": ">=23.0.0",
     "base64-sol": "^1.1.0",
     "chai": "^4.5.0",
     "dotenv": "^17.2.1",
