@@ -1,6 +1,5 @@
 {
-  "inputs": [],
-  "servers": {
+  "mcpServers": {
     "context7": {
       "type": "stdio",
       "command": "npx",
@@ -12,7 +11,16 @@
     },
     "serena": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/oraios/serena", "serena", "start-mcp-server"]
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server"
+      ]
+    },
+    "drawio": {
+      "command": "npx",
+      "args": ["-y", "@drawio/mcp@latest"]
     }
   }
 }
