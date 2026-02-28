@@ -1,0 +1,54 @@
+{
+  "name": "contract",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "",
+  "author": "Haruki Kondo",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "format": "npx solhint --fix --noPrompt 'contracts/**/*.sol'",
+    "clean": "npx hardhat clean",
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "verify": "npx hardhat ignition verify",
+    "coverage": "SOLIDITY_COVERAGE=true npx hardhat coverage",
+    "local": "npx hardhat node",
+    "getBalance": "npx hardhat getBalance",
+    "getChainInfo": "npx hardhat getChainInfo"
+  },
+  "devDependencies": {
+    "@account-abstraction/contracts": "^0.7.0",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^4.1.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
+    "@typechain/hardhat": "^9.0.0",
+    "@types/chai": "^4.3.20",
+    "@types/mocha": "^10.0.10",
+    "@types/node": ">=24.0.0",
+    "base64-sol": "^1.1.0",
+    "chai": "^4.5.0",
+    "dotenv": "^17.2.1",
+    "ethers": "^6.13.0",
+    "hardhat": "^2.26.1",
+    "hardhat-gas-reporter": "^1.0.8",
+    "mocha": "^11.7.5",
+    "solhint": "^5.0.4",
+    "solidity-coverage": "^0.8.1",
+    "ts-node": ">=8.0.0",
+    "typechain": "^8.3.0",
+    "typescript": ">=4.5.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+}
