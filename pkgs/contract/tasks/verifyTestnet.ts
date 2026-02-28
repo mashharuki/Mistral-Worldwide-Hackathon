@@ -1,18 +1,23 @@
-import * as fs from "fs";
 import { task } from "hardhat/config";
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
-import * as path from "path";
+import {
+  getVerifierAddress,
+  hasDeployedAddresses,
+} from "./../helpers/contractJsonHelper";
 
 /**
  * 【Task】End-to-end verification of VoiceWallet on testnet
  *
  * Steps:
- * 1. Deploy VoiceWallet implementation + proxy with MockGroth16Verifier
+ * 1. Deploy VoiceWallet implementation + proxy with Verifier
  * 2. Fund the wallet with ETH
  * 3. Execute ETH transfer from wallet
  * 4. Deploy MockERC20 and mint tokens to wallet
  * 5. Execute ERC20 transfer from wallet
  * 6. Verify all balances
+ *
+ * Verifier アドレスは deployed_addresses.json から自動取得。
+ * 見つからない場合は MockGroth16Verifier をフォールバックデプロイ。
  */
 task("verifyTestnet", "E2E verification of VoiceWallet on testnet").setAction(
   async (taskArgs, hre: HardhatRuntimeEnvironment) => {
@@ -21,24 +26,19 @@ task("verifyTestnet", "E2E verification of VoiceWallet on testnet").setAction(
     );
 
     const [deployer] = await hre.ethers.getSigners();
+    const chainId = Number((await hre.ethers.provider.getNetwork()).chainId);
     console.log("Deployer:", deployer.address);
+    console.log("Chain ID:", chainId);
 
-    // Load deployed verifier address if available
-    const deploymentsDir = path.join(
-      __dirname,
-      "../ignition/deployments/chain-84532",
-    );
-    const addressesPath = path.join(deploymentsDir, "deployed_addresses.json");
-
+    // Verifier アドレスの解決: JSON > MockVerifier フォールバック
     let verifierAddress: string;
 
-    if (fs.existsSync(addressesPath)) {
-      const addresses = JSON.parse(fs.readFileSync(addressesPath, "utf8"));
-      verifierAddress =
-        addresses["VoiceWalletDeployment#VoiceOwnershipVerifier"];
-      console.log("Using deployed VoiceOwnershipVerifier:", verifierAddress);
+    if (hasDeployedAddresses(chainId)) {
+      verifierAddress = getVerifierAddress(chainId);
+      console.log(
+        `Using VoiceOwnershipVerifier from deployed_addresses.json: ${verifierAddress}`,
+      );
     } else {
-      // Deploy MockGroth16Verifier as fallback
       console.log("No deployment found. Deploying MockGroth16Verifier...");
       const MockVerifier = await hre.ethers.getContractFactory(
         "MockGroth16Verifier",

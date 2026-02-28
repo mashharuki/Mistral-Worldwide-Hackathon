@@ -1,37 +1,80 @@
-import fs from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs";
+import * as path from "node:path";
+
+interface DeployedAddresses {
+  [key: string]: string;
+}
+
+const IGNITION_DEPLOYMENTS_DIR = path.join(
+  __dirname,
+  "../ignition/deployments",
+);
+
+const CONTRACT_KEYS = {
+  VoiceOwnershipVerifier: "VoiceWalletDeployment#VoiceOwnershipVerifier",
+  VoiceWalletFactory: "VoiceWalletDeployment#VoiceWalletFactory",
+} as const;
 
 /**
- * デプロイされたアドレス情報をjsonファイルから取得するヘルパーメソッド
- * @param chainId チェーンID
- * @param contractName  コントラクト名 <コントラクト名>Module#<コントラクト名>の形式で指定する。
- * @returns
+ * 指定チェーンの deployed_addresses.json を読み込む
  */
-export function getContractAddress(
-  chainId: string,
-  contractName: string,
-): string | undefined {
-  try {
-    // ファイルパスを構築
-    const filePath = path.join(
-      __dirname,
-      "../",
-      "ignition",
-      "deployments",
-      `chain-${chainId}`,
-      "deployed_addresses.json",
+function loadDeployedAddresses(chainId: number): DeployedAddresses {
+  const filePath = path.join(
+    IGNITION_DEPLOYMENTS_DIR,
+    `chain-${chainId}`,
+    "deployed_addresses.json",
+  );
+  if (!fs.existsSync(filePath)) {
+    throw new Error(
+      `Deployed addresses not found for chain ${chainId} at ${filePath}`,
     );
-
-    // JSONファイルの内容を読み込み
-    const fileContent = fs.readFileSync(filePath, "utf-8");
-
-    // JSONをオブジェクトにパース
-    const deployedAddresses = JSON.parse(fileContent);
-
-    // 指定されたコントラクト名のアドレスを返す
-    return deployedAddresses[contractName];
-  } catch (error) {
-    console.error("Error reading contract address:", error);
-    return undefined;
   }
+  return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
+
+/**
+ * deployed_addresses.json が存在するか確認する
+ */
+export function hasDeployedAddresses(chainId: number): boolean {
+  const filePath = path.join(
+    IGNITION_DEPLOYMENTS_DIR,
+    `chain-${chainId}`,
+    "deployed_addresses.json",
+  );
+  return fs.existsSync(filePath);
+}
+
+/**
+ * VoiceOwnershipVerifier のデプロイ済みアドレスを取得する
+ */
+export function getVerifierAddress(chainId: number): string {
+  const addresses = loadDeployedAddresses(chainId);
+  const address = addresses[CONTRACT_KEYS.VoiceOwnershipVerifier];
+  if (!address) {
+    throw new Error(
+      "VoiceOwnershipVerifier address not found in deployed_addresses.json",
+    );
+  }
+  return address;
+}
+
+/**
+ * VoiceWalletFactory のデプロイ済みアドレスを取得する
+ */
+export function getFactoryAddress(chainId: number): string {
+  const addresses = loadDeployedAddresses(chainId);
+  const address = addresses[CONTRACT_KEYS.VoiceWalletFactory];
+  if (!address) {
+    throw new Error(
+      "VoiceWalletFactory address not found in deployed_addresses.json",
+    );
+  }
+  return address;
+}
+
+/**
+ * 全デプロイ済みアドレスを取得する
+ */
+export function getAllDeployedAddresses(chainId: number): DeployedAddresses {
+  return loadDeployedAddresses(chainId);
 }

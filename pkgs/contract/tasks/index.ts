@@ -2,11 +2,6 @@
 import "./utils/getBalance";
 import "./utils/getChainInfo";
 
-// Deploy
-import "./deploy/deployVerifier";
-import "./deploy/deployVoiceWallet";
-import "./deploy/deployMockERC20";
-
 // Wallet
 import "./wallet/walletInfo";
 import "./wallet/ethTransfer";

@@ -123,29 +123,33 @@ https://mistral-worldwide-hackathon-fronten.vercel.app
   pnpm --filter contract run test
   ```
 
-- Base Sepoliaへデプロイ
+- デプロイ（Hardhat Ignition）
 
   ```bash
+  # Verifier + WalletFactory を一括デプロイ
   pnpm --filter contract run deploy --network base-sepolia
+
+  # VoiceCommitmentVerifier を単体デプロイ
+  pnpm --filter contract run deploy:commitmentVerifier --network base-sepolia
+
+  # VoiceWallet（Proxy 初期化込み）デプロイ
+  # VoiceWalletDeployment の Verifier を自動参照し、未デプロイなら同時にデプロイ
+  pnpm --filter contract run deploy:walletProxy \
+    --network base-sepolia \
+    --parameters '{"VoiceWalletProxyDeployment": {"owner": "0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072", "commitment": "0x9f4d6e3b8c2a7d1e5f0b3a9c4e8d2f6a7b1c0d3e5f9a2b4c6d8e1f3a5b7c9d00"}}'
+
+  # MockERC20 をデプロイ（テスト用）
+  pnpm --filter contract run deploy:mockERC20 --network base-sepolia
   ```
 
 - タスク（Hardhat Task）を使う
+
+  > `--verifier` は省略可能です。省略時は `ignition/deployments/chain-{chainId}/deployed_addresses.json` から `contractJsonHelper` が自動解決します。明示的に指定すればそちらが優先されます。
 
   ```bash
   # チェーン情報 / 残高確認
   pnpm --filter contract run getChainInfo --network base-sepolia
   pnpm --filter contract run getBalance --network base-sepolia
-
-  # Verifier デプロイ（ownership または commitment）
-  pnpm --filter contract exec hardhat deployVerifier --type ownership --network base-sepolia
-  pnpm --filter contract exec hardhat deployVerifier --type commitment --network base-sepolia
-
-  # VoiceWallet（Proxy 初期化込み）デプロイ
-  pnpm --filter contract exec hardhat deployVoiceWallet \
-    --verifier 0xYourVerifier \
-    --commitment 0xYourCommitmentBytes32 \
-    --entrypoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
-    --network base-sepolia
 
   # Wallet 情報取得
   pnpm --filter contract exec hardhat walletInfo \
@@ -179,12 +183,12 @@ https://mistral-worldwide-hackathon-fronten.vercel.app
     --network base-sepolia
 
   # 証明検証（proof は JSON 文字列）
+  # --verifier 省略時は deployed_addresses.json から自動取得
   pnpm --filter contract exec hardhat verifyProof \
-    --verifier 0xYourVerifier \
     --proof '{"a":["1","2"],"b":[["3","4"],["5","6"]],"c":["7","8"],"input":["9"]}' \
     --network base-sepolia
 
-  # テストネットE2E検証
+  # テストネットE2E検証（Verifier は自動解決、見つからない場合は MockVerifier をデプロイ）
   pnpm --filter contract exec hardhat verifyTestnet --network base-sepolia
   ```
 
