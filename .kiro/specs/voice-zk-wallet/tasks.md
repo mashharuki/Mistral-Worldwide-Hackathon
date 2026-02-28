@@ -52,7 +52,7 @@
 
 ## Task 3. スマートコントラクト — ERC-4337 ウォレットと ZK 検証
 
-- [ ] 3.1 Groth16Verifier と VoiceWallet コントラクトの実装
+- [x] 3.1 Groth16Verifier と VoiceWallet コントラクトの実装
   - ZK 回路パイプラインが生成した Solidity Verifier コントラクトをプロジェクトに統合する
   - SimpleAccount（ERC-4337 v0.7）を拡張した VoiceWallet コントラクトを実装する
   - 初期化時に voiceCommitment（公開コミットメント）、verifier アドレス、entryPoint アドレスを登録する
