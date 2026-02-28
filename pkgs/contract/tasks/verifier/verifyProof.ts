@@ -19,13 +19,19 @@ task("verifyProof", "Verify a Groth16 proof on a deployed verifier")
     types.string,
   )
   .addOptionalParam(
-    "prooffile",
+    "proof",
+    "JSON string of proof: {a:[2], b:[[2],[2]], c:[2], input:[1]}",
+    undefined,
+    types.string,
+  )
+  .addOptionalParam(
+    "proofFile",
     "Path to snarkjs proof json (e.g. pkgs/circuit/data/VoiceOwnership_proof.json)",
     undefined,
     types.string,
   )
   .addOptionalParam(
-    "publicfile",
+    "publicFile",
     "Path to snarkjs public json (e.g. pkgs/circuit/data/VoiceOwnership_public.json)",
     undefined,
     types.string,
@@ -114,11 +120,14 @@ task("verifyProof", "Verify a Groth16 proof on a deployed verifier")
         }
 
         // snarkjs format -> verifier input format
+        // NOTE:
+        // snarkjs の pi_b は Solidity verifier が期待する順序と逆になるため、
+        // 各ペアを [1], [0] の順で並べ替える。
         proofData = {
           a: [snarkProof.pi_a[0], snarkProof.pi_a[1]],
           b: [
-            [snarkProof.pi_b[0][0], snarkProof.pi_b[0][1]],
-            [snarkProof.pi_b[1][0], snarkProof.pi_b[1][1]],
+            [snarkProof.pi_b[0][1], snarkProof.pi_b[0][0]],
+            [snarkProof.pi_b[1][1], snarkProof.pi_b[1][0]],
           ],
           c: [snarkProof.pi_c[0], snarkProof.pi_c[1]],
           input: [snarkPublic[0]],
