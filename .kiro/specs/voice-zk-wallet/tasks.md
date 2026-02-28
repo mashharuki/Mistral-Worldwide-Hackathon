@@ -62,7 +62,7 @@
   - _Requirements: 3.1, 3.2, 3.5, 11.4, 11.6_
   - _Contracts: IVoiceWallet, IGroth16Verifier_
 
-- [ ] 3.2 VoiceWalletFactory コントラクトの実装
+- [x] 3.2 VoiceWalletFactory コントラクトの実装
   - CREATE2 を使用して voiceCommitment から決定論的にウォレットアドレスを算出する Factory コントラクトを実装する
   - 同一の commitment + salt から常に同一のアドレスが導出されることを保証する
   - 未デプロイ状態でもアドレスを事前計算できる getAddress 関数を実装する
@@ -70,7 +70,7 @@
   - _Requirements: 3.1, 3.4, 11.2_
   - _Contracts: IVoiceWalletFactory_
 
-- [ ] 3.3 コントラクトテストと Base Sepolia デプロイ
+- [x] 3.3 コントラクトテストと Base Sepolia デプロイ
   - VoiceWallet の validateUserOp テストを作成し、有効な ZK Proof での成功と無効な Proof での revert を検証する
   - VoiceWalletFactory のテストを作成し、決定論的アドレス生成と getAddress の一致を検証する
   - EntryPoint v0.7.0（`0x0000000071727De22E5E9d8BAf0edAc6f37da032`）との互換性をテストする

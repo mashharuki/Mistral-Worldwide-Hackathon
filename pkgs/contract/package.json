@@ -17,6 +17,7 @@
     "verify": "npx hardhat ignition verify",
     "coverage": "SOLIDITY_COVERAGE=true npx hardhat coverage",
     "local": "npx hardhat node",
+    "deploy": "npx hardhat ignition deploy ./ignition/modules/VoiceWalletDeployment.ts",
     "getBalance": "npx hardhat getBalance",
     "getChainInfo": "npx hardhat getChainInfo"
   },
