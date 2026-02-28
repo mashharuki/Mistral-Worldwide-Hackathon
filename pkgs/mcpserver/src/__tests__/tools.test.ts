@@ -37,6 +37,8 @@ import { backendClient } from "../lib/backendClient.js";
 import { viemClient } from "../lib/viemClient.js";
 import { relayerClient } from "../lib/relayerClient.js";
 
+const relayerClientMock = relayerClient!;
+
 async function createTestClient() {
   const server = createMcpServer();
   const client = new Client({ name: "test-client", version: "1.0.0" });
@@ -422,7 +424,7 @@ describe("transfer_tokens tool", () => {
     // Relayer sends tx
     const mockTxHash =
       "0xaaaa000000000000000000000000000000000000000000000000000000000001";
-    vi.mocked(relayerClient.writeContract).mockResolvedValue(
+    vi.mocked(relayerClientMock.writeContract).mockResolvedValue(
       mockTxHash as `0x${string}`,
     );
     // Receipt
@@ -464,7 +466,7 @@ describe("transfer_tokens tool", () => {
       .mockResolvedValueOnce(0n); // nonce
     const mockTxHash =
       "0xbbbb000000000000000000000000000000000000000000000000000000000002";
-    vi.mocked(relayerClient.writeContract).mockResolvedValue(
+    vi.mocked(relayerClientMock.writeContract).mockResolvedValue(
       mockTxHash as `0x${string}`,
     );
     vi.mocked(viemClient.waitForTransactionReceipt).mockResolvedValue({
@@ -583,7 +585,7 @@ describe("transfer_tokens tool", () => {
       1000000000000000000n,
     );
     vi.mocked(viemClient.readContract).mockResolvedValue(0n);
-    vi.mocked(relayerClient.writeContract).mockRejectedValue(
+    vi.mocked(relayerClientMock.writeContract).mockRejectedValue(
       new Error("Transaction reverted"),
     );
 

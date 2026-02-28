@@ -23,7 +23,8 @@ export function createMcpServer(): McpServer {
   const server = new McpServer({
     name: "voice-zk-wallet-mcp",
     version: "0.1.0",
-    description: "音声特徴量から ZK ウォレットを生成する MCP サーバー",
+    description:
+      "音声特徴量抽出・ZKウォレット生成・残高/アドレス/QR取得・トークン送金を提供する MCP サーバー",
   });
 
   // --- Tool 1: extract_voice_features ---
@@ -96,7 +97,7 @@ export function createMcpServer(): McpServer {
     {
       title: "トークン送金",
       description:
-        "ZK Proof を含む UserOperation で ETH または USDC を送金します",
+        "ZK Proof を含む UserOperation で ETH / USDC を送金し、オンチェーン状態を更新します（残高不足や証明不正時はエラー）",
       inputSchema: transferTokensInput,
     },
     async ({ from, to, amount, token, proof }) =>
