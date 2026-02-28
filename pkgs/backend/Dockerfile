@@ -18,7 +18,10 @@ RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 COPY app.py /app/app.py
+COPY feature_extraction.py /app/feature_extraction.py
+COPY proof_generation.py /app/proof_generation.py
 COPY api.http /app/api.http
+COPY zk /app/zk
 
 EXPOSE 8080
 

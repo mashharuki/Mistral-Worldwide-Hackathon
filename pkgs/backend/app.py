@@ -1,12 +1,24 @@
 import os
+from pathlib import Path
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from feature_extraction import AudioFormatError, AudioQualityError, extract_voice_features
+from proof_generation import (
+    ProofGenerationError,
+    build_generate_proof_response,
+    compute_poseidon_commitment,
+)
 
 
 def create_app() -> Flask:
     app = Flask(__name__)
     CORS(app)
+    circuit_root = Path(
+        os.getenv(
+            "ZK_CIRCUIT_ROOT",
+            os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "circuit")),
+        )
+    )
 
     @app.get("/health")
     def health():
@@ -39,6 +51,95 @@ def create_app() -> Flask:
                     {
                         "error": {
                             "code": "INVALID_AUDIO",
+                            "message": str(error),
+                        }
+                    }
+                ),
+                400,
+            )
+
+    @app.post("/generate-proof")
+    def generate_proof():
+        payload = request.get_json(silent=True) or {}
+        reference_features = payload.get("referenceFeatures")
+        current_features = payload.get("currentFeatures")
+        salt = str(payload.get("salt", ""))
+        if reference_features is None or current_features is None or salt == "":
+            return (
+                jsonify(
+                    {
+                        "error": {
+                            "code": "BAD_REQUEST",
+                            "message": "referenceFeatures, currentFeatures, salt are required",
+                        }
+                    }
+                ),
+                400,
+            )
+
+        try:
+            response = build_generate_proof_response(
+                reference_features=[int(value) for value in reference_features],
+                current_features=[int(value) for value in current_features],
+                salt=salt,
+                circuit_name="VoiceOwnership",
+                circuit_root=circuit_root,
+                hamming_threshold=128,
+            )
+            return jsonify(response), 200
+        except (ValueError, ProofGenerationError) as error:
+            return (
+                jsonify(
+                    {
+                        "error": {
+                            "code": "PROOF_GENERATION_ERROR",
+                            "message": str(error),
+                        }
+                    }
+                ),
+                400,
+            )
+
+    @app.post("/generate-commitment")
+    def generate_commitment():
+        payload = request.get_json(silent=True) or {}
+        features = payload.get("features")
+        salt = str(payload.get("salt", ""))
+        if features is None or salt == "":
+            return (
+                jsonify(
+                    {
+                        "error": {
+                            "code": "BAD_REQUEST",
+                            "message": "features and salt are required",
+                        }
+                    }
+                ),
+                400,
+            )
+
+        try:
+            packed_features = [int(value) for value in features]
+            commitment = compute_poseidon_commitment(
+                packed_features,
+                salt,
+                circuit_root,
+            )
+            return (
+                jsonify(
+                    {
+                        "commitment": commitment,
+                        "packedFeatures": [str(value) for value in packed_features],
+                    }
+                ),
+                200,
+            )
+        except (ValueError, ProofGenerationError) as error:
+            return (
+                jsonify(
+                    {
+                        "error": {
+                            "code": "COMMITMENT_GENERATION_ERROR",
                             "message": str(error),
                         }
                     }
