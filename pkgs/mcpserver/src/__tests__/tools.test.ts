@@ -207,3 +207,181 @@ describe("generate_zk_wallet tool", () => {
     await server.close();
   });
 });
+
+// ============================================================
+// Task 4.3: get_wallet_balance, get_wallet_address, show_wallet_qrcode
+// ============================================================
+
+describe("get_wallet_balance tool", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return ETH and USDC balances in friendly format", async () => {
+    // ETH balance: 0.5 ETH = 500000000000000000 wei
+    vi.mocked(viemClient.getBalance).mockResolvedValue(
+      500000000000000000n,
+    );
+    // Bytecode exists -> wallet is deployed
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    // USDC balance (6 decimals): 100 USDC = 100000000
+    vi.mocked(viemClient.readContract).mockResolvedValue(100000000n);
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "get_wallet_balance",
+      arguments: {
+        walletAddress: "0x1234567890123456789012345678901234567890",
+      },
+    });
+
+    expect(result.isError).toBeFalsy();
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    const parsed = JSON.parse(textContent[0].text);
+    expect(parsed.eth).toBe("0.5 ETH");
+    expect(parsed.usdc).toBe("100 USDC");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should notify when wallet is not deployed", async () => {
+    vi.mocked(viemClient.getBalance).mockResolvedValue(0n);
+    // No bytecode -> wallet not deployed
+    vi.mocked(viemClient.getBytecode).mockResolvedValue(undefined);
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "get_wallet_balance",
+      arguments: {
+        walletAddress: "0x1234567890123456789012345678901234567890",
+      },
+    });
+
+    expect(result.isError).toBeFalsy();
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    const parsed = JSON.parse(textContent[0].text);
+    expect(parsed.walletDeployed).toBe(false);
+    expect(parsed.message).toContain("未作成");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should return error on RPC failure", async () => {
+    vi.mocked(viemClient.getBytecode).mockRejectedValue(
+      new Error("RPC error"),
+    );
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "get_wallet_balance",
+      arguments: {
+        walletAddress: "0x1234567890123456789012345678901234567890",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("RPC error");
+
+    await client.close();
+    await server.close();
+  });
+});
+
+describe("get_wallet_address tool", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return checksum address from Factory getAddress", async () => {
+    const mockAddress = "0xAbCdEf1234567890AbCdEf1234567890AbCdEf12";
+    vi.mocked(viemClient.readContract).mockResolvedValue(mockAddress);
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "get_wallet_address",
+      arguments: {
+        commitment:
+          "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      },
+    });
+
+    expect(viemClient.readContract).toHaveBeenCalled();
+    expect(result.isError).toBeFalsy();
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    const parsed = JSON.parse(textContent[0].text);
+    expect(parsed.address).toBe(mockAddress);
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should return error on contract call failure", async () => {
+    vi.mocked(viemClient.readContract).mockRejectedValue(
+      new Error("Factory getAddress failed"),
+    );
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "get_wallet_address",
+      arguments: {
+        commitment:
+          "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("Factory getAddress failed");
+
+    await client.close();
+    await server.close();
+  });
+});
+
+describe("show_wallet_qrcode tool", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return EIP-681 URI and QR data", async () => {
+    const { server, client } = await createTestClient();
+    const walletAddress = "0x1234567890123456789012345678901234567890";
+    const result = await client.callTool({
+      name: "show_wallet_qrcode",
+      arguments: { walletAddress },
+    });
+
+    expect(result.isError).toBeFalsy();
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    const parsed = JSON.parse(textContent[0].text);
+    // EIP-681 format: ethereum:<address>@<chainId>
+    expect(parsed.eip681Uri).toContain("ethereum:");
+    expect(parsed.eip681Uri).toContain(walletAddress);
+    expect(parsed.eip681Uri).toContain("84532");
+    expect(parsed.qrData).toBeDefined();
+
+    await client.close();
+    await server.close();
+  });
+});

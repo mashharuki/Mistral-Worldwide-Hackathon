@@ -1,16 +1,19 @@
-import { Hono } from "hono";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPTransport } from "@hono/mcp";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { Hono } from "hono";
 import {
   extractVoiceFeaturesInput,
   generateZkWalletInput,
-  getWalletBalanceInput,
   getWalletAddressInput,
+  getWalletBalanceInput,
   showWalletQrcodeInput,
   transferTokensInput,
 } from "./lib/schemas.js";
 import { handleExtractVoiceFeatures } from "./tools/extractVoiceFeatures.js";
 import { handleGenerateZkWallet } from "./tools/generateZkWallet.js";
+import { handleGetWalletAddress } from "./tools/getWalletAddress.js";
+import { handleGetWalletBalance } from "./tools/getWalletBalance.js";
+import { handleShowWalletQrcode } from "./tools/showWalletQrcode.js";
 
 /**
  * 6 ツールを登録した McpServer を生成する
@@ -19,6 +22,7 @@ export function createMcpServer(): McpServer {
   const server = new McpServer({
     name: "voice-zk-wallet-mcp",
     version: "0.1.0",
+    description: "音声特徴量から ZK ウォレットを生成する MCP サーバー",
   });
 
   // --- Tool 1: extract_voice_features ---
@@ -55,15 +59,8 @@ export function createMcpServer(): McpServer {
         "指定ウォレットの ETH / USDC 残高をフレンドリーな形式で返却します",
       inputSchema: getWalletBalanceInput,
     },
-    async ({ walletAddress }) => {
-      // TODO: Task 4.3 で実装
-      return {
-        content: [
-          { type: "text" as const, text: "Not implemented yet" },
-        ],
-        isError: true,
-      };
-    },
+    async ({ walletAddress }) =>
+      handleGetWalletBalance({ walletAddress }),
   );
 
   // --- Tool 4: get_wallet_address ---
@@ -75,15 +72,8 @@ export function createMcpServer(): McpServer {
         "声のコミットメントから Factory 経由でウォレットアドレスを算出します",
       inputSchema: getWalletAddressInput,
     },
-    async ({ commitment }) => {
-      // TODO: Task 4.3 で実装
-      return {
-        content: [
-          { type: "text" as const, text: "Not implemented yet" },
-        ],
-        isError: true,
-      };
-    },
+    async ({ commitment }) =>
+      handleGetWalletAddress({ commitment }),
   );
 
   // --- Tool 5: show_wallet_qrcode ---
@@ -95,15 +85,8 @@ export function createMcpServer(): McpServer {
         "ウォレットアドレスの EIP-681 ペイメントリンク付き QR コードデータを生成します",
       inputSchema: showWalletQrcodeInput,
     },
-    async ({ walletAddress }) => {
-      // TODO: Task 4.3 で実装
-      return {
-        content: [
-          { type: "text" as const, text: "Not implemented yet" },
-        ],
-        isError: true,
-      };
-    },
+    async ({ walletAddress }) =>
+      handleShowWalletQrcode({ walletAddress }),
   );
 
   // --- Tool 6: transfer_tokens ---
