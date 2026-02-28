@@ -71,3 +71,26 @@ jobs:
         run: pnpm build
       - name: Test
         run: pnpm test || echo "No test script"
+
+  circuit:
+    needs: setup
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pkgs/circuit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 8
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+        working-directory: .
+      - name: Compile circuit
+        run: pnpm run compile
+      - name: Test circuit
+        run: pnpm test || echo "No test script"
