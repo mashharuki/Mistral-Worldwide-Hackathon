@@ -1,0 +1,225 @@
+@base_url = http://localhost:3000
+
+# ============================================================
+# Health Check
+# ============================================================
+
+### Health check (root)
+GET {{base_url}}/
+Accept: application/json
+
+### Health check (/health)
+GET {{base_url}}/health
+Accept: application/json
+
+# ============================================================
+# MCP Protocol: Initialize
+# ============================================================
+
+### MCP Initialize
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-03-26",
+    "capabilities": {},
+    "clientInfo": {
+      "name": "http-test-client",
+      "version": "1.0.0"
+    }
+  }
+}
+
+# ============================================================
+# MCP Protocol: List Tools
+# ============================================================
+
+### MCP tools/list - 登録済みツール一覧を取得
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/list",
+  "params": {}
+}
+
+# ============================================================
+# Tool 1: extract_voice_features
+# ============================================================
+
+### extract_voice_features - 音声から特徴量を抽出
+# ※ Backend Server (BACKEND_URL) が起動している必要あり
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 10,
+  "method": "tools/call",
+  "params": {
+    "name": "extract_voice_features",
+    "arguments": {
+      "audio": "UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA="
+    }
+  }
+}
+
+# ============================================================
+# Tool 2: generate_zk_wallet
+# ============================================================
+
+### generate_zk_wallet - 特徴量からウォレットアドレスを算出 (salt 自動生成)
+# ※ Backend Server が起動している必要あり
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 20,
+  "method": "tools/call",
+  "params": {
+    "name": "generate_zk_wallet",
+    "arguments": {
+      "features": [123456789, 987654321, 111111111, 222222222, 333333333, 444444444, 555555555, 666666666]
+    }
+  }
+}
+
+### generate_zk_wallet - salt を指定
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 21,
+  "method": "tools/call",
+  "params": {
+    "name": "generate_zk_wallet",
+    "arguments": {
+      "features": [123456789, 987654321, 111111111, 222222222, 333333333, 444444444, 555555555, 666666666],
+      "salt": "0x0000000000000000000000000000000000000000000000000000000000000001"
+    }
+  }
+}
+
+# ============================================================
+# Tool 3: get_wallet_balance
+# ============================================================
+
+### get_wallet_balance - ウォレット残高を取得
+# ※ walletAddress を実際のアドレスに置き換えてください
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 30,
+  "method": "tools/call",
+  "params": {
+    "name": "get_wallet_balance",
+    "arguments": {
+      "walletAddress": "0x1234567890123456789012345678901234567890"
+    }
+  }
+}
+
+# ============================================================
+# Tool 4: get_wallet_address
+# ============================================================
+
+### get_wallet_address - コミットメントからウォレットアドレスを算出
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 40,
+  "method": "tools/call",
+  "params": {
+    "name": "get_wallet_address",
+    "arguments": {
+      "commitment": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+    }
+  }
+}
+
+# ============================================================
+# Tool 5: show_wallet_qrcode
+# ============================================================
+
+### show_wallet_qrcode - EIP-681 QR コードデータを生成
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 50,
+  "method": "tools/call",
+  "params": {
+    "name": "show_wallet_qrcode",
+    "arguments": {
+      "walletAddress": "0x1234567890123456789012345678901234567890"
+    }
+  }
+}
+
+# ============================================================
+# Tool 6: transfer_tokens
+# ============================================================
+
+### transfer_tokens - ETH を送金
+# ※ RELAYER_PRIVATE_KEY の設定と、from ウォレットのデプロイ・残高が必要
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 60,
+  "method": "tools/call",
+  "params": {
+    "name": "transfer_tokens",
+    "arguments": {
+      "from": "0x1234567890123456789012345678901234567890",
+      "to": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+      "amount": "0.001",
+      "token": "ETH",
+      "proof": "{\"proof\":{\"a\":[\"1\",\"2\"],\"b\":[[\"3\",\"4\"],[\"5\",\"6\"]],\"c\":[\"7\",\"8\"]},\"publicSignals\":[\"12345\"]}"
+    }
+  }
+}
+
+### transfer_tokens - USDC を送金
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 61,
+  "method": "tools/call",
+  "params": {
+    "name": "transfer_tokens",
+    "arguments": {
+      "from": "0x1234567890123456789012345678901234567890",
+      "to": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+      "amount": "10",
+      "token": "USDC",
+      "proof": "{\"proof\":{\"a\":[\"1\",\"2\"],\"b\":[[\"3\",\"4\"],[\"5\",\"6\"]],\"c\":[\"7\",\"8\"]},\"publicSignals\":[\"12345\"]}"
+    }
+  }
+}
