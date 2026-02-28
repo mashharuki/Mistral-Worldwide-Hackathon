@@ -2,3 +2,5 @@ node_modules
 zkey
 VoiceCommitment_cpp
 VoiceCommitment_js
+VoiceOwnership_cpp
+VoiceOwnership_js

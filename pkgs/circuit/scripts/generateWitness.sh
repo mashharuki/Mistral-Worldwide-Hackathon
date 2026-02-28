@@ -1,21 +1,24 @@
 #!/bin/bash
+set -euo pipefail
 
-# Variable to store the name of the circuit
-# CIRCUIT=PasswordHash
-CIRCUIT=VoiceCommitment
+# Default circuits when no argument is provided
+DEFAULT_CIRCUITS=("VoiceCommitment" "VoiceOwnership")
 
-# In case there is a circuit name as input
-if [ "$1" ]; then
-    CIRCUIT=$1
+if [ "$#" -gt 0 ]; then
+    CIRCUITS=("$@")
+else
+    CIRCUITS=("${DEFAULT_CIRCUITS[@]}")
 fi
 
-# Compile the circuit
-circom ./src/${CIRCUIT}.circom --r1cs --wasm --sym --c
+for CIRCUIT in "${CIRCUITS[@]}"; do
+    echo "----- Compile ${CIRCUIT} -----"
+    circom "./src/${CIRCUIT}.circom" --r1cs --wasm --sym --c
 
-# Generate the witness.wtns
-INPUT_FILE=./data/${CIRCUIT}.json
-if [ ! -f "$INPUT_FILE" ]; then
-    INPUT_FILE=./data/input.json
-fi
+    INPUT_FILE="./data/${CIRCUIT}.json"
+    if [ ! -f "$INPUT_FILE" ]; then
+        INPUT_FILE="./data/input.json"
+    fi
 
-node ${CIRCUIT}_js/generate_witness.js ${CIRCUIT}_js/${CIRCUIT}.wasm "$INPUT_FILE" ${CIRCUIT}_js/witness.wtns
+    echo "----- Generate witness ${CIRCUIT} (input: ${INPUT_FILE}) -----"
+    node "${CIRCUIT}_js/generate_witness.js" "${CIRCUIT}_js/${CIRCUIT}.wasm" "$INPUT_FILE" "${CIRCUIT}_js/witness.wtns"
+done

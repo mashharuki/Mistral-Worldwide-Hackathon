@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require("path");
 const circomlibjs = require("circomlibjs");
 
+const DEFAULT_CIRCUITS = ["VoiceCommitment", "VoiceOwnership"];
+
 function defaultVoiceFeatures() {
   return [
     1n,
@@ -30,23 +32,77 @@ async function createVoiceCommitmentInput() {
   };
 }
 
-async function main() {
-  const circuit = process.argv[2] || "VoiceCommitment";
-  if (circuit !== "VoiceCommitment") {
-    throw new Error(`Unsupported circuit: ${circuit}`);
+async function createVoiceOwnershipInput() {
+  const poseidon = await circomlibjs.buildPoseidon();
+  const salt = 42n;
+  const referenceFeatures = [
+    0n,
+    0n,
+    0n,
+    0n,
+    0n,
+    0n,
+    0n,
+    0n,
+  ];
+  const currentFeatures = [
+    (1n << 64n) - 1n,
+    (1n << 63n) - 1n,
+    0n,
+    0n,
+    0n,
+    0n,
+    0n,
+    0n,
+  ];
+  const publicCommitment = poseidon.F.toString(
+    poseidon([...referenceFeatures, salt]),
+  );
+
+  return {
+    input: {
+      referenceFeatures: referenceFeatures.map((value) => value.toString()),
+      currentFeatures: currentFeatures.map((value) => value.toString()),
+      salt: salt.toString(),
+      publicCommitment,
+    },
+    commitment: publicCommitment,
+  };
+}
+
+async function buildInputForCircuit(circuit) {
+  if (circuit === "VoiceCommitment") {
+    return createVoiceCommitmentInput();
   }
+  if (circuit === "VoiceOwnership") {
+    return createVoiceOwnershipInput();
+  }
+  throw new Error(`Unsupported circuit: ${circuit}`);
+}
 
-  const { input, commitment } = await createVoiceCommitmentInput();
+function writeJson(filePath, value) {
+  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+async function main() {
+  const circuits = process.argv.slice(2);
+  const targetCircuits = circuits.length > 0 ? circuits : DEFAULT_CIRCUITS;
   const dataDir = path.join(__dirname, "../data");
-  const circuitInputPath = path.join(dataDir, `${circuit}.json`);
-  const legacyInputPath = path.join(dataDir, "input.json");
 
-  fs.writeFileSync(circuitInputPath, `${JSON.stringify(input, null, 2)}\n`);
-  fs.writeFileSync(legacyInputPath, `${JSON.stringify(input, null, 2)}\n`);
+  for (const circuit of targetCircuits) {
+    const { input, commitment } = await buildInputForCircuit(circuit);
+    const circuitInputPath = path.join(dataDir, `${circuit}.json`);
+    writeJson(circuitInputPath, input);
 
-  console.log("Generated input file:", circuitInputPath);
-  console.log("Updated fallback input file:", legacyInputPath);
-  console.log("Expected commitment:", commitment);
+    if (circuit === "VoiceCommitment") {
+      const legacyInputPath = path.join(dataDir, "input.json");
+      writeJson(legacyInputPath, input);
+      console.log("Updated fallback input file:", legacyInputPath);
+    }
+
+    console.log("Generated input file:", circuitInputPath);
+    console.log("Expected commitment:", commitment);
+  }
 }
 
 main().catch((error) => {

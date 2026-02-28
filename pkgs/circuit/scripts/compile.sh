@@ -1,13 +1,16 @@
 #!/bin/bash
+set -euo pipefail
 
-# Variable to store the name of the circuit
-# CIRCUIT=PasswordHash
-CIRCUIT=VoiceCommitment
+# Default circuits when no argument is provided
+DEFAULT_CIRCUITS=("VoiceCommitment" "VoiceOwnership")
 
-# In case there is a circuit name as input
-if [ "$1" ]; then
-    CIRCUIT=$1
+if [ "$#" -gt 0 ]; then
+    CIRCUITS=("$@")
+else
+    CIRCUITS=("${DEFAULT_CIRCUITS[@]}")
 fi
 
-# Compile the circuit
-circom ./src/${CIRCUIT}.circom --r1cs --wasm --sym --c
+for CIRCUIT in "${CIRCUITS[@]}"; do
+    echo "----- Compile ${CIRCUIT} -----"
+    circom "./src/${CIRCUIT}.circom" --r1cs --wasm --sym --c
+done
