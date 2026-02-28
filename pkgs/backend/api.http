@@ -1,0 +1,30 @@
+### Health check
+GET http://localhost:8080/health
+Accept: application/json
+
+### Extract features (Task 2.2予定)
+POST http://localhost:8080/extract-features
+Content-Type: application/json
+
+{
+  "audio": "BASE64_AUDIO_PAYLOAD"
+}
+
+### Generate proof (Task 2.3予定)
+POST http://localhost:8080/generate-proof
+Content-Type: application/json
+
+{
+  "referenceFeatures": [],
+  "currentFeatures": [],
+  "salt": "0"
+}
+
+### Generate commitment (Task 2.3予定)
+POST http://localhost:8080/generate-commitment
+Content-Type: application/json
+
+{
+  "features": [],
+  "salt": "0"
+}

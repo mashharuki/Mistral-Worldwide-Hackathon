@@ -26,7 +26,7 @@
 
 ## Task 2. バックエンドサーバー — 声の処理と ZK 証明生成
 
-- [ ] 2.1 (P) Flask API の骨格構築と Docker 設定
+- [x] 2.1 (P) Flask API の骨格構築と Docker 設定
   - Python Flask アプリケーションの骨格を作成し、ヘルスチェックエンドポイントを実装する
   - CORS 設定、JSON レスポンス形式、エラーハンドリングのベース構造を整備する
   - Docker コンテナ設定を作成し、Python 3.11 + Node.js（snarkjs 用）のマルチステージビルドを構成する
