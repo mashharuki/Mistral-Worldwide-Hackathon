@@ -17,7 +17,7 @@
   - 回路コンパイルが通ることを確認する
   - _Requirements: 2.2, 2.4_
 
-- [ ] 1.3 回路テストと Groth16 パイプラインの実行
+- [x] 1.3 回路テストと Groth16 パイプラインの実行
   - VoiceCommitment の単体テストを作成し、同一入力からの決定論的なコミットメント生成を検証する
   - VoiceOwnership のテストを作成し、ハミング距離閾値の境界値（閾値ちょうど、閾値+1、閾値-1）を検証する
   - 既存の executeGroth16.sh パイプラインを VoiceOwnership 回路に適応させ、Groth16 セットアップ → 証明生成 → 検証 → Solidity Verifier 生成までを実行する

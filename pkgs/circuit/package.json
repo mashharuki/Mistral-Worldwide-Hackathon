@@ -12,8 +12,8 @@
     "generateInput": "node ./scripts/generateInput.js",
     "test:VoiceCommitment": "node ./test/VoiceCommitment.test.js",
     "test:VoiceOwnership": "node ./test/VoiceOwnership.test.js",
-    "test": "node ./test/VoiceCommitment.test.js",
-    "cp:verifier": "cp VoiceCommitmentVerifier.sol ../backend/contracts",
+    "test": "pnpm run test:VoiceCommitment && pnpm run test:VoiceOwnership",
+    "cp:verifier": "./scripts/copyVerifier.sh",
     "cp:zk": "cp VoiceCommitment_js/VoiceCommitment.wasm ../backend/zk && cp zkey/VoiceCommitment_final.zkey ../backend/zk && cp VoiceCommitment_js/VoiceCommitment.wasm ../frontend/zk && cp zkey/VoiceCommitment_final.zkey ../frontend/zk"
   },
   "keywords": [],

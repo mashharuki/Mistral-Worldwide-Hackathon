@@ -7,6 +7,9 @@ CIRCUITS=()
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
+        --)
+            shift
+            ;;
         -p|--ptau)
             PTAU="$2"
             shift 2
