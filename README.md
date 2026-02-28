@@ -204,13 +204,57 @@ https://mistral-worldwide-hackathon-fronten.vercel.app
 
 - ビルド
 
+  ```bash
+  pnpm mcpserver run build
+  ```
+
 - テスト
+
+  ```bash
+  pnpm mcpserver run test
+  ```
 
 - ローカルで起動
 
+  ```bash
+  pnpm mcpserver run dev
+  ```
+
+  MCPインスペクターを使ったテストは以下の通り
+
+  ```bash
+  npx @modelcontextprotocol/inspector
+  ```
+
+- Dockerコンテナイメージのビルド
+
+  ```bash
+  pnpm mcpserver run docker:build
+  ```
+
+- ローカルでのDockerコンテナ起動
+
+  ```bash
+  pnpm mcpserver run docker:run
+  ```
+
+  もしローカルでMCPサーバーのチェックをしたいなら追加で以下のコマンドを実行
+
+  ```bash
+  ngrok http 3000
+  ```
+
 - Cloud Runにデプロイ
 
+  ```bash
+  pnpm mcpserver run cloudrun:deploy
+  ```
+
 - Cloud Runから削除
+
+  ```bash
+  pnpm mcpserver run cloudrun:cleanup
+  ```
 
 ### フロントエンド
 
