@@ -14,6 +14,7 @@ import { handleGenerateZkWallet } from "./tools/generateZkWallet.js";
 import { handleGetWalletAddress } from "./tools/getWalletAddress.js";
 import { handleGetWalletBalance } from "./tools/getWalletBalance.js";
 import { handleShowWalletQrcode } from "./tools/showWalletQrcode.js";
+import { handleTransferTokens } from "./tools/transferTokens.js";
 
 /**
  * 6 ツールを登録した McpServer を生成する
@@ -98,15 +99,8 @@ export function createMcpServer(): McpServer {
         "ZK Proof を含む UserOperation で ETH または USDC を送金します",
       inputSchema: transferTokensInput,
     },
-    async ({ from, to, amount, token, proof }) => {
-      // TODO: Task 4.4 で実装
-      return {
-        content: [
-          { type: "text" as const, text: "Not implemented yet" },
-        ],
-        isError: true,
-      };
-    },
+    async ({ from, to, amount, token, proof }) =>
+      handleTransferTokens({ from, to, amount, token, proof }),
   );
 
   return server;

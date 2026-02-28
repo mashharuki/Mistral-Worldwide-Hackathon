@@ -1,20 +1,6 @@
 import { formatEther, formatUnits } from "viem";
 import { viemClient } from "../lib/viemClient.js";
-
-/** MockERC20 (USDC) on Base Sepolia */
-const USDC_ADDRESS =
-  (process.env.USDC_ADDRESS ??
-    "0x6aec1F4fddaa5c3dD559d884ED4905aE108d5Caa") as `0x${string}`;
-
-const erc20BalanceOfAbi = [
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const;
+import { USDC_ADDRESS, erc20Abi } from "../lib/contracts.js";
 
 /**
  * get_wallet_balance ツールハンドラー
@@ -59,7 +45,7 @@ export async function handleGetWalletBalance({
     // USDC 残高 (6 decimals)
     const usdcBalance = (await viemClient.readContract({
       address: USDC_ADDRESS,
-      abi: erc20BalanceOfAbi,
+      abi: erc20Abi,
       functionName: "balanceOf",
       args: [address],
     })) as bigint;

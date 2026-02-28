@@ -21,11 +21,21 @@ vi.mock("../lib/viemClient.js", () => ({
     readContract: vi.fn(),
     getBalance: vi.fn(),
     getBytecode: vi.fn(),
+    waitForTransactionReceipt: vi.fn(),
+  },
+}));
+
+// relayerClient をモック
+vi.mock("../lib/relayerClient.js", () => ({
+  relayerClient: {
+    writeContract: vi.fn(),
+    account: { address: "0x0000000000000000000000000000000000000001" },
   },
 }));
 
 import { backendClient } from "../lib/backendClient.js";
 import { viemClient } from "../lib/viemClient.js";
+import { relayerClient } from "../lib/relayerClient.js";
 
 async function createTestClient() {
   const server = createMcpServer();
@@ -380,6 +390,221 @@ describe("show_wallet_qrcode tool", () => {
     expect(parsed.eip681Uri).toContain(walletAddress);
     expect(parsed.eip681Uri).toContain("84532");
     expect(parsed.qrData).toBeDefined();
+
+    await client.close();
+    await server.close();
+  });
+});
+
+// ============================================================
+// Task 4.4: transfer_tokens
+// ============================================================
+
+const mockProof = JSON.stringify({
+  proof: { a: ["1", "2"], b: [["3", "4"], ["5", "6"]], c: ["7", "8"] },
+  publicSignals: ["12345"],
+});
+
+describe("transfer_tokens tool", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should transfer ETH successfully", async () => {
+    // Wallet deployed
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    // 1 ETH balance
+    vi.mocked(viemClient.getBalance).mockResolvedValue(
+      1000000000000000000n,
+    );
+    // readContract: nonce from EntryPoint
+    vi.mocked(viemClient.readContract).mockResolvedValue(0n);
+    // Relayer sends tx
+    const mockTxHash =
+      "0xaaaa000000000000000000000000000000000000000000000000000000000001";
+    vi.mocked(relayerClient.writeContract).mockResolvedValue(
+      mockTxHash as `0x${string}`,
+    );
+    // Receipt
+    vi.mocked(viemClient.waitForTransactionReceipt).mockResolvedValue({
+      status: "success",
+      transactionHash: mockTxHash,
+    } as any);
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "0.1",
+        token: "ETH",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBeFalsy();
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    const parsed = JSON.parse(textContent[0].text);
+    expect(parsed.txHash).toBe(mockTxHash);
+    expect(parsed.status).toBe("confirmed");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should transfer USDC successfully", async () => {
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    // readContract: first call = USDC balanceOf, second call = nonce
+    vi.mocked(viemClient.readContract)
+      .mockResolvedValueOnce(100000000n) // 100 USDC
+      .mockResolvedValueOnce(0n); // nonce
+    const mockTxHash =
+      "0xbbbb000000000000000000000000000000000000000000000000000000000002";
+    vi.mocked(relayerClient.writeContract).mockResolvedValue(
+      mockTxHash as `0x${string}`,
+    );
+    vi.mocked(viemClient.waitForTransactionReceipt).mockResolvedValue({
+      status: "success",
+      transactionHash: mockTxHash,
+    } as any);
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "10",
+        token: "USDC",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBeFalsy();
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    const parsed = JSON.parse(textContent[0].text);
+    expect(parsed.txHash).toBe(mockTxHash);
+    expect(parsed.status).toBe("confirmed");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should return error on insufficient ETH balance", async () => {
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    vi.mocked(viemClient.getBalance).mockResolvedValue(0n); // 0 ETH
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "0.1",
+        token: "ETH",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("残高不足");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should return error on insufficient USDC balance", async () => {
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    vi.mocked(viemClient.readContract).mockResolvedValue(0n); // 0 USDC
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "10",
+        token: "USDC",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("残高不足");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should return error when wallet is not deployed", async () => {
+    vi.mocked(viemClient.getBytecode).mockResolvedValue(undefined);
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "0.1",
+        token: "ETH",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("未作成");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should return error on transaction failure", async () => {
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    vi.mocked(viemClient.getBalance).mockResolvedValue(
+      1000000000000000000n,
+    );
+    vi.mocked(viemClient.readContract).mockResolvedValue(0n);
+    vi.mocked(relayerClient.writeContract).mockRejectedValue(
+      new Error("Transaction reverted"),
+    );
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "0.1",
+        token: "ETH",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("Transaction reverted");
 
     await client.close();
     await server.close();

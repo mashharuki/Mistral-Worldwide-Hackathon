@@ -102,7 +102,7 @@
   - `show_wallet_qrcode` ツールを実装し、EIP-681 形式のペイメントリンクを含む QR コード用データを生成して返却する
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 5.1, 5.4, 7.2, 7.5_
 
-- [ ] 4.4 トークン送金ツールの実装
+- [x] 4.4 トークン送金ツールの実装
   - `transfer_tokens` ツールを実装し、ETH 送金と USDC（ERC-20 transfer）送金の両方に対応する
   - ZK Proof データを含む UserOperation を構築し、EntryPoint 経由でトランザクションを送信する
   - 送金前に残高チェックを行い、不足時はエラーを返却する
