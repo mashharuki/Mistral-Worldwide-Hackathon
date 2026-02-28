@@ -23,8 +23,8 @@
       }
     ],
     "data": [
-      {"column1": "value1", "column2": "value2"},
-      {"column1": "value3", "column2": "value4"}
+      { "column1": "value1", "column2": "value2" },
+      { "column1": "value3", "column2": "value4" }
     ],
     "target": "target_column_name",
     "metadata": {
@@ -63,11 +63,36 @@
         }
       ],
       "data": [
-        {"age": 25, "income": 45000, "education": "bachelor", "purchased": "yes"},
-        {"age": 34, "income": 67000, "education": "master", "purchased": "yes"},
-        {"age": 19, "income": 23000, "education": "high_school", "purchased": "no"},
-        {"age": 42, "income": 85000, "education": "bachelor", "purchased": "yes"},
-        {"age": 28, "income": 52000, "education": "bachelor", "purchased": "no"}
+        {
+          "age": 25,
+          "income": 45000,
+          "education": "bachelor",
+          "purchased": "yes"
+        },
+        {
+          "age": 34,
+          "income": 67000,
+          "education": "master",
+          "purchased": "yes"
+        },
+        {
+          "age": 19,
+          "income": 23000,
+          "education": "high_school",
+          "purchased": "no"
+        },
+        {
+          "age": 42,
+          "income": 85000,
+          "education": "bachelor",
+          "purchased": "yes"
+        },
+        {
+          "age": 28,
+          "income": 52000,
+          "education": "bachelor",
+          "purchased": "no"
+        }
       ],
       "target": "purchased",
       "metadata": {

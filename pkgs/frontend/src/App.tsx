@@ -1,201 +1,204 @@
-import { useConversation } from '@elevenlabs/react'
-import { useMemo, useState } from 'react'
-import './css/App.css'
+import { useConversation } from "@elevenlabs/react";
+import { useMemo, useState } from "react";
+import "./css/App.css";
 
-type ConnectionType = 'webrtc' | 'websocket'
-type MessageRole = 'user' | 'agent' | 'debug' | 'system'
+type ConnectionType = "webrtc" | "websocket";
+type MessageRole = "user" | "agent" | "debug" | "system";
 
 type MessageItem = {
-  id: string
-  role: MessageRole
-  text: string
-  isFinal: boolean
-}
+  id: string;
+  role: MessageRole;
+  text: string;
+  isFinal: boolean;
+};
 
-const DEFAULT_VOLUME_RATE = 0.8
-const DEFAULT_CONNECTION_TYPE: ConnectionType = 'webrtc'
+const DEFAULT_VOLUME_RATE = 0.8;
+const DEFAULT_CONNECTION_TYPE: ConnectionType = "webrtc";
 
 const getRandomId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
-}
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
-  return typeof value === 'object' && value !== null
-}
+  return typeof value === "object" && value !== null;
+};
 
 const getStringValue = (value: unknown): string => {
-  return typeof value === 'string' ? value : ''
-}
+  return typeof value === "string" ? value : "";
+};
 
 const getBooleanValue = (value: unknown): boolean => {
-  return typeof value === 'boolean' ? value : false
-}
+  return typeof value === "boolean" ? value : false;
+};
 
 const getMessageRole = (value: unknown): MessageRole => {
-  const roleValue = getStringValue(value).toLowerCase()
-  if (roleValue === 'user' || roleValue === 'agent' || roleValue === 'debug') {
-    return roleValue
+  const roleValue = getStringValue(value).toLowerCase();
+  if (roleValue === "user" || roleValue === "agent" || roleValue === "debug") {
+    return roleValue;
   }
-  return 'system'
-}
+  return "system";
+};
 
 const buildMessageItem = (message: unknown): MessageItem => {
   if (isRecord(message)) {
     const textValue =
       getStringValue(message.text) ||
       getStringValue(message.message) ||
-      JSON.stringify(message)
+      JSON.stringify(message);
     const roleText =
       getStringValue(message.role) ||
       getStringValue(message.type) ||
-      getStringValue(message.source)
-    const roleValue = getMessageRole(roleText)
+      getStringValue(message.source);
+    const roleValue = getMessageRole(roleText);
     const isFinalValue =
-      getBooleanValue(message.isFinal) || getBooleanValue(message.final)
+      getBooleanValue(message.isFinal) || getBooleanValue(message.final);
     return {
       id: getRandomId(),
       role: roleValue,
       text: textValue,
       isFinal: isFinalValue,
-    }
+    };
   }
 
   return {
     id: getRandomId(),
-    role: 'system',
+    role: "system",
     text: getStringValue(message) || String(message),
     isFinal: true,
-  }
-}
+  };
+};
 
 const buildErrorText = (error: unknown): string => {
   if (error instanceof Error) {
-    return error.message
+    return error.message;
   }
-  if (typeof error === 'string') {
-    return error
+  if (typeof error === "string") {
+    return error;
   }
-  return JSON.stringify(error)
-}
+  return JSON.stringify(error);
+};
 
 function App() {
   const agentIdFromEnv =
-    typeof import.meta.env.VITE_ELEVENLABS_AGENT_ID === 'string'
+    typeof import.meta.env.VITE_ELEVENLABS_AGENT_ID === "string"
       ? import.meta.env.VITE_ELEVENLABS_AGENT_ID
-      : ''
-  const [userId, setUserId] = useState('')
+      : "";
+  const [userId, setUserId] = useState("");
   const [connectionType, setConnectionType] = useState<ConnectionType>(
     DEFAULT_CONNECTION_TYPE,
-  )
-  const [micReady, setMicReady] = useState(false)
-  const [micMuted, setMicMuted] = useState(false)
-  const [volumeRate, setVolumeRate] = useState(DEFAULT_VOLUME_RATE)
-  const [statusText, setStatusText] = useState('disconnected')
-  const [modeText, setModeText] = useState('idle')
-  const [errorText, setErrorText] = useState('')
-  const [conversationId, setConversationId] = useState('')
-  const [messages, setMessages] = useState<MessageItem[]>([])
-  const [inputText, setInputText] = useState('')
+  );
+  const [micReady, setMicReady] = useState(false);
+  const [micMuted, setMicMuted] = useState(false);
+  const [volumeRate, setVolumeRate] = useState(DEFAULT_VOLUME_RATE);
+  const [statusText, setStatusText] = useState("disconnected");
+  const [modeText, setModeText] = useState("idle");
+  const [errorText, setErrorText] = useState("");
+  const [conversationId, setConversationId] = useState("");
+  const [messages, setMessages] = useState<MessageItem[]>([]);
+  const [inputText, setInputText] = useState("");
 
   const conversation = useConversation({
     micMuted,
     volume: volumeRate,
     onMessage: (message: unknown) => {
-      setMessages((prevMessages) => [...prevMessages, buildMessageItem(message)])
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        buildMessageItem(message),
+      ]);
     },
     onError: (error: unknown) => {
-      setErrorText(buildErrorText(error))
+      setErrorText(buildErrorText(error));
     },
     onStatusChange: (payload: { status: string }) => {
-      setStatusText(payload.status)
+      setStatusText(payload.status);
     },
     onModeChange: (payload: { mode: string }) => {
-      setModeText(payload.mode)
+      setModeText(payload.mode);
     },
     onConnect: () => {
-      setErrorText('')
+      setErrorText("");
     },
     onDisconnect: () => {
-      setConversationId('')
+      setConversationId("");
     },
-  })
+  });
 
-  const isConnected = useMemo(() => statusText === 'connected', [statusText])
+  const isConnected = useMemo(() => statusText === "connected", [statusText]);
   const canSendFeedback = useMemo(
     () => Boolean(conversation.canSendFeedback),
     [conversation.canSendFeedback],
-  )
+  );
   const isSpeaking = useMemo(
     () => Boolean(conversation.isSpeaking),
     [conversation.isSpeaking],
-  )
+  );
 
   const handleRequestMic = async (): Promise<void> => {
-    setErrorText('')
+    setErrorText("");
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true })
-      setMicReady(true)
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      setMicReady(true);
     } catch (error: unknown) {
-      setErrorText(buildErrorText(error))
+      setErrorText(buildErrorText(error));
     }
-  }
+  };
 
   const handleStartSession = async (): Promise<void> => {
-    setErrorText('')
+    setErrorText("");
     if (!agentIdFromEnv) {
-      setErrorText('VITE_ELEVENLABS_AGENT_ID を設定してください')
-      return
+      setErrorText("VITE_ELEVENLABS_AGENT_ID を設定してください");
+      return;
     }
     try {
       if (!micReady) {
-        await navigator.mediaDevices.getUserMedia({ audio: true })
-        setMicReady(true)
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+        setMicReady(true);
       }
       const newConversationId = await conversation.startSession({
         agentId: agentIdFromEnv,
         connectionType,
         userId: userId ? userId : undefined,
-      })
-      setConversationId(newConversationId)
+      });
+      setConversationId(newConversationId);
     } catch (error: unknown) {
-      setErrorText(buildErrorText(error))
+      setErrorText(buildErrorText(error));
     }
-  }
+  };
 
   const handleEndSession = async (): Promise<void> => {
-    setErrorText('')
+    setErrorText("");
     try {
-      await conversation.endSession()
+      await conversation.endSession();
     } catch (error: unknown) {
-      setErrorText(buildErrorText(error))
+      setErrorText(buildErrorText(error));
     }
-  }
+  };
 
   const handleSendMessage = (): void => {
-    const trimmedText = inputText.trim()
+    const trimmedText = inputText.trim();
     if (!trimmedText) {
-      return
+      return;
     }
-    conversation.sendUserMessage(trimmedText)
-    setInputText('')
-  }
+    conversation.sendUserMessage(trimmedText);
+    setInputText("");
+  };
 
   const handleChangeInputText = (value: string): void => {
-    setInputText(value)
-    conversation.sendUserActivity()
-  }
+    setInputText(value);
+    conversation.sendUserActivity();
+  };
 
   const handleChangeVolumeRate = (value: number): void => {
-    setVolumeRate(value)
-  }
+    setVolumeRate(value);
+  };
 
   const handleToggleMute = (): void => {
-    setMicMuted((prevValue) => !prevValue)
-  }
+    setMicMuted((prevValue) => !prevValue);
+  };
 
   const handleSendFeedback = (isPositive: boolean): void => {
-    conversation.sendFeedback(isPositive)
-  }
+    conversation.sendFeedback(isPositive);
+  };
 
   return (
     <div className="app">
@@ -207,11 +210,11 @@ function App() {
           </p>
         </div>
         <div className="status-panel">
-          <span className={`status-badge ${isConnected ? 'connected' : ''}`}>
+          <span className={`status-badge ${isConnected ? "connected" : ""}`}>
             {statusText}
           </span>
-          <span className={`status-badge ${isSpeaking ? 'speaking' : ''}`}>
-            {isSpeaking ? 'speaking' : 'listening'}
+          <span className={`status-badge ${isSpeaking ? "speaking" : ""}`}>
+            {isSpeaking ? "speaking" : "listening"}
           </span>
           <span className="status-text">{modeText}</span>
         </div>
@@ -275,14 +278,12 @@ function App() {
           <div className="meta">
             <div>
               <span className="meta-label">Conversation ID</span>
-              <span className="meta-value">
-                {conversationId || '未接続'}
-              </span>
+              <span className="meta-value">{conversationId || "未接続"}</span>
             </div>
             <div>
               <span className="meta-label">Mic Ready</span>
               <span className="meta-value">
-                {micReady ? '取得済み' : '未取得'}
+                {micReady ? "取得済み" : "未取得"}
               </span>
             </div>
           </div>
@@ -308,7 +309,7 @@ function App() {
           </div>
           <div className="actions">
             <button className="secondary" onClick={handleToggleMute}>
-              {micMuted ? 'ミュート解除' : 'ミュート'}
+              {micMuted ? "ミュート解除" : "ミュート"}
             </button>
           </div>
           <div className="field">
@@ -365,7 +366,7 @@ function App() {
                 <span className="message-role">{message.role}</span>
                 <span className="message-text">{message.text}</span>
                 <span className="message-meta">
-                  {message.isFinal ? 'final' : 'partial'}
+                  {message.isFinal ? "final" : "partial"}
                 </span>
               </li>
             ))}
@@ -373,7 +374,7 @@ function App() {
         )}
       </section>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

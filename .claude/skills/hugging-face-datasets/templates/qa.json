@@ -4,7 +4,13 @@
   "system_prompt": "Generate high-quality question-answer pairs with clear, informative answers. Include context when needed and ensure questions are well-formed and answerable. Cover diverse topics and question types.",
   "validation_schema": {
     "required_fields": ["question", "answer"],
-    "recommended_fields": ["context", "answer_type", "difficulty", "topic", "source"],
+    "recommended_fields": [
+      "context",
+      "answer_type",
+      "difficulty",
+      "topic",
+      "source"
+    ],
     "field_types": {
       "question": "string",
       "answer": "string|array",

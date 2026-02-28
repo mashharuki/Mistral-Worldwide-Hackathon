@@ -4,7 +4,12 @@
   "system_prompt": "You are an AI assistant expert at using tools and engaging in helpful conversations. Generate training examples that demonstrate natural dialogue patterns, tool usage, and problem-solving interactions.",
   "validation_schema": {
     "required_fields": ["messages"],
-    "recommended_fields": ["scenario", "complexity", "tools_used", "learning_objectives"],
+    "recommended_fields": [
+      "scenario",
+      "complexity",
+      "tools_used",
+      "learning_objectives"
+    ],
     "field_types": {
       "messages": "array",
       "scenario": "string",
@@ -23,7 +28,7 @@
             "type": "function",
             "function": {
               "name": "tool_name",
-              "arguments": {"param": "value"}
+              "arguments": { "param": "value" }
             }
           }
         ]
@@ -49,7 +54,11 @@
       "scenario": "API education and explanation",
       "complexity": "simple",
       "tools_used": [],
-      "learning_objectives": ["API concepts", "educational conversation", "analogical explanation"]
+      "learning_objectives": [
+        "API concepts",
+        "educational conversation",
+        "analogical explanation"
+      ]
     }
   ]
 }

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
- "scripts": {
+  "scripts": {
     "frontend": "pnpm --filter frontend",
     "contract": "pnpm --filter contract",
     "circuit": "pnpm --filter circuit",

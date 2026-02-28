@@ -1,5 +1,5 @@
 :root {
-  font-family: 'Inter', 'Noto Sans JP', system-ui, sans-serif;
+  font-family: "Inter", "Noto Sans JP", system-ui, sans-serif;
   line-height: 1.6;
   font-weight: 400;
   color: #1f2937;
@@ -33,7 +33,9 @@ button {
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 button:disabled {
