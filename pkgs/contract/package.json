@@ -19,7 +19,17 @@
     "local": "npx hardhat node",
     "deploy": "npx hardhat ignition deploy ./ignition/modules/VoiceWalletDeployment.ts",
     "getBalance": "npx hardhat getBalance",
-    "getChainInfo": "npx hardhat getChainInfo"
+    "getChainInfo": "npx hardhat getChainInfo",
+    "deployVerifier": "npx hardhat deployVerifier",
+    "deployVoiceWallet": "npx hardhat deployVoiceWallet",
+    "deployMockERC20": "npx hardhat deployMockERC20",
+    "walletInfo": "npx hardhat walletInfo",
+    "walletEthTransfer": "npx hardhat walletEthTransfer",
+    "walletErc20Transfer": "npx hardhat walletErc20Transfer",
+    "walletAddDeposit": "npx hardhat walletAddDeposit",
+    "walletWithdrawDeposit": "npx hardhat walletWithdrawDeposit",
+    "verifyProof": "npx hardhat verifyProof",
+    "verifyTestnet": "npx hardhat verifyTestnet"
   },
   "devDependencies": {
     "@account-abstraction/contracts": "^0.7.0",

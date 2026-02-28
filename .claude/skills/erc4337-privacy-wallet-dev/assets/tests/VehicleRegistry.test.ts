@@ -1,9 +1,9 @@
+import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { VehicleRegistry } from "../typechain-types";
-import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
+import type { VehicleRegistry } from "../typechain-types";
 
-describe("VehicleRegistry", function () {
+describe("VehicleRegistry", () => {
   let registry: VehicleRegistry;
   let owner: SignerWithAddress;
   let wallet1: SignerWithAddress;
@@ -18,7 +18,7 @@ describe("VehicleRegistry", function () {
   let commitment2: string;
   let metadataHash: string;
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     [owner, wallet1, wallet2, verifier, unauthorized] =
       await ethers.getSigners();
 
@@ -43,8 +43,8 @@ describe("VehicleRegistry", function () {
     await registry.setVerifierAuthorization(verifier.address, true);
   });
 
-  describe("Vehicle Registration", function () {
-    it("should register vehicle with commitment", async function () {
+  describe("Vehicle Registration", () => {
+    it("should register vehicle with commitment", async () => {
       await expect(
         registry
           .connect(wallet1)
@@ -60,7 +60,7 @@ describe("VehicleRegistry", function () {
         );
     });
 
-    it("should not allow zero commitment", async function () {
+    it("should not allow zero commitment", async () => {
       await expect(
         registry
           .connect(wallet1)
@@ -68,7 +68,7 @@ describe("VehicleRegistry", function () {
       ).to.be.revertedWith("VehicleRegistry: invalid commitment");
     });
 
-    it("should not allow zero wallet address", async function () {
+    it("should not allow zero wallet address", async () => {
       await expect(
         registry
           .connect(wallet1)
@@ -76,7 +76,7 @@ describe("VehicleRegistry", function () {
       ).to.be.revertedWith("VehicleRegistry: invalid wallet");
     });
 
-    it("should not allow duplicate commitment registration", async function () {
+    it("should not allow duplicate commitment registration", async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);
@@ -88,7 +88,7 @@ describe("VehicleRegistry", function () {
       ).to.be.revertedWith("VehicleRegistry: already registered");
     });
 
-    it("should not allow wallet to register multiple vehicles", async function () {
+    it("should not allow wallet to register multiple vehicles", async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);
@@ -101,14 +101,14 @@ describe("VehicleRegistry", function () {
     });
   });
 
-  describe("Vehicle Record Retrieval", function () {
-    beforeEach(async function () {
+  describe("Vehicle Record Retrieval", () => {
+    beforeEach(async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);
     });
 
-    it("should allow verifier to get vehicle record", async function () {
+    it("should allow verifier to get vehicle record", async () => {
       const record = await registry
         .connect(verifier)
         .getVehicleRecord(commitment1);
@@ -119,20 +119,20 @@ describe("VehicleRegistry", function () {
       expect(record.metadataHash).to.equal(metadataHash);
     });
 
-    it("should not allow unauthorized to get vehicle record", async function () {
+    it("should not allow unauthorized to get vehicle record", async () => {
       await expect(
         registry.connect(unauthorized).getVehicleRecord(commitment1),
       ).to.be.revertedWith("VehicleRegistry: not authorized verifier");
     });
 
-    it("should get commitment by wallet address", async function () {
+    it("should get commitment by wallet address", async () => {
       const commitment = await registry
         .connect(wallet1)
         .getCommitmentByWallet(wallet1.address);
       expect(commitment).to.equal(commitment1);
     });
 
-    it("should allow verifier to get commitment by wallet", async function () {
+    it("should allow verifier to get commitment by wallet", async () => {
       const commitment = await registry
         .connect(verifier)
         .getCommitmentByWallet(wallet1.address);
@@ -140,14 +140,14 @@ describe("VehicleRegistry", function () {
     });
   });
 
-  describe("Vehicle Commitment Update", function () {
-    beforeEach(async function () {
+  describe("Vehicle Commitment Update", () => {
+    beforeEach(async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);
     });
 
-    it("should allow owner to update commitment", async function () {
+    it("should allow owner to update commitment", async () => {
       await expect(
         registry
           .connect(wallet1)
@@ -170,7 +170,7 @@ describe("VehicleRegistry", function () {
       expect(newRecord.walletAddress).to.equal(wallet1.address);
     });
 
-    it("should not allow non-owner to update commitment", async function () {
+    it("should not allow non-owner to update commitment", async () => {
       await expect(
         registry
           .connect(wallet2)
@@ -178,7 +178,7 @@ describe("VehicleRegistry", function () {
       ).to.be.revertedWith("VehicleRegistry: not vehicle owner");
     });
 
-    it("should not allow update to existing commitment", async function () {
+    it("should not allow update to existing commitment", async () => {
       // Register second vehicle first
       await registry
         .connect(wallet2)
@@ -192,14 +192,14 @@ describe("VehicleRegistry", function () {
     });
   });
 
-  describe("Vehicle Deactivation", function () {
-    beforeEach(async function () {
+  describe("Vehicle Deactivation", () => {
+    beforeEach(async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);
     });
 
-    it("should allow owner to deactivate vehicle", async function () {
+    it("should allow owner to deactivate vehicle", async () => {
       await expect(registry.connect(wallet1).deactivateVehicle(commitment1))
         .to.emit(registry, "VehicleDeactivated")
         .withArgs(commitment1, wallet1.address);
@@ -216,13 +216,13 @@ describe("VehicleRegistry", function () {
       expect(walletCommitment).to.equal(ethers.ZeroHash);
     });
 
-    it("should not allow non-owner to deactivate vehicle", async function () {
+    it("should not allow non-owner to deactivate vehicle", async () => {
       await expect(
         registry.connect(wallet2).deactivateVehicle(commitment1),
       ).to.be.revertedWith("VehicleRegistry: not vehicle owner");
     });
 
-    it("should not allow double deactivation", async function () {
+    it("should not allow double deactivation", async () => {
       await registry.connect(wallet1).deactivateVehicle(commitment1);
 
       await expect(
@@ -231,21 +231,21 @@ describe("VehicleRegistry", function () {
     });
   });
 
-  describe("Verification", function () {
-    beforeEach(async function () {
+  describe("Verification", () => {
+    beforeEach(async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);
     });
 
-    it("should verify active vehicle registration", async function () {
+    it("should verify active vehicle registration", async () => {
       const isRegistered = await registry
         .connect(verifier)
         .verifyVehicleRegistration(commitment1);
       expect(isRegistered).to.be.true;
     });
 
-    it("should not verify inactive vehicle", async function () {
+    it("should not verify inactive vehicle", async () => {
       await registry.connect(wallet1).deactivateVehicle(commitment1);
 
       const isRegistered = await registry
@@ -254,29 +254,29 @@ describe("VehicleRegistry", function () {
       expect(isRegistered).to.be.false;
     });
 
-    it("should verify ownership correctly", async function () {
+    it("should verify ownership correctly", async () => {
       const isValid = await registry
         .connect(verifier)
         .verifyOwnership(commitment1, wallet1.address);
       expect(isValid).to.be.true;
     });
 
-    it("should reject invalid ownership claims", async function () {
+    it("should reject invalid ownership claims", async () => {
       const isValid = await registry
         .connect(verifier)
         .verifyOwnership(commitment1, wallet2.address);
       expect(isValid).to.be.false;
     });
 
-    it("should not allow unauthorized verification", async function () {
+    it("should not allow unauthorized verification", async () => {
       await expect(
         registry.connect(unauthorized).verifyVehicleRegistration(commitment1),
       ).to.be.revertedWith("VehicleRegistry: not authorized verifier");
     });
   });
 
-  describe("Verifier Authorization", function () {
-    it("should allow owner to authorize verifier", async function () {
+  describe("Verifier Authorization", () => {
+    it("should allow owner to authorize verifier", async () => {
       await expect(
         registry.setVerifierAuthorization(unauthorized.address, true),
       )
@@ -287,7 +287,7 @@ describe("VehicleRegistry", function () {
         .true;
     });
 
-    it("should allow owner to revoke verifier", async function () {
+    it("should allow owner to revoke verifier", async () => {
       await expect(registry.setVerifierAuthorization(verifier.address, false))
         .to.emit(registry, "VerifierAuthorized")
         .withArgs(verifier.address, false);
@@ -295,7 +295,7 @@ describe("VehicleRegistry", function () {
       expect(await registry.authorizedVerifiers(verifier.address)).to.be.false;
     });
 
-    it("should not allow non-owner to authorize verifier", async function () {
+    it("should not allow non-owner to authorize verifier", async () => {
       await expect(
         registry
           .connect(unauthorized)
@@ -304,14 +304,14 @@ describe("VehicleRegistry", function () {
     });
   });
 
-  describe("Metadata Management", function () {
-    beforeEach(async function () {
+  describe("Metadata Management", () => {
+    beforeEach(async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);
     });
 
-    it("should allow owner to update metadata", async function () {
+    it("should allow owner to update metadata", async () => {
       const newMetadataHash = ethers.keccak256(
         ethers.toUtf8Bytes(
           JSON.stringify({ model: "Tesla Model S", year: 2025 }),
@@ -328,7 +328,7 @@ describe("VehicleRegistry", function () {
       expect(record.metadataHash).to.equal(newMetadataHash);
     });
 
-    it("should not allow non-owner to update metadata", async function () {
+    it("should not allow non-owner to update metadata", async () => {
       const newMetadataHash = ethers.keccak256(
         ethers.toUtf8Bytes("new metadata"),
       );
@@ -339,8 +339,8 @@ describe("VehicleRegistry", function () {
     });
   });
 
-  describe("Batch Operations", function () {
-    it("should register multiple vehicles in batch", async function () {
+  describe("Batch Operations", () => {
+    it("should register multiple vehicles in batch", async () => {
       const commitments = [commitment1, commitment2];
       const wallets = [wallet1.address, wallet2.address];
       const metadatas = [metadataHash, metadataHash];
@@ -358,7 +358,7 @@ describe("VehicleRegistry", function () {
       expect(record2.walletAddress).to.equal(wallet2.address);
     });
 
-    it("should revert batch registration with mismatched arrays", async function () {
+    it("should revert batch registration with mismatched arrays", async () => {
       const commitments = [commitment1];
       const wallets = [wallet1.address, wallet2.address];
       const metadatas = [metadataHash];
@@ -369,8 +369,8 @@ describe("VehicleRegistry", function () {
     });
   });
 
-  describe("Privacy Guarantees", function () {
-    it("should not store raw plate number", async function () {
+  describe("Privacy Guarantees", () => {
+    it("should not store raw plate number", async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);
@@ -388,7 +388,7 @@ describe("VehicleRegistry", function () {
       }
     });
 
-    it("should only allow access through authorized interfaces", async function () {
+    it("should only allow access through authorized interfaces", async () => {
       await registry
         .connect(wallet1)
         .registerVehicle(commitment1, wallet1.address, metadataHash);

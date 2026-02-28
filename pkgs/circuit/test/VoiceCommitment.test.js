@@ -23,16 +23,7 @@ async function run() {
   const poseidon = await buildPoseidon();
 
   // test voice features and salt for the circuit test
-  const voiceFeatures = [
-    1n,
-    2n,
-    3n,
-    4n,
-    5n,
-    6n,
-    7n,
-    8n,
-  ];
+  const voiceFeatures = [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n];
   const salt = 999n;
 
   // generate witness and check constraints
@@ -47,23 +38,16 @@ async function run() {
   await circuit.checkConstraints(witness);
 
   // calculate expected commitment and assert output
-  const expectedCommitment = poseidon.F.toString(poseidon([...voiceFeatures, salt]));
+  const expectedCommitment = poseidon.F.toString(
+    poseidon([...voiceFeatures, salt]),
+  );
   await circuit.assertOut(witness, { commitment: expectedCommitment });
 
   const tooLarge = (1n << 64n).toString();
   await expectFailure(
     circuit.calculateWitness(
       {
-        voiceFeatures: [
-          tooLarge,
-          "0",
-          "0",
-          "0",
-          "0",
-          "0",
-          "0",
-          "0",
-        ],
+        voiceFeatures: [tooLarge, "0", "0", "0", "0", "0", "0", "0"],
         salt: "1",
       },
       true,

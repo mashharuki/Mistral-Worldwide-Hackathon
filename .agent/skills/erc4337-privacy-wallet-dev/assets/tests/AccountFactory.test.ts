@@ -1,9 +1,12 @@
+import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { AccountFactory, PrivacyProtectedAccount } from "../typechain-types";
-import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
+import {
+  type AccountFactory,
+  PrivacyProtectedAccount,
+} from "../typechain-types";
 
-describe("AccountFactory", function () {
+describe("AccountFactory", () => {
   let factory: AccountFactory;
   let owner: SignerWithAddress;
   let entryPoint: SignerWithAddress;
@@ -14,20 +17,20 @@ describe("AccountFactory", function () {
   const plateNumber2 = "XYZ-9999";
   const userSalt = ethers.id("user-secret-salt");
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     [owner, entryPoint, user1, user2] = await ethers.getSigners();
 
     const AccountFactory = await ethers.getContractFactory("AccountFactory");
     factory = await AccountFactory.deploy(entryPoint.address);
   });
 
-  describe("Deployment", function () {
-    it("should deploy with correct implementation", async function () {
+  describe("Deployment", () => {
+    it("should deploy with correct implementation", async () => {
       const implementationAddress = await factory.accountImplementation();
       expect(implementationAddress).to.not.equal(ethers.ZeroAddress);
     });
 
-    it("should set correct EntryPoint in implementation", async function () {
+    it("should set correct EntryPoint in implementation", async () => {
       const implementation = await factory.accountImplementation();
       const accountImpl = await ethers.getContractAt(
         "PrivacyProtectedAccount",
@@ -37,8 +40,8 @@ describe("AccountFactory", function () {
     });
   });
 
-  describe("Deterministic Address Generation", function () {
-    it("should generate deterministic addresses", async function () {
+  describe("Deterministic Address Generation", () => {
+    it("should generate deterministic addresses", async () => {
       const commitment = ethers.keccak256(
         ethers.solidityPacked(["string", "bytes32"], [plateNumber1, userSalt]),
       );
@@ -60,7 +63,7 @@ describe("AccountFactory", function () {
       expect(await account.owner()).to.equal(user1.address);
     });
 
-    it("should generate same address for same parameters", async function () {
+    it("should generate same address for same parameters", async () => {
       const commitment = ethers.keccak256(
         ethers.solidityPacked(["string", "bytes32"], [plateNumber1, userSalt]),
       );
@@ -80,7 +83,7 @@ describe("AccountFactory", function () {
       expect(address1).to.equal(address2);
     });
 
-    it("should generate different addresses for different parameters", async function () {
+    it("should generate different addresses for different parameters", async () => {
       const commitment1 = ethers.keccak256(
         ethers.solidityPacked(["string", "bytes32"], [plateNumber1, userSalt]),
       );
@@ -103,7 +106,7 @@ describe("AccountFactory", function () {
       expect(address1).to.not.equal(address2);
     });
 
-    it("should generate different addresses for different salts", async function () {
+    it("should generate different addresses for different salts", async () => {
       const commitment = ethers.keccak256(
         ethers.solidityPacked(["string", "bytes32"], [plateNumber1, userSalt]),
       );
@@ -115,8 +118,8 @@ describe("AccountFactory", function () {
     });
   });
 
-  describe("Account Creation", function () {
-    it("should create account with correct parameters", async function () {
+  describe("Account Creation", () => {
+    it("should create account with correct parameters", async () => {
       const commitment = ethers.keccak256(
         ethers.solidityPacked(["string", "bytes32"], [plateNumber1, userSalt]),
       );
@@ -132,7 +135,7 @@ describe("AccountFactory", function () {
         );
     });
 
-    it("should return existing account if already created", async function () {
+    it("should return existing account if already created", async () => {
       const commitment = ethers.keccak256(
         ethers.solidityPacked(["string", "bytes32"], [plateNumber1, userSalt]),
       );
@@ -149,7 +152,7 @@ describe("AccountFactory", function () {
       expect(receipt2?.logs.length).to.equal(0);
     });
 
-    it("should create multiple accounts for different users", async function () {
+    it("should create multiple accounts for different users", async () => {
       const commitment1 = ethers.keccak256(
         ethers.solidityPacked(["string", "bytes32"], [plateNumber1, userSalt]),
       );
@@ -186,8 +189,8 @@ describe("AccountFactory", function () {
     });
   });
 
-  describe("Privacy Features", function () {
-    it("should compute vehicle commitment correctly", async function () {
+  describe("Privacy Features", () => {
+    it("should compute vehicle commitment correctly", async () => {
       const commitment = await factory.computeVehicleCommitment(
         plateNumber1,
         userSalt,
@@ -200,7 +203,7 @@ describe("AccountFactory", function () {
       expect(commitment).to.equal(expectedCommitment);
     });
 
-    it("should produce different commitments for different plate numbers", async function () {
+    it("should produce different commitments for different plate numbers", async () => {
       const commitment1 = await factory.computeVehicleCommitment(
         plateNumber1,
         userSalt,
@@ -213,7 +216,7 @@ describe("AccountFactory", function () {
       expect(commitment1).to.not.equal(commitment2);
     });
 
-    it("should produce different commitments for different salts", async function () {
+    it("should produce different commitments for different salts", async () => {
       const salt1 = ethers.id("salt1");
       const salt2 = ethers.id("salt2");
 
@@ -230,8 +233,8 @@ describe("AccountFactory", function () {
     });
   });
 
-  describe("Batch Operations", function () {
-    it("should create multiple accounts in batch", async function () {
+  describe("Batch Operations", () => {
+    it("should create multiple accounts in batch", async () => {
       const owners = [user1.address, user2.address];
       const commitments = [
         ethers.keccak256(
@@ -259,7 +262,7 @@ describe("AccountFactory", function () {
       expect(accounts[0]).to.not.equal(accounts[1]);
     });
 
-    it("should get addresses for batch", async function () {
+    it("should get addresses for batch", async () => {
       const owners = [user1.address, user2.address];
       const commitments = [
         ethers.keccak256(
@@ -292,7 +295,7 @@ describe("AccountFactory", function () {
       );
     });
 
-    it("should revert batch operations with mismatched array lengths", async function () {
+    it("should revert batch operations with mismatched array lengths", async () => {
       const owners = [user1.address];
       const commitments = [
         ethers.keccak256(ethers.toUtf8Bytes("commitment1")),
@@ -310,8 +313,8 @@ describe("AccountFactory", function () {
     });
   });
 
-  describe("Cross-chain Determinism", function () {
-    it("should maintain determinism across deployments", async function () {
+  describe("Cross-chain Determinism", () => {
+    it("should maintain determinism across deployments", async () => {
       // Deploy second factory
       const AccountFactory = await ethers.getContractFactory("AccountFactory");
       const factory2 = await AccountFactory.deploy(entryPoint.address);
@@ -337,8 +340,8 @@ describe("AccountFactory", function () {
     });
   });
 
-  describe("Gas Efficiency", function () {
-    it("should create account with reasonable gas", async function () {
+  describe("Gas Efficiency", () => {
+    it("should create account with reasonable gas", async () => {
       const commitment = ethers.keccak256(
         ethers.solidityPacked(["string", "bytes32"], [plateNumber1, userSalt]),
       );

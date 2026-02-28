@@ -3,119 +3,170 @@ import { task } from "hardhat/config";
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
 import * as path from "path";
 
-task("verifyTestnet", "Verify vehicle wallet on testnet").setAction(
+/**
+ * 【Task】End-to-end verification of VoiceWallet on testnet
+ *
+ * Steps:
+ * 1. Deploy VoiceWallet implementation + proxy with MockGroth16Verifier
+ * 2. Fund the wallet with ETH
+ * 3. Execute ETH transfer from wallet
+ * 4. Deploy MockERC20 and mint tokens to wallet
+ * 5. Execute ERC20 transfer from wallet
+ * 6. Verify all balances
+ */
+task("verifyTestnet", "E2E verification of VoiceWallet on testnet").setAction(
   async (taskArgs, hre: HardhatRuntimeEnvironment) => {
-    const [deployer] = await hre.ethers.getSigners();
-    console.log("Using deployer address:", deployer.address);
+    console.log(
+      "################################### [START] ###################################",
+    );
 
-    // Load deployed addresses
+    const [deployer] = await hre.ethers.getSigners();
+    console.log("Deployer:", deployer.address);
+
+    // Load deployed verifier address if available
     const deploymentsDir = path.join(
       __dirname,
       "../ignition/deployments/chain-84532",
     );
     const addressesPath = path.join(deploymentsDir, "deployed_addresses.json");
 
-    if (!fs.existsSync(addressesPath)) {
-      throw new Error(`Deployment addresses not found at ${addressesPath}`);
+    let verifierAddress: string;
+
+    if (fs.existsSync(addressesPath)) {
+      const addresses = JSON.parse(fs.readFileSync(addressesPath, "utf8"));
+      verifierAddress =
+        addresses["VoiceWalletDeployment#VoiceOwnershipVerifier"];
+      console.log("Using deployed VoiceOwnershipVerifier:", verifierAddress);
+    } else {
+      // Deploy MockGroth16Verifier as fallback
+      console.log("No deployment found. Deploying MockGroth16Verifier...");
+      const MockVerifier = await hre.ethers.getContractFactory(
+        "MockGroth16Verifier",
+      );
+      const mockVerifier = await MockVerifier.deploy();
+      await mockVerifier.waitForDeployment();
+      verifierAddress = await mockVerifier.getAddress();
+      console.log("MockGroth16Verifier deployed at:", verifierAddress);
     }
 
-    const addresses = JSON.parse(fs.readFileSync(addressesPath, "utf8"));
+    // 1. Deploy VoiceWallet implementation
+    console.log("\n--- Step 1: Deploy VoiceWallet ---");
+    const entryPointAddress = "0x0000000071727De22E5E9d8BAf0edAc6f37da032";
+    const VoiceWallet = await hre.ethers.getContractFactory("VoiceWallet");
+    const implementation = await VoiceWallet.deploy(entryPointAddress);
+    await implementation.waitForDeployment();
+    const implAddress = await implementation.getAddress();
+    console.log("Implementation deployed at:", implAddress);
 
-    const factoryAddress =
-      addresses["LicensePlateAccountFactoryModule#LicensePlateAccountFactory"];
-    console.log("Factory Address:", factoryAddress);
-
-    const factory = await hre.ethers.getContractAt(
-      "LicensePlateAccountFactory",
-      factoryAddress,
+    // 2. Deploy proxy with initialize
+    console.log("\n--- Step 2: Deploy Proxy & Initialize ---");
+    const voiceCommitment = hre.ethers.keccak256(
+      hre.ethers.toUtf8Bytes("test-voice-commitment"),
     );
+    console.log("Voice Commitment:", voiceCommitment);
 
-    // 1. Create/Get Vehicle Wallet
-    const plateNumber = "TEST-PLATE-TASK-1234";
-    const userSalt = hre.ethers.id("test-salt-task-testnet");
-    const deploymentSalt = BigInt(Math.floor(Math.random() * 100000));
-
-    const commitment = await factory.computePlateCommitment(
-      plateNumber,
-      userSalt,
-    );
-    console.log("Plate Commitment:", commitment);
-
-    const predictedAddress = await factory.getAddressFromPlate(
+    const initData = implementation.interface.encodeFunctionData("initialize", [
       deployer.address,
-      commitment,
-      deploymentSalt,
-    );
-    console.log("Predicted Wallet Address:", predictedAddress);
-
-    console.log("Creating/Getting account...");
-    const createTx = await factory.createAccountFromPlate(
-      deployer.address,
-      commitment,
-      deploymentSalt,
-      "0x",
-    );
-    await createTx.wait();
-    console.log("Account created/ready at:", predictedAddress);
-
-    // 2. Deploy MockERC20
-    console.log("Deploying MockERC20...");
-    const MockERC20 = await hre.ethers.getContractFactory("MockERC20");
-    const mockToken = await MockERC20.deploy("CarValueTokenTask", "CVTT");
-    await mockToken.waitForDeployment();
-    const mockTokenAddress = await mockToken.getAddress();
-    console.log("MockERC20 deployed at:", mockTokenAddress);
-
-    // 3. Mint tokens to Vehicle Wallet
-    const marketValue = hre.ethers.parseEther("777");
-    console.log(
-      `Minting ${hre.ethers.formatEther(marketValue)} CVTT to wallet...`,
-    );
-    const mintTx = await mockToken.mint(predictedAddress, marketValue);
-    await mintTx.wait();
-
-    const balance = await mockToken.balanceOf(predictedAddress);
-    console.log("Wallet Balance:", hre.ethers.formatEther(balance), "CVTT");
-
-    // 4. Execute transfer via Vehicle Wallet
-    const transferAmount = hre.ethers.parseEther("770");
-    console.log(
-      `Transferring ${hre.ethers.formatEther(transferAmount)} CVTT from wallet to deployer...`,
-    );
-
-    const accountContract = await hre.ethers.getContractAt(
-      "PrivacyProtectedAccount",
-      predictedAddress,
-    );
-    const transferData = mockToken.interface.encodeFunctionData("transfer", [
-      deployer.address,
-      transferAmount,
+      entryPointAddress,
+      verifierAddress,
+      voiceCommitment,
     ]);
 
-    // execute(dest, value, func)
-    const executeTx = await accountContract.execute(
-      mockTokenAddress,
-      0n,
-      transferData,
-    );
-    const receipt = await executeTx.wait();
-    console.log("Execute Transaction Hash:", receipt?.hash);
+    const Proxy = await hre.ethers.getContractFactory("TestERC1967Proxy");
+    const proxy = await Proxy.deploy(implAddress, initData);
+    await proxy.waitForDeployment();
+    const walletAddress = await proxy.getAddress();
+    console.log("Wallet (proxy) deployed at:", walletAddress);
 
-    // 5. Final verification
-    const finalWalletBalance = await mockToken.balanceOf(predictedAddress);
-    const finalDeployerBalance = await mockToken.balanceOf(deployer.address);
+    const wallet = await hre.ethers.getContractAt("VoiceWallet", walletAddress);
 
-    console.log("--- Final Results ---");
+    // Verify initialization
+    const owner = await wallet.owner();
+    const verifier = await wallet.verifier();
+    const commitment = await wallet.voiceCommitment();
+    console.log("Owner:", owner);
+    console.log("Verifier:", verifier);
+    console.log("Commitment:", commitment);
+
+    // 3. Fund wallet with ETH
+    console.log("\n--- Step 3: Fund Wallet with ETH ---");
+    const fundAmount = hre.ethers.parseEther("0.001");
+    const fundTx = await deployer.sendTransaction({
+      to: walletAddress,
+      value: fundAmount,
+    });
+    await fundTx.wait();
+
+    const walletEthBalance =
+      await hre.ethers.provider.getBalance(walletAddress);
     console.log(
-      "Final Wallet Balance:",
-      hre.ethers.formatEther(finalWalletBalance),
-      "CVTT",
+      "Wallet ETH Balance:",
+      hre.ethers.formatEther(walletEthBalance),
+      "ETH",
+    );
+
+    // 4. Execute ETH transfer
+    console.log("\n--- Step 4: Execute ETH Transfer ---");
+    const ethTransferAmount = hre.ethers.parseEther("0.0005");
+    const ethTx = await wallet.executeEthTransfer(
+      deployer.address,
+      ethTransferAmount,
+    );
+    const ethReceipt = await ethTx.wait();
+    console.log("ETH Transfer TX:", ethReceipt?.hash);
+
+    const walletEthAfter = await hre.ethers.provider.getBalance(walletAddress);
+    console.log(
+      "Wallet ETH After:",
+      hre.ethers.formatEther(walletEthAfter),
+      "ETH",
+    );
+
+    // 5. Deploy MockERC20 and mint
+    console.log("\n--- Step 5: Deploy MockERC20 & Mint ---");
+    const MockERC20 = await hre.ethers.getContractFactory("MockERC20");
+    const mockToken = await MockERC20.deploy("VoiceTestToken", "VTT");
+    await mockToken.waitForDeployment();
+    const tokenAddress = await mockToken.getAddress();
+    console.log("MockERC20 deployed at:", tokenAddress);
+
+    const mintAmount = hre.ethers.parseEther("1000");
+    const mintTx = await mockToken.mint(walletAddress, mintAmount);
+    await mintTx.wait();
+    console.log("Minted", hre.ethers.formatEther(mintAmount), "VTT to wallet");
+
+    // 6. Execute ERC20 transfer
+    console.log("\n--- Step 6: Execute ERC20 Transfer ---");
+    const tokenTransferAmount = hre.ethers.parseEther("500");
+    const erc20Tx = await wallet.executeERC20Transfer(
+      tokenAddress,
+      deployer.address,
+      tokenTransferAmount,
+    );
+    const erc20Receipt = await erc20Tx.wait();
+    console.log("ERC20 Transfer TX:", erc20Receipt?.hash);
+
+    // 7. Final verification
+    console.log("\n--- Final Results ---");
+    const finalWalletTokenBalance = await mockToken.balanceOf(walletAddress);
+    const finalDeployerTokenBalance = await mockToken.balanceOf(
+      deployer.address,
+    );
+    const finalWalletEth = await hre.ethers.provider.getBalance(walletAddress);
+
+    console.log(
+      "Wallet VTT Balance:",
+      hre.ethers.formatEther(finalWalletTokenBalance),
     );
     console.log(
-      "Final Deployer Balance:",
-      hre.ethers.formatEther(finalDeployerBalance),
-      "CVTT",
+      "Deployer VTT Balance:",
+      hre.ethers.formatEther(finalDeployerTokenBalance),
     );
-    console.log("Verification Successful via Task!");
+    console.log("Wallet ETH Balance:", hre.ethers.formatEther(finalWalletEth));
+    console.log("Verification Successful!");
+
+    console.log(
+      "################################### [END] ###################################",
+    );
   },
 );

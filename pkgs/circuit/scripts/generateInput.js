@@ -5,16 +5,7 @@ const circomlibjs = require("circomlibjs");
 const DEFAULT_CIRCUITS = ["VoiceCommitment", "VoiceOwnership"];
 
 function defaultVoiceFeatures() {
-  return [
-    1n,
-    2n,
-    3n,
-    4n,
-    5n,
-    6n,
-    7n,
-    8n,
-  ];
+  return [1n, 2n, 3n, 4n, 5n, 6n, 7n, 8n];
 }
 
 async function createVoiceCommitmentInput() {
@@ -35,16 +26,7 @@ async function createVoiceCommitmentInput() {
 async function createVoiceOwnershipInput() {
   const poseidon = await circomlibjs.buildPoseidon();
   const salt = 42n;
-  const referenceFeatures = [
-    0n,
-    0n,
-    0n,
-    0n,
-    0n,
-    0n,
-    0n,
-    0n,
-  ];
+  const referenceFeatures = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
   const currentFeatures = [
     (1n << 64n) - 1n,
     (1n << 63n) - 1n,

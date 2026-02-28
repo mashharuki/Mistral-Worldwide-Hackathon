@@ -9,7 +9,9 @@ describe("VoiceWallet", () => {
   async function deployFixture() {
     const [owner, entryPoint, recipient] = await ethers.getSigners();
 
-    const verifierFactory = await ethers.getContractFactory("MockGroth16Verifier");
+    const verifierFactory = await ethers.getContractFactory(
+      "MockGroth16Verifier",
+    );
     const verifier = await verifierFactory.deploy();
     await verifier.waitForDeployment();
 
@@ -22,7 +24,12 @@ describe("VoiceWallet", () => {
     // initialize関数の呼び出しデータをエンコード
     const initializeData = walletFactory.interface.encodeFunctionData(
       "initialize(address,address,address,bytes32)",
-      [owner.address, entryPoint.address, await verifier.getAddress(), commitment],
+      [
+        owner.address,
+        entryPoint.address,
+        await verifier.getAddress(),
+        commitment,
+      ],
     );
 
     // ERC1967ProxyをデプロイしてWalletコントラクトを初期化
@@ -81,9 +88,7 @@ describe("VoiceWallet", () => {
 
     expect(validationData).to.eq(0n);
     await expect(
-      wallet
-        .connect(entryPoint)
-        .validateUserOp(userOp, ethers.ZeroHash, 0n),
+      wallet.connect(entryPoint).validateUserOp(userOp, ethers.ZeroHash, 0n),
     ).to.not.be.reverted;
   });
 
@@ -140,10 +145,7 @@ describe("VoiceWallet", () => {
 
     await expect(
       wallet.connect(owner).executeEthTransfer(recipient.address, amount),
-    ).to.changeEtherBalances(
-      [wallet, recipient],
-      [-amount, amount],
-    );
+    ).to.changeEtherBalances([wallet, recipient], [-amount, amount]);
   });
 
   it("ERC20 transfer関数でトークン送金できる", async () => {
@@ -158,7 +160,11 @@ describe("VoiceWallet", () => {
     await expect(
       wallet
         .connect(owner)
-        .executeERC20Transfer(await token.getAddress(), recipient.address, amount),
+        .executeERC20Transfer(
+          await token.getAddress(),
+          recipient.address,
+          amount,
+        ),
     ).to.not.be.reverted;
 
     expect(await token.balanceOf(recipient.address)).to.eq(amount);

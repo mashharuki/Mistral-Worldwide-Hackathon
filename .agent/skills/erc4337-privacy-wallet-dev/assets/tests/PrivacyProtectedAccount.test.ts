@@ -1,9 +1,12 @@
+import type { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { PrivacyProtectedAccount, AccountFactory } from "../typechain-types";
-import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
+import type {
+  AccountFactory,
+  PrivacyProtectedAccount,
+} from "../typechain-types";
 
-describe("PrivacyProtectedAccount", function () {
+describe("PrivacyProtectedAccount", () => {
   let accountFactory: AccountFactory;
   let account: PrivacyProtectedAccount;
   let owner: SignerWithAddress;
@@ -14,7 +17,7 @@ describe("PrivacyProtectedAccount", function () {
   const userSalt = ethers.id("user-secret-salt");
   let vehicleCommitment: string;
 
-  beforeEach(async function () {
+  beforeEach(async () => {
     [owner, entryPoint, otherUser] = await ethers.getSigners();
 
     // Compute vehicle commitment off-chain (simulating frontend behavior)
@@ -42,28 +45,28 @@ describe("PrivacyProtectedAccount", function () {
     );
   });
 
-  describe("Initialization", function () {
-    it("should initialize with correct owner", async function () {
+  describe("Initialization", () => {
+    it("should initialize with correct owner", async () => {
       expect(await account.owner()).to.equal(owner.address);
     });
 
-    it("should initialize with correct vehicle commitment", async function () {
+    it("should initialize with correct vehicle commitment", async () => {
       expect(await account.vehicleCommitment()).to.equal(vehicleCommitment);
     });
 
-    it("should have correct entryPoint", async function () {
+    it("should have correct entryPoint", async () => {
       expect(await account.entryPoint()).to.equal(entryPoint.address);
     });
 
-    it("should not allow double initialization", async function () {
+    it("should not allow double initialization", async () => {
       await expect(
         account.initialize(owner.address, vehicleCommitment),
       ).to.be.revertedWith("account: already initialized");
     });
   });
 
-  describe("Privacy Protection", function () {
-    it("should verify vehicle ownership with correct preimage", async function () {
+  describe("Privacy Protection", () => {
+    it("should verify vehicle ownership with correct preimage", async () => {
       const isValid = await account.verifyVehicleOwnership(
         plateNumber,
         userSalt,
@@ -71,7 +74,7 @@ describe("PrivacyProtectedAccount", function () {
       expect(isValid).to.be.true;
     });
 
-    it("should reject vehicle ownership with wrong plate number", async function () {
+    it("should reject vehicle ownership with wrong plate number", async () => {
       const wrongPlate = "XYZ-9999";
       const isValid = await account.verifyVehicleOwnership(
         wrongPlate,
@@ -80,7 +83,7 @@ describe("PrivacyProtectedAccount", function () {
       expect(isValid).to.be.false;
     });
 
-    it("should reject vehicle ownership with wrong salt", async function () {
+    it("should reject vehicle ownership with wrong salt", async () => {
       const wrongSalt = ethers.id("wrong-salt");
       const isValid = await account.verifyVehicleOwnership(
         plateNumber,
@@ -89,7 +92,7 @@ describe("PrivacyProtectedAccount", function () {
       expect(isValid).to.be.false;
     });
 
-    it("should not store raw plate number on-chain", async function () {
+    it("should not store raw plate number on-chain", async () => {
       // This test verifies that searching for the plate number in storage fails
       // In a real audit, you would scan all storage slots
       const storageSlots = 10;
@@ -106,8 +109,8 @@ describe("PrivacyProtectedAccount", function () {
     });
   });
 
-  describe("Vehicle Commitment Update", function () {
-    it("should allow owner to update vehicle commitment", async function () {
+  describe("Vehicle Commitment Update", () => {
+    it("should allow owner to update vehicle commitment", async () => {
       const newPlateNumber = "NEW-5678";
       const newCommitment = ethers.keccak256(
         ethers.solidityPacked(
@@ -125,7 +128,7 @@ describe("PrivacyProtectedAccount", function () {
       expect(await account.vehicleCommitment()).to.equal(newCommitment);
     });
 
-    it("should not allow non-owner to update commitment", async function () {
+    it("should not allow non-owner to update commitment", async () => {
       const newCommitment = ethers.keccak256(ethers.toUtf8Bytes("new-data"));
 
       await expect(
@@ -133,15 +136,15 @@ describe("PrivacyProtectedAccount", function () {
       ).to.be.revertedWith("only owner");
     });
 
-    it("should not allow zero commitment", async function () {
+    it("should not allow zero commitment", async () => {
       await expect(
         account.connect(owner).updateVehicleCommitment(ethers.ZeroHash),
       ).to.be.revertedWith("account: commitment cannot be zero");
     });
   });
 
-  describe("Execution", function () {
-    it("should allow owner to execute transactions", async function () {
+  describe("Execution", () => {
+    it("should allow owner to execute transactions", async () => {
       const recipient = otherUser.address;
       const amount = ethers.parseEther("0.1");
 
@@ -157,7 +160,7 @@ describe("PrivacyProtectedAccount", function () {
       ).to.changeEtherBalances([account, otherUser], [-amount, amount]);
     });
 
-    it("should allow batch execution", async function () {
+    it("should allow batch execution", async () => {
       const recipients = [otherUser.address, otherUser.address];
       const amounts = [ethers.parseEther("0.1"), ethers.parseEther("0.2")];
       const data = ["0x", "0x"];
@@ -176,8 +179,8 @@ describe("PrivacyProtectedAccount", function () {
     });
   });
 
-  describe("EntryPoint Deposit", function () {
-    it("should allow depositing to EntryPoint", async function () {
+  describe("EntryPoint Deposit", () => {
+    it("should allow depositing to EntryPoint", async () => {
       const depositAmount = ethers.parseEther("0.5");
 
       await account.connect(owner).addDeposit({ value: depositAmount });
@@ -186,20 +189,20 @@ describe("PrivacyProtectedAccount", function () {
       // In real implementation, verify the deposit was recorded
     });
 
-    it("should allow owner to withdraw from EntryPoint", async function () {
+    it("should allow owner to withdraw from EntryPoint", async () => {
       // This test requires a mock EntryPoint with proper implementation
       // Skipping detailed implementation for template purposes
     });
   });
 
-  describe("Access Control", function () {
-    it("should restrict execute to owner or EntryPoint", async function () {
+  describe("Access Control", () => {
+    it("should restrict execute to owner or EntryPoint", async () => {
       await expect(
         account.connect(otherUser).execute(otherUser.address, 0, "0x"),
       ).to.be.revertedWith("account: not Owner or EntryPoint");
     });
 
-    it("should accept ETH transfers", async function () {
+    it("should accept ETH transfers", async () => {
       const amount = ethers.parseEther("1");
 
       await expect(
@@ -211,8 +214,8 @@ describe("PrivacyProtectedAccount", function () {
     });
   });
 
-  describe("Gas Optimization", function () {
-    it("should use minimal gas for commitment verification", async function () {
+  describe("Gas Optimization", () => {
+    it("should use minimal gas for commitment verification", async () => {
       // Measure gas for verification
       const tx = await account.verifyVehicleOwnership.staticCall(
         plateNumber,
