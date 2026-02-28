@@ -11,8 +11,10 @@ from src.proof_generation import (
 
 
 def create_app() -> Flask:
+    # Flaskアプリケーションを作成し、CORSを有効化
     app = Flask(__name__)
     CORS(app)
+    # ZK回路ファイルのルートパスを設定
     circuit_root = Path(
         os.getenv(
             "ZK_CIRCUIT_ROOT",
@@ -22,10 +24,12 @@ def create_app() -> Flask:
 
     @app.get("/health")
     def health():
+        # ヘルスチェックエンドポイント
         return jsonify({"status": "ok"}), 200
 
     @app.post("/extract-features")
     def extract_features():
+        # 音声特徴量抽出エンドポイント
         payload = request.get_json(silent=True) or {}
         audio = payload.get("audio")
         mime_type = payload.get("mimeType", "")
@@ -43,6 +47,7 @@ def create_app() -> Flask:
             )
 
         try:
+            # 音声特徴量を抽出
             result = extract_voice_features(audio, mime_type)
             return jsonify(result), 200
         except (AudioFormatError, AudioQualityError) as error:
@@ -60,6 +65,7 @@ def create_app() -> Flask:
 
     @app.post("/generate-proof")
     def generate_proof():
+        # 証明生成エンドポイント
         payload = request.get_json(silent=True) or {}
         reference_features = payload.get("referenceFeatures")
         current_features = payload.get("currentFeatures")
@@ -78,6 +84,7 @@ def create_app() -> Flask:
             )
 
         try:
+            # 証明を生成
             response = build_generate_proof_response(
                 reference_features=[int(value) for value in reference_features],
                 current_features=[int(value) for value in current_features],
@@ -102,6 +109,7 @@ def create_app() -> Flask:
 
     @app.post("/generate-commitment")
     def generate_commitment():
+        # コミットメント生成エンドポイント
         payload = request.get_json(silent=True) or {}
         features = payload.get("features")
         salt = str(payload.get("salt", ""))
@@ -119,6 +127,7 @@ def create_app() -> Flask:
             )
 
         try:
+            # コミットメントを計算
             packed_features = [int(value) for value in features]
             commitment = compute_poseidon_commitment(
                 packed_features,
@@ -149,6 +158,7 @@ def create_app() -> Flask:
 
     @app.errorhandler(400)
     def bad_request(error):
+        # 400エラーハンドラ
         return (
             jsonify(
                 {
@@ -163,6 +173,7 @@ def create_app() -> Flask:
 
     @app.errorhandler(404)
     def not_found(error):
+        # 404エラーハンドラ
         return (
             jsonify(
                 {
@@ -177,6 +188,7 @@ def create_app() -> Flask:
 
     @app.errorhandler(500)
     def internal_error(error):
+        # 500エラーハンドラ
         return (
             jsonify(
                 {
@@ -196,6 +208,7 @@ app = create_app()
 
 
 if __name__ == "__main__":
+    # アプリケーションのエントリポイント
     host = os.getenv("FLASK_HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8080"))
     debug = os.getenv("FLASK_DEBUG", "0") == "1"

@@ -5,7 +5,12 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "python3 -m unittest discover -s tests -p 'test_*.py'"
+    "test": "python3 -m unittest discover -s tests -p 'test_*.py'",
+    "format": "python3 -m black src tests",
+    "format:check": "python3 -m black --check src tests",
+    "zk:copy": "./scripts/copy-zk.sh",
+    "docker:build": "docker build -t voice-zk-wallet-backend:local .",
+    "docker:run": "docker run --rm --name voice-zk-wallet-backend -p 8080:8080 -e ZK_CIRCUIT_ROOT=/app/zk voice-zk-wallet-backend:local"
   },
   "keywords": [],
   "author": "",

@@ -6,10 +6,12 @@ from typing import Dict, List
 
 
 class ProofGenerationError(ValueError):
+    # 証明生成エラー
     pass
 
 
 def _validate_packed_features(values: List[int], name: str) -> None:
+    # パックされた特徴量のバリデーション
     if len(values) != 8:
         raise ProofGenerationError(f"{name} must contain 8 packed field elements")
     for value in values:
@@ -20,6 +22,7 @@ def _validate_packed_features(values: List[int], name: str) -> None:
 
 
 def hamming_distance_from_packed(reference_features: List[int], current_features: List[int]) -> int:
+    # ハミング距離を計算
     _validate_packed_features(reference_features, "referenceFeatures")
     _validate_packed_features(current_features, "currentFeatures")
     distance = 0
@@ -29,6 +32,7 @@ def hamming_distance_from_packed(reference_features: List[int], current_features
 
 
 def ensure_hamming_threshold(reference_features: List[int], current_features: List[int], threshold: int = 128) -> int:
+    # ハミング距離がしきい値を超えていないか確認
     distance = hamming_distance_from_packed(reference_features, current_features)
     if distance > threshold:
         raise ProofGenerationError(
@@ -38,6 +42,7 @@ def ensure_hamming_threshold(reference_features: List[int], current_features: Li
 
 
 def compute_poseidon_commitment(features: List[int], salt: str, circuit_root: Path) -> str:
+    # Poseidonハッシュを使用してコミットメントを計算
     _validate_packed_features(features, "features")
     try:
         salt_int = int(salt)
@@ -61,6 +66,7 @@ def compute_poseidon_commitment(features: List[int], salt: str, circuit_root: Pa
 
 
 def run_snarkjs_groth16(input_payload: Dict[str, object], circuit_name: str, circuit_root: Path) -> Dict[str, object]:
+    # snarkjsを使用してGroth16証明を生成
     wasm_path = circuit_root / f"{circuit_name}_js" / f"{circuit_name}.wasm"
     zkey_path = circuit_root / "zkey" / f"{circuit_name}_final.zkey"
     if not wasm_path.exists() or not zkey_path.exists():
@@ -111,6 +117,7 @@ def build_generate_proof_response(
     circuit_root: Path,
     hamming_threshold: int = 128,
 ) -> Dict[str, object]:
+    # 証明生成レスポンスを構築
     distance = ensure_hamming_threshold(reference_features, current_features, hamming_threshold)
     commitment = compute_poseidon_commitment(reference_features, salt, circuit_root)
     prover_result = run_snarkjs_groth16(

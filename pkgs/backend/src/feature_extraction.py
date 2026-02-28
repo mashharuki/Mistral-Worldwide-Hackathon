@@ -8,14 +8,17 @@ from typing import Dict, List, Tuple
 
 
 class AudioFormatError(ValueError):
+    # 音声フォーマットエラー
     pass
 
 
 class AudioQualityError(ValueError):
+    # 音声品質エラー
     pass
 
 
 def decode_audio_base64(audio_base64: str) -> bytes:
+    # Base64エンコードされた音声データをデコード
     try:
         return base64.b64decode(audio_base64, validate=True)
     except Exception as error:
@@ -23,12 +26,14 @@ def decode_audio_base64(audio_base64: str) -> bytes:
 
 
 def detect_audio_format(audio_bytes: bytes, mime_type: str = "") -> str:
+    # 音声データのフォーマットを検出
     lower_mime = mime_type.lower().strip()
     if lower_mime in ("audio/wav", "audio/x-wav", "wav"):
         return "wav"
     if lower_mime in ("audio/webm", "webm"):
         return "webm"
 
+    # マジックナンバーによるフォーマット検出
     if len(audio_bytes) >= 12 and audio_bytes[:4] == b"RIFF" and audio_bytes[8:12] == b"WAVE":
         return "wav"
     if len(audio_bytes) >= 4 and audio_bytes[:4] == bytes([0x1A, 0x45, 0xDF, 0xA3]):
@@ -38,6 +43,7 @@ def detect_audio_format(audio_bytes: bytes, mime_type: str = "") -> str:
 
 
 def validate_audio_quality(audio_bytes: bytes, audio_format: str, min_seconds: float = 1.0) -> None:
+    # 音声データの品質を検証
     if audio_format == "wav":
         with wave.open(io.BytesIO(audio_bytes), "rb") as wav_file:
             frame_rate = wav_file.getframerate()
@@ -58,6 +64,7 @@ def validate_audio_quality(audio_bytes: bytes, audio_format: str, min_seconds: f
 
 
 def _deterministic_embedding(audio_bytes: bytes, dims: int = 512) -> List[float]:
+    # 音声データから決定論的な埋め込みベクトルを生成
     values: List[float] = []
     seed = audio_bytes
     counter = 0
@@ -74,9 +81,9 @@ def _deterministic_embedding(audio_bytes: bytes, dims: int = 512) -> List[float]
 
 
 def _extract_embedding_with_model(audio_bytes: bytes) -> Tuple[List[float], str]:
-    # This phase keeps extraction deterministic and dependency-light.
-    # When pyannote/wespeaker is available, this function can be switched
-    # by environment setting without changing API contract.
+    # 音声データから埋め込みベクトルを抽出
+    # この段階では決定論的な方法を使用し、依存関係を軽減
+    # pyannote/wespeakerが利用可能な場合、環境設定により切り替え可能
     provider = os.getenv("BACKEND_EMBEDDING_PROVIDER", "deterministic")
     model_name = os.getenv("BACKEND_EMBEDDING_MODEL", "mistral-hackaton-2026")
     embedding = _deterministic_embedding(audio_bytes, dims=512)
@@ -84,10 +91,12 @@ def _extract_embedding_with_model(audio_bytes: bytes) -> Tuple[List[float], str]
 
 
 def binarize_embedding(embedding: List[float], threshold: float = 0.0) -> List[int]:
+    # 埋め込みベクトルを二値化
     return [1 if value >= threshold else 0 for value in embedding]
 
 
 def pack_binary_features(binary_features: List[int]) -> List[int]:
+    # 二値化された特徴量をパック
     if len(binary_features) != 512:
         raise ValueError("binary feature length must be 512")
     if any(bit not in (0, 1) for bit in binary_features):
@@ -104,6 +113,7 @@ def pack_binary_features(binary_features: List[int]) -> List[int]:
 
 
 def extract_voice_features(audio_base64: str, mime_type: str = "") -> Dict[str, object]:
+    # 音声データから特徴量を抽出
     audio_bytes = b""
     embedding: List[float] = []
     binary_features: List[int] = []
@@ -127,7 +137,7 @@ def extract_voice_features(audio_base64: str, mime_type: str = "") -> Dict[str, 
             "modelUsed": model_used,
         }
     finally:
-        # Explicitly drop sensitive in-memory buffers as early as possible.
+        # メモリ上の敏感なデータを明示的にクリア
         audio_bytes = b""
         embedding = []
         binary_features = []
