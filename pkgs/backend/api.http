@@ -1,9 +1,12 @@
+@base_url = http://0.0.0.0:8080
+# @base_url = https://YOUR_CLOUD_RUN_URL
+
 ### Health check
-GET http://localhost:8080/health
+GET {{base_url}}/health
 Accept: application/json
 
 ### Extract features (Task 2.2予定)
-POST http://localhost:8080/extract-features
+POST {{base_url}}/extract-features
 Content-Type: application/json
 
 {
@@ -11,8 +14,14 @@ Content-Type: application/json
   "mimeType": "audio/wav"
 }
 
+### Extract features (sample file: ./samples/extract_features.sample.json)
+POST {{base_url}}/extract-features
+Content-Type: application/json
+
+< ./samples/extract_features.sample.json
+
 ### Generate proof (Task 2.3予定)
-POST http://localhost:8080/generate-proof
+POST {{base_url}}/generate-proof
 Content-Type: application/json
 
 {
@@ -21,11 +30,23 @@ Content-Type: application/json
   "salt": "0"
 }
 
+### Generate proof (sample file: ./samples/generate_proof.sample.json)
+POST {{base_url}}/generate-proof
+Content-Type: application/json
+
+< ./samples/generate_proof.sample.json
+
 ### Generate commitment (Task 2.3予定)
-POST http://localhost:8080/generate-commitment
+POST {{base_url}}/generate-commitment
 Content-Type: application/json
 
 {
   "features": [],
   "salt": "0"
 }
+
+### Generate commitment (sample file: ./samples/generate_commitment.sample.json)
+POST {{base_url}}/generate-commitment
+Content-Type: application/json
+
+< ./samples/generate_commitment.sample.json

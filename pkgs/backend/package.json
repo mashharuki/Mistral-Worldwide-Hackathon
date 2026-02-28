@@ -9,6 +9,8 @@
     "format": "python3 -m black src tests",
     "format:check": "python3 -m black --check src tests",
     "zk:copy": "./scripts/copy-zk.sh",
+    "cloudrun:deploy": "./scripts/deploy.sh",
+    "cloudrun:cleanup": "./scripts/cleanup.sh",
     "docker:build": "docker build -t voice-zk-wallet-backend:local .",
     "docker:run": "docker run --rm --name voice-zk-wallet-backend -p 8080:8080 -e ZK_CIRCUIT_ROOT=/app/zk voice-zk-wallet-backend:local"
   },
