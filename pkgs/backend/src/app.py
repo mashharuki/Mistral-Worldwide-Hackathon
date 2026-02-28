@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from feature_extraction import AudioFormatError, AudioQualityError, extract_voice_features
-from proof_generation import (
+from src.feature_extraction import AudioFormatError, AudioQualityError, extract_voice_features
+from src.proof_generation import (
     ProofGenerationError,
     build_generate_proof_response,
     compute_poseidon_commitment,

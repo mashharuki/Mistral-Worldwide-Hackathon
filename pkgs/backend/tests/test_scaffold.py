@@ -7,8 +7,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 class BackendScaffoldTest(unittest.TestCase):
     def test_app_py_exists_and_has_required_routes(self):
-        app_file = ROOT / "app.py"
-        self.assertTrue(app_file.exists(), "app.py is missing")
+        app_file = ROOT / "src" / "app.py"
+        self.assertTrue(app_file.exists(), "src/app.py is missing")
 
         content = app_file.read_text(encoding="utf-8")
         self.assertIn("from flask import Flask, jsonify, request", content)

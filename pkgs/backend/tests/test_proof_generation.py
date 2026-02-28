@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from proof_generation import (
+from src.proof_generation import (
     ProofGenerationError,
     build_generate_proof_response,
     ensure_hamming_threshold,
@@ -25,7 +25,7 @@ class ProofGenerationTest(unittest.TestCase):
         with self.assertRaises(ProofGenerationError):
             ensure_hamming_threshold(reference, current, threshold=128)
 
-    @patch("proof_generation.subprocess.run")
+    @patch("src.proof_generation.subprocess.run")
     def test_run_snarkjs_groth16_invokes_fullprove(self, mock_run):
         def _mock_subprocess(command, check, capture_output, text):
             Path(command[-2]).write_text(json.dumps({"pi_a": []}), encoding="utf-8")
@@ -58,8 +58,8 @@ class ProofGenerationTest(unittest.TestCase):
             self.assertEqual(called_cmd[:3], ["snarkjs", "groth16", "fullprove"])
             self.assertTrue(called_cmd[3].endswith("input.json"))
 
-    @patch("proof_generation.run_snarkjs_groth16")
-    @patch("proof_generation.compute_poseidon_commitment")
+    @patch("src.proof_generation.run_snarkjs_groth16")
+    @patch("src.proof_generation.compute_poseidon_commitment")
     def test_build_generate_proof_response(self, mock_commitment, mock_prover):
         mock_commitment.return_value = "999"
         mock_prover.return_value = {

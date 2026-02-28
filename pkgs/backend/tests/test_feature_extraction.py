@@ -5,7 +5,7 @@ import struct
 import unittest
 import wave
 
-from feature_extraction import (
+from src.feature_extraction import (
     AudioFormatError,
     AudioQualityError,
     decode_audio_base64,
