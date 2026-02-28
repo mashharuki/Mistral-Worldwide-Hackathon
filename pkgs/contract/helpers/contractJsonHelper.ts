@@ -13,6 +13,9 @@ const IGNITION_DEPLOYMENTS_DIR = path.join(
 const CONTRACT_KEYS = {
   VoiceOwnershipVerifier: "VoiceWalletDeployment#VoiceOwnershipVerifier",
   VoiceWalletFactory: "VoiceWalletDeployment#VoiceWalletFactory",
+  VoiceWalletProxy: "VoiceWalletProxyDeployment#TestERC1967Proxy",
+  VoiceWalletImplementation: "VoiceWalletProxyDeployment#VoiceWallet",
+  MockERC20: "MockERC20Deployment#MockERC20",
 } as const;
 
 /**
@@ -68,6 +71,35 @@ export function getFactoryAddress(chainId: number): string {
     throw new Error(
       "VoiceWalletFactory address not found in deployed_addresses.json",
     );
+  }
+  return address;
+}
+
+/**
+ * VoiceWallet Proxy（TestERC1967Proxy）のデプロイ済みアドレスを取得する
+ * 互換性のため、Proxyキーがない場合は VoiceWallet キーをフォールバックする。
+ */
+export function getWalletProxyAddress(chainId: number): string {
+  const addresses = loadDeployedAddresses(chainId);
+  const address =
+    addresses[CONTRACT_KEYS.VoiceWalletProxy] ??
+    addresses[CONTRACT_KEYS.VoiceWalletImplementation];
+  if (!address) {
+    throw new Error(
+      "VoiceWallet proxy address not found in deployed_addresses.json",
+    );
+  }
+  return address;
+}
+
+/**
+ * MockERC20 のデプロイ済みアドレスを取得する
+ */
+export function getMockERC20Address(chainId: number): string {
+  const addresses = loadDeployedAddresses(chainId);
+  const address = addresses[CONTRACT_KEYS.MockERC20];
+  if (!address) {
+    throw new Error("MockERC20 address not found in deployed_addresses.json");
   }
   return address;
 }

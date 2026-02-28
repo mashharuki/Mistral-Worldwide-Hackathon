@@ -1,7 +1,7 @@
 {
   "VoiceWalletDeployment#VoiceOwnershipVerifier": "0x877e07ddC0b95640cD009154ab9dA6a691Ee783b",
   "VoiceWalletDeployment#VoiceWalletFactory": "0x3872A516c8e8FDB29b5D28C6D5528153D66Edd4f",
-  "MockERC20Deployment#MockERC20": "0xD29fEB1B78507bc427078f96BE7145Da7Cda1465",
+  "MockERC20Deployment#MockERC20": "0x6aec1F4fddaa5c3dD559d884ED4905aE108d5Caa",
   "VoiceCommitmentVerifierDeployment#VoiceCommitmentVerifier": "0x1977B0FFC21aC09233FBe5757D183a311288aBD0",
   "VoiceWalletProxyDeployment#VoiceWallet": "0x47a0cB4A9531ce8bB5AB9c8D12b07b9955B38cb2",
   "VoiceWalletProxyDeployment#TestERC1967Proxy": "0x8D66f6946A7E0B654A56D36f8D49611620703Bfb"

@@ -151,36 +151,33 @@ https://mistral-worldwide-hackathon-fronten.vercel.app
   pnpm --filter contract run getChainInfo --network base-sepolia
   pnpm --filter contract run getBalance --network base-sepolia
 
-  # Wallet 情報取得
+  # Wallet 情報取得（walletは deployed_addresses.json から自動解決）
   pnpm --filter contract exec hardhat walletInfo \
-    --wallet 0xYourWalletProxy \
     --network base-sepolia
 
-  # ETH / ERC20 送金
+  # ETH / ERC20 送金（wallet / token は deployed_addresses.json から自動解決）
   pnpm --filter contract exec hardhat walletEthTransfer \
-    --wallet 0xYourWalletProxy \
-    --to 0xRecipient \
+    --to 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 \
     --amount 0.001 \
     --network base-sepolia
 
   pnpm --filter contract exec hardhat walletErc20Transfer \
-    --wallet 0xYourWalletProxy \
-    --token 0xYourERC20 \
-    --to 0xRecipient \
+    --to 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 \
     --amount 1 \
     --network base-sepolia
 
   # EntryPoint への deposit 入出金
   pnpm --filter contract exec hardhat walletAddDeposit \
-    --wallet 0xYourWalletProxy \
     --amount 0.01 \
     --network base-sepolia
 
   pnpm --filter contract exec hardhat walletWithdrawDeposit \
-    --wallet 0xYourWalletProxy \
-    --to 0xRecipient \
+    --to 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 \
     --amount 0.005 \
     --network base-sepolia
+
+  # 必要なら手動アドレスを上書き可能
+  # --wallet 0x... / --token 0x...
 
   # 証明検証（proof は JSON 文字列）
   # --verifier 省略時は deployed_addresses.json から自動取得
