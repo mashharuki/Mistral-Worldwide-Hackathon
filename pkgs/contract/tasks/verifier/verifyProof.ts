@@ -1,5 +1,6 @@
 import { task, types } from "hardhat/config";
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
+import fs from "node:fs";
 import {
   getVerifierAddress,
   hasDeployedAddresses,
@@ -17,9 +18,17 @@ task("verifyProof", "Verify a Groth16 proof on a deployed verifier")
     undefined,
     types.string,
   )
-  .addParam(
-    "proof",
-    "JSON string of proof: {a:[2], b:[[2],[2]], c:[2], input:[1]}",
+  .addOptionalParam(
+    "prooffile",
+    "Path to snarkjs proof json (e.g. pkgs/circuit/data/VoiceOwnership_proof.json)",
+    undefined,
+    types.string,
+  )
+  .addOptionalParam(
+    "publicfile",
+    "Path to snarkjs public json (e.g. pkgs/circuit/data/VoiceOwnership_public.json)",
+    undefined,
+    types.string,
   )
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
     console.log(
@@ -54,12 +63,71 @@ task("verifyProof", "Verify a Groth16 proof on a deployed verifier")
       c: [string, string];
       input: [string];
     };
-    try {
-      proofData = JSON.parse(taskArgs.proof);
-    } catch {
-      throw new Error(
-        'Invalid proof JSON. Expected: {"a":[...], "b":[[...],[...]], "c":[...], "input":[...]}',
-      );
+
+    const defaultProofFile = "../circuit/data/VoiceOwnership_proof.json";
+    const defaultPublicFile = "../circuit/data/VoiceOwnership_public.json";
+    const proofArg =
+      typeof taskArgs.proof === "string" ? taskArgs.proof.trim() : "";
+    const proofFileArg =
+      typeof taskArgs.proofFile === "string" ? taskArgs.proofFile : undefined;
+    const publicFileArg =
+      typeof taskArgs.publicFile === "string" ? taskArgs.publicFile : undefined;
+
+    if (proofArg.length > 0) {
+      try {
+        proofData = JSON.parse(proofArg);
+      } catch {
+        throw new Error(
+          'Invalid proof JSON. Expected: {"a":[...], "b":[[...],[...]], "c":[...], "input":[...]}',
+        );
+      }
+    } else {
+      const resolvedProofFile =
+        proofFileArg ??
+        (fs.existsSync(defaultProofFile) ? defaultProofFile : undefined);
+      const resolvedPublicFile =
+        publicFileArg ??
+        (fs.existsSync(defaultPublicFile) ? defaultPublicFile : undefined);
+
+      if (resolvedProofFile && resolvedPublicFile) {
+        if (!fs.existsSync(resolvedProofFile)) {
+          throw new Error(`proofFile not found: ${resolvedProofFile}`);
+        }
+        if (!fs.existsSync(resolvedPublicFile)) {
+          throw new Error(`publicFile not found: ${resolvedPublicFile}`);
+        }
+
+        if (!proofFileArg && !publicFileArg) {
+          console.log(
+            `Proof files auto-resolved: ${resolvedProofFile}, ${resolvedPublicFile}`,
+          );
+        }
+
+        const snarkProof = JSON.parse(
+          fs.readFileSync(resolvedProofFile, "utf8"),
+        );
+        const snarkPublic = JSON.parse(
+          fs.readFileSync(resolvedPublicFile, "utf8"),
+        ) as string[];
+        if (!Array.isArray(snarkPublic) || snarkPublic.length < 1) {
+          throw new Error("publicFile must contain at least one public signal");
+        }
+
+        // snarkjs format -> verifier input format
+        proofData = {
+          a: [snarkProof.pi_a[0], snarkProof.pi_a[1]],
+          b: [
+            [snarkProof.pi_b[0][0], snarkProof.pi_b[0][1]],
+            [snarkProof.pi_b[1][0], snarkProof.pi_b[1][1]],
+          ],
+          c: [snarkProof.pi_c[0], snarkProof.pi_c[1]],
+          input: [snarkPublic[0]],
+        };
+      } else {
+        throw new Error(
+          "Provide either --proof OR both --proofFile and --publicFile.",
+        );
+      }
     }
 
     console.log("Verifier:", verifierAddr);

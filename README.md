@@ -185,6 +185,17 @@ https://mistral-worldwide-hackathon-fronten.vercel.app
     --proof '{"a":["1","2"],"b":[["3","4"],["5","6"]],"c":["7","8"],"input":["9"]}' \
     --network base-sepolia
 
+  # または snarkjs の出力ファイルを直接指定（推奨）
+  pnpm --filter contract exec hardhat verifyProof \
+    --proof-file ../circuit/data/VoiceOwnership_proof.json \
+    --public-file ../circuit/data/VoiceOwnership_public.json \
+    --network base-sepolia
+
+  # 引数省略時は既定ファイルを自動使用
+  # ../circuit/data/VoiceOwnership_proof.json
+  # ../circuit/data/VoiceOwnership_public.json
+  pnpm --filter contract exec hardhat verifyProof --network base-sepolia
+
   # テストネットE2E検証（Verifier は自動解決、見つからない場合は MockVerifier をデプロイ）
   pnpm --filter contract exec hardhat verifyTestnet --network base-sepolia
   ```
