@@ -25,6 +25,12 @@ interface HealthResponse {
   status: string;
 }
 
+/**
+ * バックエンドにリクエストを送るためのユーティリティ関数
+ * @param path
+ * @param options
+ * @returns
+ */
 async function request<T>(
   path: string,
   options?: RequestInit,
@@ -41,9 +47,17 @@ async function request<T>(
   return res.json() as Promise<T>;
 }
 
+/**
+ * バックエンドAPIを呼び出すためのクライアントオブジェクト
+ */
 export const backendClient = {
   baseUrl: BACKEND_BASE_URL,
 
+  /**
+   * 声紋特徴量を抽出するAPIを呼び出す
+   * @param audio
+   * @returns
+   */
   async extractFeatures(audio: string): Promise<ExtractFeaturesResponse> {
     return request<ExtractFeaturesResponse>("/extract-features", {
       method: "POST",
@@ -51,6 +65,11 @@ export const backendClient = {
     });
   },
 
+  /**
+   * ZK証明を生成するAPIを呼び出す
+   * @param params
+   * @returns
+   */
   async generateProof(params: {
     referenceFeatures: number[];
     currentFeatures: number[];
@@ -62,6 +81,11 @@ export const backendClient = {
     });
   },
 
+  /**
+   * コミットメントを生成するAPIを呼び出す
+   * @param params
+   * @returns
+   */
   async generateCommitment(params: {
     features: number[];
     salt: string;
@@ -72,6 +96,10 @@ export const backendClient = {
     });
   },
 
+  /**
+   * ヘルスチェックAPIを呼び出す
+   * @returns
+   */
   async health(): Promise<HealthResponse> {
     return request<HealthResponse>("/health");
   },
