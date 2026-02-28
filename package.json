@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "frontend": "pnpm --filter frontend",
+    "backend": "pnpm --filter backend",
+    "mcpserver": "pnpm --filter mcpserver",
     "contract": "pnpm --filter contract",
     "circuit": "pnpm --filter circuit",
     "format": "pnpm exec biome format --write .",
