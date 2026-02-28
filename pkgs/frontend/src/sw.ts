@@ -14,6 +14,5 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// `injectManifest.injectionPoint` でこの値にプリキャッシュ対象が注入される。
-const precacheManifest = self.__WB_MANIFEST;
-void precacheManifest;
+// `injectManifest.injectionPoint` を最適化で消さないために export する。
+export const precacheManifest = self.__WB_MANIFEST;
