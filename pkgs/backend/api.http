@@ -5,7 +5,7 @@ GET {{base_url}}/health
 Accept: application/json
 
 ### Extract features (Task 2.2予定)
-POST {{base_url}}/extract-features
+POST http://localhost:8080/extract-features
 Content-Type: application/json
 
 {
@@ -20,7 +20,7 @@ Content-Type: application/json
 < ./samples/extract_features.sample.json
 
 ### Generate proof (Task 2.3予定)
-POST {{base_url}}/generate-proof
+POST http://localhost:8080/generate-proof
 Content-Type: application/json
 
 {
@@ -36,7 +36,7 @@ Content-Type: application/json
 < ./samples/generate_proof.sample.json
 
 ### Generate commitment (Task 2.3予定)
-POST {{base_url}}/generate-commitment
+POST http://localhost:8080/generate-commitment
 Content-Type: application/json
 
 {
