@@ -1,6 +1,7 @@
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from feature_extraction import AudioFormatError, AudioQualityError, extract_voice_features
 
 
 def create_app() -> Flask:
@@ -10,6 +11,40 @@ def create_app() -> Flask:
     @app.get("/health")
     def health():
         return jsonify({"status": "ok"}), 200
+
+    @app.post("/extract-features")
+    def extract_features():
+        payload = request.get_json(silent=True) or {}
+        audio = payload.get("audio")
+        mime_type = payload.get("mimeType", "")
+        if not audio:
+            return (
+                jsonify(
+                    {
+                        "error": {
+                            "code": "BAD_REQUEST",
+                            "message": "audio field is required",
+                        }
+                    }
+                ),
+                400,
+            )
+
+        try:
+            result = extract_voice_features(audio, mime_type)
+            return jsonify(result), 200
+        except (AudioFormatError, AudioQualityError) as error:
+            return (
+                jsonify(
+                    {
+                        "error": {
+                            "code": "INVALID_AUDIO",
+                            "message": str(error),
+                        }
+                    }
+                ),
+                400,
+            )
 
     @app.errorhandler(400)
     def bad_request(error):
