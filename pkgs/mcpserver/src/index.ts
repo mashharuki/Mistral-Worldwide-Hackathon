@@ -1,18 +1,9 @@
 import { serve } from "@hono/node-server";
-import { Hono } from "hono";
+import { app } from "./app.js";
 
-const app = new Hono();
+const port = Number(process.env.PORT ?? 3000);
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
+serve({ fetch: app.fetch, port }, (info) => {
+  console.log(`MCP Server is running on http://localhost:${info.port}`);
+  console.log(`MCP endpoint: http://localhost:${info.port}/mcp`);
 });
-
-serve(
-  {
-    fetch: app.fetch,
-    port: 3000,
-  },
-  (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`);
-  },
-);

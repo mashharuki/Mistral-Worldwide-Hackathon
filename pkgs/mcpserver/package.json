@@ -6,15 +6,21 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "vitest run"
   },
   "dependencies": {
+    "@hono/mcp": "^0.2.4",
     "@hono/node-server": "^1.19.9",
-    "hono": "^4.12.3"
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "hono": "^4.12.3",
+    "viem": "^2.46.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
     "tsx": "^4.7.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.18"
   }
 }

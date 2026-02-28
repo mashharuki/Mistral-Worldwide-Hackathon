@@ -80,7 +80,7 @@
 
 ## Task 4. MCP サーバー — ツール実装
 
-- [ ] 4.1 MCP サーバーのセットアップ
+- [x] 4.1 MCP サーバーのセットアップ
   - 既存の Hono サーバー骨格に @hono/mcp と @modelcontextprotocol/sdk を導入し、Streamable HTTP トランスポートで MCP サーバーを構築する
   - viem を導入して Base Sepolia RPC への接続を設定する
   - Backend Server への HTTP 通信用クライアントを設定する
