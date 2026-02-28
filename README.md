@@ -114,19 +114,78 @@ https://mistral-worldwide-hackathon-fronten.vercel.app
 - ビルド
 
   ```bash
-  pnpm --filter contract compile
+  pnpm --filter contract run compile
   ```
 
 - テスト
 
   ```bash
-  pnpm --filter contract test
+  pnpm --filter contract run test
   ```
 
 - Base Sepoliaへデプロイ
 
   ```bash
-  pnpm --filter contract deploy -- --network base-sepolia
+  pnpm --filter contract run deploy --network base-sepolia
+  ```
+
+- タスク（Hardhat Task）を使う
+
+  ```bash
+  # チェーン情報 / 残高確認
+  pnpm --filter contract run getChainInfo --network base-sepolia
+  pnpm --filter contract run getBalance --network base-sepolia
+
+  # Verifier デプロイ（ownership または commitment）
+  pnpm --filter contract exec hardhat deployVerifier --type ownership --network base-sepolia
+  pnpm --filter contract exec hardhat deployVerifier --type commitment --network base-sepolia
+
+  # VoiceWallet（Proxy 初期化込み）デプロイ
+  pnpm --filter contract exec hardhat deployVoiceWallet \
+    --verifier 0xYourVerifier \
+    --commitment 0xYourCommitmentBytes32 \
+    --entrypoint 0x0000000071727De22E5E9d8BAf0edAc6f37da032 \
+    --network base-sepolia
+
+  # Wallet 情報取得
+  pnpm --filter contract exec hardhat walletInfo \
+    --wallet 0xYourWalletProxy \
+    --network base-sepolia
+
+  # ETH / ERC20 送金
+  pnpm --filter contract exec hardhat walletEthTransfer \
+    --wallet 0xYourWalletProxy \
+    --to 0xRecipient \
+    --amount 0.001 \
+    --network base-sepolia
+
+  pnpm --filter contract exec hardhat walletErc20Transfer \
+    --wallet 0xYourWalletProxy \
+    --token 0xYourERC20 \
+    --to 0xRecipient \
+    --amount 1 \
+    --network base-sepolia
+
+  # EntryPoint への deposit 入出金
+  pnpm --filter contract exec hardhat walletAddDeposit \
+    --wallet 0xYourWalletProxy \
+    --amount 0.01 \
+    --network base-sepolia
+
+  pnpm --filter contract exec hardhat walletWithdrawDeposit \
+    --wallet 0xYourWalletProxy \
+    --to 0xRecipient \
+    --amount 0.005 \
+    --network base-sepolia
+
+  # 証明検証（proof は JSON 文字列）
+  pnpm --filter contract exec hardhat verifyProof \
+    --verifier 0xYourVerifier \
+    --proof '{"a":["1","2"],"b":[["3","4"],["5","6"]],"c":["7","8"],"input":["9"]}' \
+    --network base-sepolia
+
+  # テストネットE2E検証
+  pnpm --filter contract exec hardhat verifyTestnet --network base-sepolia
   ```
 
 ### MCPサーバー

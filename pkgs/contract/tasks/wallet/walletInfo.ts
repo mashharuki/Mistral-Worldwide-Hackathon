@@ -25,10 +25,7 @@ task(
     const entryPoint = await wallet.entryPoint();
     const deposit = await wallet.getDeposit();
 
-    const publicClient = await hre.viem.getPublicClient();
-    const ethBalance = await publicClient.getBalance({
-      address: taskArgs.wallet as `0x${string}`,
-    });
+    const ethBalance = await hre.ethers.provider.getBalance(taskArgs.wallet);
 
     console.log("Wallet Address:", taskArgs.wallet);
     console.log("Owner:", owner);

@@ -1,6 +1,5 @@
 import { task } from "hardhat/config";
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
-import { formatEther } from "viem";
 
 /**
  * 【Task】	getChainInfo of connected chain
@@ -11,12 +10,13 @@ task("getChainInfo", "getChainInfo of connected chain").setAction(
       "################################### [START] ###################################",
     );
 
-    const publicClient = await hre.viem.getPublicClient();
-    const chainId = await publicClient.getChainId();
-    const blockNumber = await publicClient.getBlockNumber();
-    const count = await publicClient.getBlockTransactionCount();
-    const gasPrice = await publicClient.getGasPrice();
-    const gasPriceInEther = formatEther(gasPrice);
+    const network = await hre.ethers.provider.getNetwork();
+    const chainId = network.chainId;
+    const blockNumber = await hre.ethers.provider.getBlockNumber();
+    const block = await hre.ethers.provider.getBlock(blockNumber);
+    const count = block?.transactions.length ?? 0;
+    const gasPrice = await hre.ethers.provider.getFeeData();
+    const gasPriceInEther = hre.ethers.formatEther(gasPrice.gasPrice ?? 0n);
 
     console.log(`
       Chain ID: ${chainId}

@@ -1,6 +1,5 @@
 import { task } from "hardhat/config";
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
-import { formatEther } from "viem";
 
 /**
  * 【Task】get the balance of the account
@@ -10,15 +9,12 @@ task("getBalance", "getBalance").setAction(
     console.log(
       "################################### [START] ###################################",
     );
-    const [owner] = await hre.viem.getWalletClients();
+    const [owner] = await hre.ethers.getSigners();
 
-    const publicClient = await hre.viem.getPublicClient();
-    const ownerBalance = await publicClient.getBalance({
-      address: owner.account.address,
-    });
+    const ownerBalance = await hre.ethers.provider.getBalance(owner.address);
 
     console.log(
-      `Balance of ${owner.account.address}: ${formatEther(ownerBalance)} ETH`,
+      `Balance of ${owner.address}: ${hre.ethers.formatEther(ownerBalance)} ETH`,
     );
 
     console.log(
