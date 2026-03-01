@@ -150,9 +150,7 @@ function normalizeGroth16Proof(proofObj: any): {
     };
   }
 
-  throw new Error(
-    "invalid proof format: expected {a,b,c} or {pi_a,pi_b,pi_c}",
-  );
+  throw new Error("invalid proof format: expected {a,b,c} or {pi_a,pi_b,pi_c}");
 }
 
 /**
@@ -373,8 +371,7 @@ export async function handleTransferTokens({
   } catch (error) {
     const decoded = decodeTransferFailure(error);
     const message =
-      decoded ??
-      (error instanceof Error ? error.message : "Unknown error");
+      decoded ?? (error instanceof Error ? error.message : "Unknown error");
     return {
       content: [{ type: "text" as const, text: message }],
       isError: true,

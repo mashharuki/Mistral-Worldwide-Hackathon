@@ -16,3 +16,6 @@ export const API_CONFIG = {
   DEFAULT_TIMEOUT: 10000,
   MAX_RETRIES: 3,
 } as const;
+
+export const ENROLLMENT_PHRASE =
+  "Mistral AI is a world-leading unicorn company.";

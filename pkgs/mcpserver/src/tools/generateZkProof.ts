@@ -8,7 +8,9 @@ function normalizeSaltToDecimalString(salt: string): string {
   if (/^\d+$/.test(trimmed)) {
     return trimmed;
   }
-  throw new Error("salt must be a hex string (0x...) or non-negative integer string");
+  throw new Error(
+    "salt must be a hex string (0x...) or non-negative integer string",
+  );
 }
 
 /**
@@ -25,7 +27,7 @@ export async function handleGenerateZkProof({
   referenceFeatures: number[];
   currentFeatures: number[];
   salt: string;
-  }) {
+}) {
   try {
     const normalizedSalt = normalizeSaltToDecimalString(salt);
     const result = await backendClient.generateProof({

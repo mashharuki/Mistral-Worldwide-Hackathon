@@ -217,7 +217,9 @@ const mapToolNameToType = (toolName: string): ToolResultType | undefined => {
   return undefined;
 };
 
-const buildToolResult = (message: Record<string, unknown>): ToolResultCard | undefined => {
+const buildToolResult = (
+  message: Record<string, unknown>,
+): ToolResultCard | undefined => {
   const directToolResult = message.toolResult;
   if (isRecord(directToolResult)) {
     const directType = asToolResultType(directToolResult.type);

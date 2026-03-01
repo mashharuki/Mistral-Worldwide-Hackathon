@@ -10,6 +10,7 @@ import { PAGE_STAGGER } from "./lib/theme";
 import {
   DEFAULT_CONNECTION_TYPE,
   DEFAULT_VOLUME_RATE,
+  ENROLLMENT_PHRASE,
 } from "./utils/constants";
 import {
   asString,
@@ -18,11 +19,12 @@ import {
   buildErrorText,
   buildLogMessage,
 } from "./utils/helpers";
-import { type LogMessage, type TxStatus } from "./utils/types";
+import { type LogMessage, type TxStatus, type ViewMode } from "./utils/types";
 
-type ViewMode = "auto" | "main" | "receive";
-const ENROLLMENT_PHRASE = "Mistral AI is a world-leading unicorn company.";
-
+/**
+ * App コンポーネントに固定
+ * @returns
+ */
 function App() {
   const agentIdFromEnv =
     typeof import.meta.env.VITE_ELEVENLABS_AGENT_ID === "string"
@@ -42,7 +44,10 @@ function App() {
     micMuted,
     volume: volumeRate,
     onMessage: (message: unknown) => {
-      setMessages((prevMessages) => [...prevMessages, buildLogMessage(message)]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        buildLogMessage(message),
+      ]);
     },
     onError: (error: unknown) => {
       setErrorText(buildErrorText(error));
@@ -221,7 +226,10 @@ function App() {
           connectionType: DEFAULT_CONNECTION_TYPE,
         });
       } catch (firstError: unknown) {
-        console.warn("WebRTC接続に失敗。WebSocketへフォールバックします。", firstError);
+        console.warn(
+          "WebRTC接続に失敗。WebSocketへフォールバックします。",
+          firstError,
+        );
         await conversation.startSession({
           agentId: agentIdFromEnv,
           connectionType: "websocket",
@@ -293,7 +301,9 @@ function App() {
       <motion.section className="phone-shell" variants={PAGE_STAGGER.item}>
         {currentScreen === "receive" ? (
           <ReceiveStateScreen
-            walletAddress={latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D"}
+            walletAddress={
+              latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D"
+            }
             eip681Uri={
               latestToolSnapshot.eip681Uri ||
               `ethereum:${latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D"}`

@@ -4,6 +4,8 @@
 export type VoiceConnectionState = "disconnected" | "connecting" | "connected";
 export type VoiceActivityState = "idle" | "listening" | "speaking" | "thinking";
 
+export type ViewMode = "auto" | "main" | "receive";
+
 // Connection types
 export type ConnectionType = "webrtc" | "websocket";
 

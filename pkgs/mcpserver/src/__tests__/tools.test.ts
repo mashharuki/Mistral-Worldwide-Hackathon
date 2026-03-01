@@ -332,9 +332,7 @@ describe("generate_zk_proof tool", () => {
       commitment: "123456789",
       hammingDistance: 12,
     };
-    vi.mocked(backendClient.generateProof).mockResolvedValue(
-      mockResponse,
-    );
+    vi.mocked(backendClient.generateProof).mockResolvedValue(mockResponse);
 
     const { server, client } = await createTestClient();
     const result = await client.callTool({
