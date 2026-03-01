@@ -1,0 +1,131 @@
+.voice-orb {
+  --voice-level: 0;
+  position: relative;
+  width: 192px;
+  height: 192px;
+  display: grid;
+  place-items: center;
+}
+
+.voice-orb__core {
+  width: 108px;
+  height: 108px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(
+      circle at 32% 28%,
+      color-mix(in srgb, white 70%, transparent),
+      transparent 50%
+    ),
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--brand-secondary) 70%, var(--surface-base)),
+      color-mix(in srgb, var(--brand-primary) 76%, var(--surface-base))
+    );
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, white 72%, transparent),
+    0 24px 44px color-mix(in srgb, var(--brand-secondary) 34%, transparent);
+}
+
+.voice-orb__inner {
+  width: 54%;
+  height: 54%;
+  border-radius: 999px;
+  background: color-mix(in srgb, white 72%, var(--brand-accent));
+  opacity: 0.82;
+}
+
+.voice-orb__waves {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.voice-orb__wave {
+  position: absolute;
+  inset: 24px;
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--brand-accent) 52%, white);
+  opacity: 0.2;
+  animation: voice-wave 2.4s ease-out infinite;
+}
+
+.voice-orb__wave:nth-child(2) {
+  animation-delay: 0.6s;
+}
+
+.voice-orb__wave:nth-child(3) {
+  animation-delay: 1.2s;
+}
+
+.voice-orb__status {
+  position: absolute;
+  bottom: -10px;
+  display: flex;
+  gap: 8px;
+  font-family: "JetBrains Mono", "Noto Sans JP", monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.voice-orb__status span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, white 76%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink-subtle) 18%, white);
+  color: var(--ink-subtle);
+}
+
+.voice-orb--disconnected .voice-orb__core {
+  filter: grayscale(0.45);
+}
+
+.voice-orb--connecting .voice-orb__core {
+  animation: voice-connecting 1.4s ease-in-out infinite;
+}
+
+.voice-orb--listening .voice-orb__wave,
+.voice-orb--speaking .voice-orb__wave {
+  opacity: calc(0.24 + var(--voice-level) * 0.38);
+}
+
+.voice-orb--speaking .voice-orb__core {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, white 72%, transparent),
+    0 26px 54px color-mix(in srgb, var(--brand-primary) 44%, transparent);
+}
+
+.voice-orb--thinking .voice-orb__wave {
+  animation-duration: 1.8s;
+  border-color: color-mix(in srgb, var(--brand-secondary) 44%, white);
+}
+
+.voice-orb--idle .voice-orb__wave {
+  opacity: 0.15;
+}
+
+@keyframes voice-wave {
+  0% {
+    transform: scale(0.74);
+    opacity: 0.52;
+  }
+  70% {
+    opacity: 0.12;
+  }
+  100% {
+    transform: scale(calc(1 + var(--voice-level) * 0.45));
+    opacity: 0;
+  }
+}
+
+@keyframes voice-connecting {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}

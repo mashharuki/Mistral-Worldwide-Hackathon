@@ -2,6 +2,11 @@ import { useConversation } from "@elevenlabs/react";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { Button } from "./components/ui/button";
+import {
+    type VoiceActivityState,
+    type VoiceConnectionState,
+    VoiceOrb,
+} from "./components/voice-orb";
 import "./css/App.css";
 import { PAGE_STAGGER } from "./lib/theme";
 
@@ -81,6 +86,36 @@ const buildErrorText = (error: unknown): string => {
   return JSON.stringify(error);
 };
 
+const buildConnectionState = (statusText: string): VoiceConnectionState => {
+  if (statusText === "connected") {
+    return "connected";
+  }
+  if (statusText === "connecting") {
+    return "connecting";
+  }
+  return "disconnected";
+};
+
+const buildActivityState = (
+  modeText: string,
+  isSpeaking: boolean,
+): VoiceActivityState => {
+  if (isSpeaking) {
+    return "speaking";
+  }
+
+  if (modeText === "speaking") {
+    return "speaking";
+  }
+  if (modeText === "listening") {
+    return "listening";
+  }
+  if (modeText === "thinking") {
+    return "thinking";
+  }
+  return "idle";
+};
+
 function App() {
   const agentIdFromEnv =
     typeof import.meta.env.VITE_ELEVENLABS_AGENT_ID === "string"
@@ -134,6 +169,14 @@ function App() {
   const isSpeaking = useMemo(
     () => Boolean(conversation.isSpeaking),
     [conversation.isSpeaking],
+  );
+  const voiceConnectionState = useMemo(
+    () => buildConnectionState(statusText),
+    [statusText],
+  );
+  const voiceActivityState = useMemo(
+    () => buildActivityState(modeText, isSpeaking),
+    [isSpeaking, modeText],
   );
 
   const handleRequestMic = async (): Promise<void> => {
@@ -218,6 +261,11 @@ function App() {
           </p>
         </div>
         <div className="status-panel">
+          <VoiceOrb
+            connectionState={voiceConnectionState}
+            activityState={voiceActivityState}
+            micLevel={isConnected && !micMuted ? volumeRate : 0}
+          />
           <span className={`status-badge ${isConnected ? "connected" : ""}`}>
             {statusText}
           </span>
