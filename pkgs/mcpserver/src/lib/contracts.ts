@@ -75,6 +75,28 @@ export const voiceWalletAbi = [
     stateMutability: "view",
     type: "function",
   },
+  {
+    inputs: [],
+    name: "verifier",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function",
+  },
+] as const;
+
+export const groth16VerifierAbi = [
+  {
+    inputs: [
+      { internalType: "uint256[2]", name: "a", type: "uint256[2]" },
+      { internalType: "uint256[2][2]", name: "b", type: "uint256[2][2]" },
+      { internalType: "uint256[2]", name: "c", type: "uint256[2]" },
+      { internalType: "uint256[1]", name: "input", type: "uint256[1]" },
+    ],
+    name: "verifyProof",
+    outputs: [{ internalType: "bool", name: "", type: "bool" }],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 // ERC-20 ABI fragments

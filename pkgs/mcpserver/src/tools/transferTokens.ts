@@ -16,6 +16,7 @@ import {
   USDC_ADDRESS,
   erc20Abi,
   entryPointAbi,
+  groth16VerifierAbi,
   voiceWalletAbi,
 } from "../lib/contracts.js";
 
@@ -283,6 +284,52 @@ export async function handleTransferTokens({
         ],
         isError: true,
       };
+    }
+
+    // 4.2 Wallet が参照する verifier で事前に proof を照合（AA23原因の早期可視化）
+    if (process.env.NODE_ENV !== "test") {
+      try {
+        const verifierAddress = (await viemClient.readContract({
+          address: walletAddress,
+          abi: voiceWalletAbi,
+          functionName: "verifier",
+          args: [],
+        })) as `0x${string}`;
+
+        if (
+          verifierAddress &&
+          verifierAddress !== "0x0000000000000000000000000000000000000000"
+        ) {
+          const verifierOk = (await viemClient.readContract({
+            address: verifierAddress,
+            abi: groth16VerifierAbi,
+            functionName: "verifyProof",
+            args: [
+              normalizedProof.a.map(BigInt) as [bigint, bigint],
+              normalizedProof.b.map((row: string[]) => row.map(BigInt)) as [
+                [bigint, bigint],
+                [bigint, bigint],
+              ],
+              normalizedProof.c.map(BigInt) as [bigint, bigint],
+              [publicSignal] as [bigint],
+            ],
+          })) as boolean;
+
+          if (!verifierOk) {
+            return {
+              content: [
+                {
+                  type: "text" as const,
+                  text: `ZK proof の事前検証に失敗しました。wallet verifier=${verifierAddress}。generate_zk_proof を再実行し、reference/current/salt がウォレット作成時と一致していることを確認してください。`,
+                },
+              ],
+              isError: true,
+            };
+          }
+        }
+      } catch {
+        // verifier の事前照合が実行できない環境では本処理を継続
+      }
     }
 
     const signature = encodeAbiParameters(
