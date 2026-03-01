@@ -253,10 +253,10 @@ export async function handleTransferTokens({
       args: [walletAddress, 0n],
     })) as bigint;
 
-    // 6. PackedUserOperation を構築 (ハッカソン用: ハードコード gas 値)
-    const verificationGasLimit = 500000n;
-    const callGasLimit = 500000n;
-    const preVerificationGas = 100000n;
+    // 6. PackedUserOperation を構築 (ZK 検証を考慮して安全側に設定)
+    const verificationGasLimit = 2000000n;
+    const callGasLimit = 700000n;
+    const preVerificationGas = 150000n;
     const maxPriorityFeePerGas = 1000000000n; // 1 gwei
     const maxFeePerGas = 2000000000n; // 2 gwei
 
