@@ -6,11 +6,7 @@ import { backendClient } from "../lib/backendClient.js";
  * 音声データを Backend の /extract-features に転送し、
  * 特徴量とバイナリベクトルを返却する。
  */
-export async function handleExtractVoiceFeatures({
-  audio,
-}: {
-  audio: string;
-}) {
+export async function handleExtractVoiceFeatures({ audio }: { audio: string }) {
   try {
     const result = await backendClient.extractFeatures(audio);
     return {
@@ -27,8 +23,7 @@ export async function handleExtractVoiceFeatures({
       ],
     };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown error";
+    const message = error instanceof Error ? error.message : "Unknown error";
     return {
       content: [{ type: "text" as const, text: message }],
       isError: true,

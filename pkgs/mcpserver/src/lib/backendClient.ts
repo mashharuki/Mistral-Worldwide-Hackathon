@@ -1,5 +1,4 @@
-const BACKEND_BASE_URL =
-  process.env.BACKEND_URL ?? "http://localhost:5000";
+const BACKEND_BASE_URL = process.env.BACKEND_URL ?? "http://localhost:5000";
 
 interface ExtractFeaturesResponse {
   features: number[];
@@ -34,10 +33,7 @@ interface HealthResponse {
  * @param options
  * @returns
  */
-async function request<T>(
-  path: string,
-  options?: RequestInit,
-): Promise<T> {
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const url = `${BACKEND_BASE_URL}${path}`;
   const res = await fetch(url, {
     headers: { "Content-Type": "application/json" },

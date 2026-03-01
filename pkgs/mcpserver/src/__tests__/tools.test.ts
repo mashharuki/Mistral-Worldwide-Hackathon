@@ -58,7 +58,10 @@ describe("extract_voice_features tool", () => {
 
   it("should call backend extractFeatures and return features", async () => {
     const mockResponse = {
-      features: [123456789, 987654321, 111111111, 222222222, 333333333, 444444444, 555555555, 666666666],
+      features: [
+        123456789, 987654321, 111111111, 222222222, 333333333, 444444444,
+        555555555, 666666666,
+      ],
       binaryFeatures: [1, 0, 1, 1, 0, 1],
     };
     vi.mocked(backendClient.extractFeatures).mockResolvedValue(mockResponse);
@@ -110,8 +113,18 @@ describe("generate_zk_wallet tool", () => {
 
   it("should call backend generateCommitment and factory getAddress", async () => {
     const mockCommitmentResponse = {
-      commitment: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-      packedFeatures: ["123456789", "987654321", "111111111", "222222222", "333333333", "444444444", "555555555", "666666666"],
+      commitment:
+        "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      packedFeatures: [
+        "123456789",
+        "987654321",
+        "111111111",
+        "222222222",
+        "333333333",
+        "444444444",
+        "555555555",
+        "666666666",
+      ],
     };
     vi.mocked(backendClient.generateCommitment).mockResolvedValue(
       mockCommitmentResponse,
@@ -121,7 +134,10 @@ describe("generate_zk_wallet tool", () => {
     vi.mocked(viemClient.readContract).mockResolvedValue(mockWalletAddress);
 
     const { server, client } = await createTestClient();
-    const features = [123456789, 987654321, 111111111, 222222222, 333333333, 444444444, 555555555, 666666666];
+    const features = [
+      123456789, 987654321, 111111111, 222222222, 333333333, 444444444,
+      555555555, 666666666,
+    ];
     const result = await client.callTool({
       name: "generate_zk_wallet",
       arguments: { features, salt: "0xabc123" },
@@ -129,7 +145,7 @@ describe("generate_zk_wallet tool", () => {
 
     expect(backendClient.generateCommitment).toHaveBeenCalledWith({
       features,
-      salt: "0xabc123",
+      salt: BigInt("0xabc123").toString(10),
     });
     expect(viemClient.readContract).toHaveBeenCalled();
 
@@ -138,6 +154,10 @@ describe("generate_zk_wallet tool", () => {
     const parsed = JSON.parse(textContent[0].text);
     expect(parsed.walletAddress).toBe(mockWalletAddress);
     expect(parsed.commitment).toBe(mockCommitmentResponse.commitment);
+    expect(parsed.salt).toBe(
+      `0x${BigInt("0xabc123").toString(16).padStart(64, "0")}`,
+    );
+    expect(parsed.saltDecimal).toBe(BigInt("0xabc123").toString(10));
 
     await client.close();
     await server.close();
@@ -145,7 +165,8 @@ describe("generate_zk_wallet tool", () => {
 
   it("should generate a random salt when not provided", async () => {
     const mockCommitmentResponse = {
-      commitment: "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      commitment:
+        "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
       packedFeatures: ["1", "2", "3", "4", "5", "6", "7", "8"],
     };
     vi.mocked(backendClient.generateCommitment).mockResolvedValue(
@@ -165,7 +186,7 @@ describe("generate_zk_wallet tool", () => {
     expect(backendClient.generateCommitment).toHaveBeenCalledWith(
       expect.objectContaining({
         features: [1, 2, 3, 4, 5, 6, 7, 8],
-        salt: expect.any(String),
+        salt: expect.stringMatching(/^\d+$/),
       }),
     );
     expect(result.isError).toBeFalsy();
@@ -195,7 +216,8 @@ describe("generate_zk_wallet tool", () => {
 
   it("should return structured error on contract call failure", async () => {
     const mockCommitmentResponse = {
-      commitment: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      commitment:
+        "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
       packedFeatures: ["1", "2", "3", "4", "5", "6", "7", "8"],
     };
     vi.mocked(backendClient.generateCommitment).mockResolvedValue(
@@ -220,6 +242,76 @@ describe("generate_zk_wallet tool", () => {
   });
 });
 
+describe("create_wallet tool", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should deploy wallet when not deployed yet", async () => {
+    const predictedWalletAddress = "0x1234567890123456789012345678901234567890";
+    vi.mocked(viemClient.readContract).mockResolvedValue(
+      predictedWalletAddress,
+    );
+    vi.mocked(viemClient.getBytecode)
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce("0x6001600055");
+    vi.mocked(relayerClientMock.writeContract).mockResolvedValue(
+      "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+    );
+    vi.mocked(viemClient.waitForTransactionReceipt).mockResolvedValue({
+      status: "success",
+    } as never);
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "create_wallet",
+      arguments: {
+        commitment:
+          "18462540752726400309893078066476452350669854701354677931972054860563917542588",
+        salt: "0xdc42cc0cee775b12ea4f0e2047d609046fba264ffd0b3537e855e24f481c62c7",
+      },
+    });
+
+    expect(result.isError).toBeFalsy();
+    const textContent = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(textContent[0].text);
+    expect(parsed.walletAddress).toBe(predictedWalletAddress);
+    expect(parsed.deployed).toBe(true);
+    expect(parsed.status).toBe("confirmed");
+    expect(relayerClientMock.writeContract).toHaveBeenCalledTimes(1);
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should skip deployment when wallet already deployed", async () => {
+    const predictedWalletAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd";
+    vi.mocked(viemClient.readContract).mockResolvedValue(
+      predictedWalletAddress,
+    );
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x6001600055");
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "create_wallet",
+      arguments: {
+        commitment: "12345",
+        salt: "67890",
+      },
+    });
+
+    expect(result.isError).toBeFalsy();
+    const textContent = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(textContent[0].text);
+    expect(parsed.walletAddress).toBe(predictedWalletAddress);
+    expect(parsed.alreadyDeployed).toBe(true);
+    expect(relayerClientMock.writeContract).not.toHaveBeenCalled();
+
+    await client.close();
+    await server.close();
+  });
+});
+
 // ============================================================
 // Task 4.3: get_wallet_balance, get_wallet_address, show_wallet_qrcode
 // ============================================================
@@ -231,9 +323,7 @@ describe("get_wallet_balance tool", () => {
 
   it("should return ETH and USDC balances in friendly format", async () => {
     // ETH balance: 0.5 ETH = 500000000000000000 wei
-    vi.mocked(viemClient.getBalance).mockResolvedValue(
-      500000000000000000n,
-    );
+    vi.mocked(viemClient.getBalance).mockResolvedValue(500000000000000000n);
     // Bytecode exists -> wallet is deployed
     vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
     // USDC balance (6 decimals): 100 USDC = 100000000
@@ -287,9 +377,7 @@ describe("get_wallet_balance tool", () => {
   });
 
   it("should return error on RPC failure", async () => {
-    vi.mocked(viemClient.getBytecode).mockRejectedValue(
-      new Error("RPC error"),
-    );
+    vi.mocked(viemClient.getBytecode).mockRejectedValue(new Error("RPC error"));
 
     const { server, client } = await createTestClient();
     const result = await client.callTool({
@@ -403,7 +491,14 @@ describe("show_wallet_qrcode tool", () => {
 // ============================================================
 
 const mockProof = JSON.stringify({
-  proof: { a: ["1", "2"], b: [["3", "4"], ["5", "6"]], c: ["7", "8"] },
+  proof: {
+    a: ["1", "2"],
+    b: [
+      ["3", "4"],
+      ["5", "6"],
+    ],
+    c: ["7", "8"],
+  },
   publicSignals: ["12345"],
 });
 
@@ -416,9 +511,7 @@ describe("transfer_tokens tool", () => {
     // Wallet deployed
     vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
     // 1 ETH balance
-    vi.mocked(viemClient.getBalance).mockResolvedValue(
-      1000000000000000000n,
-    );
+    vi.mocked(viemClient.getBalance).mockResolvedValue(1000000000000000000n);
     // readContract: nonce from EntryPoint
     vi.mocked(viemClient.readContract).mockResolvedValue(0n);
     // Relayer sends tx
@@ -581,9 +674,7 @@ describe("transfer_tokens tool", () => {
 
   it("should return error on transaction failure", async () => {
     vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
-    vi.mocked(viemClient.getBalance).mockResolvedValue(
-      1000000000000000000n,
-    );
+    vi.mocked(viemClient.getBalance).mockResolvedValue(1000000000000000000n);
     vi.mocked(viemClient.readContract).mockResolvedValue(0n);
     vi.mocked(relayerClientMock.writeContract).mockRejectedValue(
       new Error("Transaction reverted"),

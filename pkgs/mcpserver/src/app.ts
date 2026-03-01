@@ -2,6 +2,7 @@ import { StreamableHTTPTransport } from "@hono/mcp";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { Hono } from "hono";
 import {
+  createWalletInput,
   extractVoiceFeaturesInput,
   generateZkWalletInput,
   getWalletAddressInput,
@@ -9,6 +10,7 @@ import {
   showWalletQrcodeInput,
   transferTokensInput,
 } from "./lib/schemas.js";
+import { handleCreateWallet } from "./tools/createWallet.js";
 import { handleExtractVoiceFeatures } from "./tools/extractVoiceFeatures.js";
 import { handleGenerateZkWallet } from "./tools/generateZkWallet.js";
 import { handleGetWalletAddress } from "./tools/getWalletAddress.js";
@@ -17,7 +19,7 @@ import { handleShowWalletQrcode } from "./tools/showWalletQrcode.js";
 import { handleTransferTokens } from "./tools/transferTokens.js";
 
 /**
- * 6 ツールを登録した McpServer を生成する
+ * 7 ツールを登録した McpServer を生成する
  */
 export function createMcpServer(): McpServer {
   const server = new McpServer({
@@ -48,11 +50,22 @@ export function createMcpServer(): McpServer {
         "声の特徴量から ZK 証明を生成し、決定論的にウォレットアドレスを算出します",
       inputSchema: generateZkWalletInput,
     },
-    async ({ features, salt }) =>
-      handleGenerateZkWallet({ features, salt }),
+    async ({ features, salt }) => handleGenerateZkWallet({ features, salt }),
   );
 
-  // --- Tool 3: get_wallet_balance ---
+  // --- Tool 3: create_wallet ---
+  server.registerTool(
+    "create_wallet",
+    {
+      title: "ウォレットデプロイ",
+      description:
+        "commitment と salt を使って Factory.createWallet を実行し、ウォレットをデプロイします",
+      inputSchema: createWalletInput,
+    },
+    async ({ commitment, salt }) => handleCreateWallet({ commitment, salt }),
+  );
+
+  // --- Tool 4: get_wallet_balance ---
   server.registerTool(
     "get_wallet_balance",
     {
@@ -61,11 +74,10 @@ export function createMcpServer(): McpServer {
         "指定ウォレットの ETH / USDC 残高をフレンドリーな形式で返却します",
       inputSchema: getWalletBalanceInput,
     },
-    async ({ walletAddress }) =>
-      handleGetWalletBalance({ walletAddress }),
+    async ({ walletAddress }) => handleGetWalletBalance({ walletAddress }),
   );
 
-  // --- Tool 4: get_wallet_address ---
+  // --- Tool 5: get_wallet_address ---
   server.registerTool(
     "get_wallet_address",
     {
@@ -74,11 +86,10 @@ export function createMcpServer(): McpServer {
         "声のコミットメントから Factory 経由でウォレットアドレスを算出します",
       inputSchema: getWalletAddressInput,
     },
-    async ({ commitment }) =>
-      handleGetWalletAddress({ commitment }),
+    async ({ commitment }) => handleGetWalletAddress({ commitment }),
   );
 
-  // --- Tool 5: show_wallet_qrcode ---
+  // --- Tool 6: show_wallet_qrcode ---
   server.registerTool(
     "show_wallet_qrcode",
     {
@@ -87,11 +98,10 @@ export function createMcpServer(): McpServer {
         "ウォレットアドレスの EIP-681 ペイメントリンク付き QR コードデータを生成します",
       inputSchema: showWalletQrcodeInput,
     },
-    async ({ walletAddress }) =>
-      handleShowWalletQrcode({ walletAddress }),
+    async ({ walletAddress }) => handleShowWalletQrcode({ walletAddress }),
   );
 
-  // --- Tool 6: transfer_tokens ---
+  // --- Tool 7: transfer_tokens ---
   server.registerTool(
     "transfer_tokens",
     {

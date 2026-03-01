@@ -5,8 +5,15 @@ export const extractVoiceFeaturesInput = {
 };
 
 export const generateZkWalletInput = {
-  features: z.array(z.number()).describe("64bit パッキングされた特徴量配列 (8要素)"),
+  features: z
+    .array(z.number())
+    .describe("64bit パッキングされた特徴量配列 (8要素)"),
   salt: z.string().optional().describe("ソルト値（省略時はランダム生成）"),
+};
+
+export const createWalletInput = {
+  commitment: z.string().describe("Voice commitment (10進または0x16進)"),
+  salt: z.string().describe("Salt (10進または0x16進)"),
 };
 
 export const getWalletBalanceInput = {

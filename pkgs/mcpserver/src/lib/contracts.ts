@@ -3,22 +3,21 @@
  */
 
 // --- デプロイ済みアドレス ---
-export const VOICE_WALLET_FACTORY_ADDRESS =
-  (process.env.VOICE_WALLET_FACTORY_ADDRESS ??
-    "0x3872A516c8e8FDB29b5D28C6D5528153D66Edd4f") as `0x${string}`;
+export const VOICE_WALLET_FACTORY_ADDRESS = (process.env
+  .VOICE_WALLET_FACTORY_ADDRESS ??
+  "0x3872A516c8e8FDB29b5D28C6D5528153D66Edd4f") as `0x${string}`;
 
-export const VOICE_OWNERSHIP_VERIFIER_ADDRESS =
-  (process.env.VOICE_OWNERSHIP_VERIFIER_ADDRESS ??
-    "0x877e07ddC0b95640cD009154ab9dA6a691Ee783b") as `0x${string}`;
+export const VOICE_OWNERSHIP_VERIFIER_ADDRESS = (process.env
+  .VOICE_OWNERSHIP_VERIFIER_ADDRESS ??
+  "0x877e07ddC0b95640cD009154ab9dA6a691Ee783b") as `0x${string}`;
 
 // EntryPoint v0.7
 export const ENTRYPOINT_ADDRESS =
   "0x0000000071727De22E5E9d8BAf0edAc6f37da032" as `0x${string}`;
 
 // MockERC20 (USDC) on Base Sepolia
-export const USDC_ADDRESS =
-  (process.env.USDC_ADDRESS ??
-    "0x6aec1F4fddaa5c3dD559d884ED4905aE108d5Caa") as `0x${string}`;
+export const USDC_ADDRESS = (process.env.USDC_ADDRESS ??
+  "0x6aec1F4fddaa5c3dD559d884ED4905aE108d5Caa") as `0x${string}`;
 
 // --- ABI フラグメント ---
 export const voiceWalletFactoryAbi = [

@@ -66,7 +66,7 @@ describe("MCP Server Setup", () => {
   });
 
   describe("McpServer tool registration", () => {
-    it("should register all 6 MCP tools via in-memory transport", async () => {
+    it("should register all 7 MCP tools via in-memory transport", async () => {
       const server = createMcpServer();
       const client = new Client({
         name: "test-client",
@@ -85,11 +85,12 @@ describe("MCP Server Setup", () => {
 
       expect(toolNames).toContain("extract_voice_features");
       expect(toolNames).toContain("generate_zk_wallet");
+      expect(toolNames).toContain("create_wallet");
       expect(toolNames).toContain("get_wallet_balance");
       expect(toolNames).toContain("get_wallet_address");
       expect(toolNames).toContain("show_wallet_qrcode");
       expect(toolNames).toContain("transfer_tokens");
-      expect(toolNames).toHaveLength(6);
+      expect(toolNames).toHaveLength(7);
 
       await client.close();
       await server.close();

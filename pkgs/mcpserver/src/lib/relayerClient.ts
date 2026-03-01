@@ -2,8 +2,7 @@ import { createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia } from "viem/chains";
 
-const rpcUrl =
-  process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org";
+const rpcUrl = process.env.BASE_SEPOLIA_RPC_URL ?? "https://sepolia.base.org";
 
 const relayerKey = process.env.RELAYER_PRIVATE_KEY;
 
