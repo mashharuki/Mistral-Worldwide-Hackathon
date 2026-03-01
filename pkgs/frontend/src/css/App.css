@@ -21,11 +21,13 @@
 .app-header h1 {
   margin: 0;
   font-size: 28px;
+  letter-spacing: -0.03em;
+  font-weight: 700;
 }
 
 .app-subtitle {
   margin: 8px 0 0;
-  color: #556070;
+  color: var(--ink-subtle);
 }
 
 .status-panel {
@@ -37,24 +39,25 @@
 .status-badge {
   padding: 6px 12px;
   border-radius: 999px;
-  background: #eef1f6;
-  color: #3a4453;
+  background: color-mix(in srgb, var(--surface-muted) 90%, white);
+  color: var(--ink-subtle);
   font-weight: 600;
+  font-family: "JetBrains Mono", "Noto Sans JP", monospace;
   text-transform: capitalize;
 }
 
 .status-badge.connected {
-  background: #e0f2ff;
-  color: #1464b8;
+  background: color-mix(in srgb, var(--brand-secondary) 22%, white);
+  color: color-mix(in srgb, var(--brand-secondary) 74%, black);
 }
 
 .status-badge.speaking {
-  background: #ffe7d8;
-  color: #c45c21;
+  background: color-mix(in srgb, var(--brand-primary) 20%, white);
+  color: color-mix(in srgb, var(--brand-primary) 66%, black);
 }
 
 .status-text {
-  color: #6b7280;
+  color: var(--ink-subtle);
   font-weight: 600;
   text-transform: capitalize;
 }
@@ -66,14 +69,16 @@
 }
 
 .card {
-  background: #ffffff;
+  background: color-mix(in srgb, white 72%, transparent);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--ink-primary) 11%, transparent);
   display: flex;
   flex-direction: column;
   gap: 16px;
   text-align: left;
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, white 88%, var(--ink-primary));
 }
 
 .card h2 {
@@ -89,7 +94,7 @@
 
 .field label {
   font-weight: 600;
-  color: #2d3748;
+  color: var(--ink-primary);
 }
 
 .actions {
@@ -121,21 +126,22 @@
 
 .meta-label {
   font-size: 12px;
+  font-family: "JetBrains Mono", "Noto Sans JP", monospace;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--ink-subtle);
 }
 
 .meta-value {
   display: block;
   margin-top: 4px;
   font-weight: 600;
-  color: #111827;
+  color: var(--ink-primary);
   word-break: break-all;
 }
 
 .error {
-  background: #fee2e2;
-  color: #991b1b;
+  background: color-mix(in srgb, var(--brand-primary) 20%, white);
+  color: color-mix(in srgb, var(--brand-primary) 70%, black);
   padding: 10px 12px;
   border-radius: 8px;
   font-weight: 600;
@@ -148,7 +154,7 @@
 
 .range-value {
   font-size: 12px;
-  color: #4b5563;
+  color: var(--ink-subtle);
 }
 
 .log {
@@ -175,38 +181,71 @@
   gap: 6px;
   padding: 12px 14px;
   border-radius: 12px;
-  background: #f1f5f9;
+  background: color-mix(in srgb, white 85%, var(--surface-muted));
 }
 
 .message.user {
-  background: #e0f2fe;
+  background: color-mix(in srgb, var(--brand-secondary) 14%, white);
 }
 
 .message.agent {
-  background: #fef3c7;
+  background: color-mix(in srgb, var(--brand-accent) 18%, white);
 }
 
 .message.debug {
-  background: #f3e8ff;
+  background: color-mix(in srgb, var(--brand-primary) 12%, white);
 }
 
 .message-role {
   font-weight: 700;
   text-transform: uppercase;
   font-size: 12px;
-  color: #64748b;
+  color: var(--ink-subtle);
+  font-family: "JetBrains Mono", "Noto Sans JP", monospace;
 }
 
 .message-text {
-  color: #111827;
+  color: var(--ink-primary);
 }
 
 .message-meta {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--ink-subtle);
+  font-family: "JetBrains Mono", "Noto Sans JP", monospace;
 }
 
 .empty {
-  color: #6b7280;
+  color: var(--ink-subtle);
   margin: 0;
+}
+
+@media (max-width: 1023px) {
+  #root {
+    padding: 24px 18px 42px;
+  }
+
+  .app-header h1 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 639px) {
+  #root {
+    padding: 20px 12px 30px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .status-panel {
+    width: 100%;
+    justify-content: space-between;
+  }
 }

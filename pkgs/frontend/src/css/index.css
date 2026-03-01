@@ -1,9 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Space+Grotesk:wght@300;400;700&display=swap");
+@import "tailwindcss";
+
 :root {
-  font-family: "Inter", "Noto Sans JP", system-ui, sans-serif;
+  --brand-primary: #ff5a36;
+  --brand-secondary: #1278ff;
+  --brand-accent: #00d1b2;
+  --surface-base: #f5f2ed;
+  --surface-muted: #ebe6df;
+  --ink-primary: #181512;
+  --ink-subtle: #574f49;
+  --noise-grid:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--ink-primary) 8%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--ink-primary) 8%, transparent) 1px,
+      transparent 1px
+    );
+  font-family: "Space Grotesk", "Noto Sans JP", sans-serif;
   line-height: 1.6;
   font-weight: 400;
-  color: #1f2937;
-  background-color: #f5f7fb;
+  color: var(--ink-primary);
+  background-color: var(--surface-base);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -18,7 +39,36 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f5f7fb;
+  background:
+    radial-gradient(
+      circle at 16% 18%,
+      color-mix(in srgb, var(--brand-primary) 24%, transparent),
+      transparent 46%
+    ),
+    radial-gradient(
+      circle at 80% 12%,
+      color-mix(in srgb, var(--brand-secondary) 26%, transparent),
+      transparent 52%
+    ),
+    linear-gradient(
+      140deg,
+      var(--surface-base) 0%,
+      var(--surface-muted) 62%,
+      color-mix(in srgb, var(--brand-accent) 8%, var(--surface-base)) 100%
+    );
+  color: var(--ink-primary);
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--noise-grid);
+  background-size: 24px 24px;
+  opacity: 0.24;
+  mix-blend-mode: multiply;
 }
 
 a {
@@ -30,7 +80,7 @@ button {
   border: none;
   padding: 10px 16px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   transition:
@@ -51,16 +101,32 @@ button:hover:not(:disabled) {
 input,
 select {
   border-radius: 10px;
-  border: 1px solid #d1d5db;
+  border: 1px solid color-mix(in srgb, var(--ink-subtle) 22%, white);
   padding: 10px 12px;
   font-size: 14px;
   font-family: inherit;
-  background: #ffffff;
+  background: color-mix(in srgb, white 80%, transparent);
 }
 
 input:focus,
 select:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  border-color: var(--brand-secondary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand-secondary) 22%, white);
+}
+
+.font-mono-brand {
+  font-family: "JetBrains Mono", "Noto Sans JP", monospace;
+}
+
+@media (max-width: 1023px) {
+  :root {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 639px) {
+  :root {
+    font-size: 14px;
+  }
 }

@@ -1,6 +1,9 @@
 import { useConversation } from "@elevenlabs/react";
+import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
+import { Button } from "./components/ui/button";
 import "./css/App.css";
+import { PAGE_STAGGER } from "./lib/theme";
 
 type ConnectionType = "webrtc" | "websocket";
 type MessageRole = "user" | "agent" | "debug" | "system";
@@ -201,8 +204,13 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <header className="app-header">
+    <motion.div
+      className="app"
+      variants={PAGE_STAGGER.container}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.header className="app-header" variants={PAGE_STAGGER.item}>
         <div>
           <h1>ElevenLabs React SDK サンプル</h1>
           <p className="app-subtitle">
@@ -218,10 +226,10 @@ function App() {
           </span>
           <span className="status-text">{modeText}</span>
         </div>
-      </header>
+      </motion.header>
 
-      <section className="grid">
-        <div className="card">
+      <motion.section className="grid" variants={PAGE_STAGGER.item}>
+        <div className="card glass">
           <h2>接続設定</h2>
           <div className="field">
             <label htmlFor="agent-id">Agent ID（環境変数）</label>
@@ -257,23 +265,22 @@ function App() {
             </select>
           </div>
           <div className="actions">
-            <button className="primary" onClick={handleRequestMic}>
+            <Button onClick={handleRequestMic}>
               マイク許可を取得
-            </button>
-            <button
-              className="primary"
+            </Button>
+            <Button
               onClick={handleStartSession}
               disabled={isConnected}
             >
               セッション開始
-            </button>
-            <button
-              className="secondary"
+            </Button>
+            <Button
+              variant="secondary"
               onClick={handleEndSession}
               disabled={!isConnected}
             >
               セッション終了
-            </button>
+            </Button>
           </div>
           <div className="meta">
             <div>
@@ -290,7 +297,7 @@ function App() {
           {errorText && <div className="error">{errorText}</div>}
         </div>
 
-        <div className="card">
+        <div className="card glass">
           <h2>音量とミュート</h2>
           <div className="field">
             <label htmlFor="volume-rate">Volume</label>
@@ -308,9 +315,9 @@ function App() {
             <span className="range-value">{volumeRate.toFixed(2)}</span>
           </div>
           <div className="actions">
-            <button className="secondary" onClick={handleToggleMute}>
+            <Button variant="secondary" onClick={handleToggleMute}>
               {micMuted ? "ミュート解除" : "ミュート"}
-            </button>
+            </Button>
           </div>
           <div className="field">
             <label htmlFor="text-message">テキスト送信</label>
@@ -322,40 +329,40 @@ function App() {
                 placeholder="メッセージを入力"
                 onChange={(event) => handleChangeInputText(event.target.value)}
               />
-              <button className="primary" onClick={handleSendMessage}>
+              <Button onClick={handleSendMessage}>
                 送信
-              </button>
+              </Button>
             </div>
           </div>
           <div className="actions">
-            <button
-              className="ghost"
+            <Button
+              variant="ghost"
               onClick={() => handleSendFeedback(true)}
               disabled={!canSendFeedback}
             >
               👍 良い
-            </button>
-            <button
-              className="ghost"
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => handleSendFeedback(false)}
               disabled={!canSendFeedback}
             >
               👎 改善
-            </button>
+            </Button>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="card log">
+      <motion.section className="card log glass" variants={PAGE_STAGGER.item}>
         <div className="log-header">
           <h2>会話ログ</h2>
-          <button
-            className="ghost"
+          <Button
+            variant="ghost"
             onClick={() => setMessages([])}
             disabled={messages.length === 0}
           >
             クリア
-          </button>
+          </Button>
         </div>
         {messages.length === 0 ? (
           <p className="empty">まだメッセージがありません。</p>
@@ -372,8 +379,8 @@ function App() {
             ))}
           </ul>
         )}
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 }
 
