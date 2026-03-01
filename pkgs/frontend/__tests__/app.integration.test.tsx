@@ -34,10 +34,8 @@ afterEach(() => {
 });
 
 describe("App integration", () => {
-  it("renders balance tool result as wallet card in message log", () => {
+  it("reflects balance tool result in main screen balance and address", () => {
     render(<App />);
-
-    expect(screen.getByText("まだメッセージがありません。")).toBeInTheDocument();
 
     act(() => {
       capturedOptions?.onMessage?.({
@@ -53,10 +51,7 @@ describe("App integration", () => {
       });
     });
 
-    expect(
-      screen.getByText("0x1234567890123456789012345678901234567890"),
-    ).toBeInTheDocument();
-    expect(screen.getByText("0.5 ETH")).toBeInTheDocument();
-    expect(screen.getByText("100 USDC")).toBeInTheDocument();
+    expect(screen.getByText("$ 1,400")).toBeInTheDocument();
+    expect(screen.getByText("0x1234...7890")).toBeInTheDocument();
   });
 });

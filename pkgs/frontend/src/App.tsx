@@ -1,9 +1,10 @@
 import { useConversation } from "@elevenlabs/react";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
-import { MessageLog } from "./components/message-log";
-import { Button } from "./components/ui/button";
-import { VoiceOrb } from "./components/voice-orb";
+import { MainStateScreen } from "./components/states/main-state-screen";
+import { ProcessingStateScreen } from "./components/states/processing-state-screen";
+import { ReceiveStateScreen } from "./components/states/receive-state-screen";
+import { SuccessStateScreen } from "./components/states/success-state-screen";
 import "./css/App.css";
 import { PAGE_STAGGER } from "./lib/theme";
 import {
@@ -11,31 +12,30 @@ import {
   DEFAULT_VOLUME_RATE,
 } from "./utils/constants";
 import {
+  asString,
   buildActivityState,
   buildConnectionState,
   buildErrorText,
   buildLogMessage,
 } from "./utils/helpers";
-import { type ConnectionType, type LogMessage } from "./utils/types";
+import { type LogMessage, type TxStatus } from "./utils/types";
+
+type ViewMode = "auto" | "main" | "receive";
 
 function App() {
   const agentIdFromEnv =
     typeof import.meta.env.VITE_ELEVENLABS_AGENT_ID === "string"
       ? import.meta.env.VITE_ELEVENLABS_AGENT_ID
       : "";
-  const [userId, setUserId] = useState("");
-  const [connectionType, setConnectionType] = useState<ConnectionType>(
-    DEFAULT_CONNECTION_TYPE,
-  );
+
   const [micReady, setMicReady] = useState(false);
-  const [micMuted, setMicMuted] = useState(false);
-  const [volumeRate, setVolumeRate] = useState(DEFAULT_VOLUME_RATE);
+  const [micMuted] = useState(false);
+  const [volumeRate] = useState(DEFAULT_VOLUME_RATE);
   const [statusText, setStatusText] = useState("disconnected");
   const [modeText, setModeText] = useState("idle");
   const [errorText, setErrorText] = useState("");
-  const [conversationId, setConversationId] = useState("");
   const [messages, setMessages] = useState<LogMessage[]>([]);
-  const [inputText, setInputText] = useState("");
+  const [viewMode, setViewMode] = useState<ViewMode>("auto");
 
   const conversation = useConversation({
     micMuted,
@@ -55,20 +55,14 @@ function App() {
     onConnect: () => {
       setErrorText("");
     },
-    onDisconnect: () => {
-      setConversationId("");
-    },
   });
 
   const isConnected = useMemo(() => statusText === "connected", [statusText]);
-  const canSendFeedback = useMemo(
-    () => Boolean(conversation.canSendFeedback),
-    [conversation.canSendFeedback],
-  );
   const isSpeaking = useMemo(
     () => Boolean(conversation.isSpeaking),
     [conversation.isSpeaking],
   );
+
   const voiceConnectionState = useMemo(
     () => buildConnectionState(statusText),
     [statusText],
@@ -78,15 +72,139 @@ function App() {
     [isSpeaking, modeText],
   );
 
-  const handleRequestMic = async (): Promise<void> => {
-    setErrorText("");
-    try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-      setMicReady(true);
-    } catch (error: unknown) {
-      setErrorText(buildErrorText(error));
+  const latestToolSnapshot = useMemo(() => {
+    let walletAddress = "";
+    let ethBalance = "0.00 ETH";
+    let usdcBalance = "0 USDC";
+    let eip681Uri = "";
+    let txTo = "Alice (0x123...abc)";
+    let txAmount = "1.5";
+    let txToken = "ETH";
+    let txStatus: TxStatus = "pending";
+    let txHash = "0x3a4b...cdef";
+    let hasTransaction = false;
+
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const toolResult = messages[index]?.toolResult;
+      if (!toolResult) {
+        continue;
+      }
+
+      if (
+        !walletAddress &&
+        (toolResult.type === "address" || toolResult.type === "balance")
+      ) {
+        walletAddress =
+          asString(toolResult.data.walletAddress) ||
+          asString(toolResult.data.address) ||
+          walletAddress;
+      }
+      if (toolResult.type === "balance") {
+        ethBalance = asString(toolResult.data.ethBalance) || ethBalance;
+        usdcBalance = asString(toolResult.data.usdcBalance) || usdcBalance;
+      }
+      if (toolResult.type === "qrcode" && !eip681Uri) {
+        eip681Uri = asString(toolResult.data.eip681Uri);
+      }
+      if (toolResult.type === "transaction") {
+        hasTransaction = true;
+        txTo = asString(toolResult.data.to) || txTo;
+        txAmount = asString(toolResult.data.amount) || txAmount;
+        txToken = asString(toolResult.data.token) === "USDC" ? "USDC" : "ETH";
+        txStatus =
+          asString(toolResult.data.status) === "confirming" ||
+          asString(toolResult.data.status) === "submitting" ||
+          asString(toolResult.data.status) === "pending" ||
+          asString(toolResult.data.status) === "confirmed" ||
+          asString(toolResult.data.status) === "failed"
+            ? (asString(toolResult.data.status) as TxStatus)
+            : txStatus;
+        txHash = asString(toolResult.data.txHash) || txHash;
+      }
     }
-  };
+
+    return {
+      walletAddress,
+      ethBalance,
+      usdcBalance,
+      eip681Uri,
+      txTo,
+      txAmount,
+      txToken,
+      txStatus,
+      txHash,
+      hasTransaction,
+    };
+  }, [messages]);
+
+  const hasProcessingTx =
+    latestToolSnapshot.hasTransaction &&
+    (latestToolSnapshot.txStatus === "confirming" ||
+      latestToolSnapshot.txStatus === "submitting" ||
+      latestToolSnapshot.txStatus === "pending");
+  const hasSuccessTx =
+    latestToolSnapshot.hasTransaction &&
+    latestToolSnapshot.txStatus === "confirmed";
+
+  const currentScreen = useMemo(() => {
+    if (viewMode === "receive") {
+      return "receive" as const;
+    }
+    if (viewMode === "main") {
+      return "main" as const;
+    }
+    if (hasSuccessTx) {
+      return "success" as const;
+    }
+    if (hasProcessingTx) {
+      return "processing" as const;
+    }
+    return "main" as const;
+  }, [hasProcessingTx, hasSuccessTx, viewMode]);
+
+  const instructionText =
+    latestToolSnapshot.txTo && latestToolSnapshot.txAmount
+      ? `Say \"Send ${latestToolSnapshot.txAmount} ${latestToolSnapshot.txToken} to ${latestToolSnapshot.txTo}\"`
+      : 'Say "Send 1.5 ETH to Alice"';
+
+  const displayAddress = useMemo(() => {
+    const rawAddress = latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D";
+    if (rawAddress.length <= 14) {
+      return rawAddress;
+    }
+    return `${rawAddress.slice(0, 6)}...${rawAddress.slice(-4)}`;
+  }, [latestToolSnapshot.walletAddress]);
+
+  const totalBalance = useMemo(() => {
+    const ethValue = Number.parseFloat(latestToolSnapshot.ethBalance);
+    const usdcValue = Number.parseFloat(latestToolSnapshot.usdcBalance);
+    const safeEth = Number.isFinite(ethValue) ? ethValue : 0;
+    const safeUsdc = Number.isFinite(usdcValue) ? usdcValue : 0;
+    const roughUsd = safeUsdc + safeEth * 2600;
+    return `$ ${roughUsd.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+  }, [latestToolSnapshot.ethBalance, latestToolSnapshot.usdcBalance]);
+
+  const latestTranscript = useMemo(() => {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      if (messages[index].role === "user") {
+        return messages[index].content;
+      }
+    }
+    return "Listening...";
+  }, [messages]);
+
+  const txProgress = useMemo(() => {
+    if (latestToolSnapshot.txStatus === "confirming") {
+      return 35;
+    }
+    if (latestToolSnapshot.txStatus === "submitting") {
+      return 72;
+    }
+    if (latestToolSnapshot.txStatus === "pending") {
+      return 88;
+    }
+    return 100;
+  }, [latestToolSnapshot.txStatus]);
 
   const handleStartSession = async (): Promise<void> => {
     setErrorText("");
@@ -94,55 +212,63 @@ function App() {
       setErrorText("VITE_ELEVENLABS_AGENT_ID を設定してください");
       return;
     }
+
     try {
       if (!micReady) {
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setMicReady(true);
       }
-      const newConversationId = await conversation.startSession({
+      await conversation.startSession({
         agentId: agentIdFromEnv,
-        connectionType,
-        userId: userId ? userId : undefined,
+        connectionType: DEFAULT_CONNECTION_TYPE,
       });
-      setConversationId(newConversationId);
     } catch (error: unknown) {
       setErrorText(buildErrorText(error));
     }
   };
 
-  const handleEndSession = async (): Promise<void> => {
-    setErrorText("");
-    try {
-      await conversation.endSession();
-    } catch (error: unknown) {
-      setErrorText(buildErrorText(error));
-    }
-  };
-
-  const handleSendMessage = (): void => {
-    const trimmedText = inputText.trim();
-    if (!trimmedText) {
+  const handleTapSpeak = async (): Promise<void> => {
+    if (!isConnected) {
+      await handleStartSession();
       return;
     }
-    conversation.sendUserMessage(trimmedText);
-    setInputText("");
-  };
-
-  const handleChangeInputText = (value: string): void => {
-    setInputText(value);
     conversation.sendUserActivity();
   };
 
-  const handleChangeVolumeRate = (value: number): void => {
-    setVolumeRate(value);
+  const copyAddress = async (): Promise<void> => {
+    if (!latestToolSnapshot.walletAddress) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(latestToolSnapshot.walletAddress);
+    } catch {
+      // no-op
+    }
   };
 
-  const handleToggleMute = (): void => {
-    setMicMuted((prevValue) => !prevValue);
-  };
+  const shareAddress = async (): Promise<void> => {
+    const url =
+      latestToolSnapshot.eip681Uri ||
+      `ethereum:${latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D"}`;
 
-  const handleSendFeedback = (isPositive: boolean): void => {
-    conversation.sendFeedback(isPositive);
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({
+          title: "Voice ZK Wallet",
+          text: latestToolSnapshot.walletAddress,
+          url,
+        });
+        return;
+      } catch {
+        // no-op
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // no-op
+    }
   };
 
   return (
@@ -152,159 +278,58 @@ function App() {
       initial="hidden"
       animate="visible"
     >
-      <motion.header className="app-header" variants={PAGE_STAGGER.item}>
-        <div>
-          <h1>ElevenLabs React SDK サンプル</h1>
-          <p className="app-subtitle">
-            Agents の音声会話とテキスト入力を同時に試せます。
-          </p>
-        </div>
-        <div className="status-panel">
-          <VoiceOrb
+      <motion.section className="phone-shell" variants={PAGE_STAGGER.item}>
+        {currentScreen === "receive" ? (
+          <ReceiveStateScreen
+            walletAddress={latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D"}
+            eip681Uri={
+              latestToolSnapshot.eip681Uri ||
+              `ethereum:${latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D"}`
+            }
+            displayAddress={displayAddress}
+            onBack={() => setViewMode("main")}
+            onClose={() => setViewMode("auto")}
+            onCopy={copyAddress}
+            onShare={shareAddress}
+          />
+        ) : null}
+
+        {currentScreen === "processing" ? (
+          <ProcessingStateScreen
+            amount={latestToolSnapshot.txAmount}
+            token={latestToolSnapshot.txToken}
+            to={latestToolSnapshot.txTo}
+            progress={txProgress}
+          />
+        ) : null}
+
+        {currentScreen === "success" ? (
+          <SuccessStateScreen
+            amount={latestToolSnapshot.txAmount}
+            token={latestToolSnapshot.txToken}
+            to={latestToolSnapshot.txTo}
+            txHash={latestToolSnapshot.txHash}
+            explorerUrl={`https://sepolia.basescan.org/tx/${latestToolSnapshot.txHash}`}
+            onBackHome={() => setViewMode("main")}
+          />
+        ) : null}
+
+        {currentScreen === "main" ? (
+          <MainStateScreen
+            instruction={instructionText}
+            totalBalance={totalBalance}
+            displayAddress={displayAddress}
+            transcript={latestTranscript}
             connectionState={voiceConnectionState}
             activityState={voiceActivityState}
             micLevel={isConnected && !micMuted ? volumeRate : 0}
+            onTapSpeak={handleTapSpeak}
+            onOpenReceive={() => setViewMode("receive")}
+            onCopyAddress={copyAddress}
           />
-          <span className={`status-badge ${isConnected ? "connected" : ""}`}>
-            {statusText}
-          </span>
-          <span className={`status-badge ${isSpeaking ? "speaking" : ""}`}>
-            {isSpeaking ? "speaking" : "listening"}
-          </span>
-          <span className="status-text">{modeText}</span>
-        </div>
-      </motion.header>
+        ) : null}
 
-      <motion.section className="grid" variants={PAGE_STAGGER.item}>
-        <div className="card glass">
-          <h2>接続設定</h2>
-          <div className="field">
-            <label htmlFor="agent-id">Agent ID（環境変数）</label>
-            <input
-              id="agent-id"
-              type="text"
-              placeholder="VITE_ELEVENLABS_AGENT_ID を設定してください"
-              value={agentIdFromEnv}
-              disabled
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="user-id">User ID（任意）</label>
-            <input
-              id="user-id"
-              type="text"
-              placeholder="例: user_001"
-              value={userId}
-              onChange={(event) => setUserId(event.target.value)}
-            />
-          </div>
-          <div className="field">
-            <label htmlFor="connection-type">Connection Type</label>
-            <select
-              id="connection-type"
-              value={connectionType}
-              onChange={(event) =>
-                setConnectionType(event.target.value as ConnectionType)
-              }
-            >
-              <option value="webrtc">webrtc</option>
-              <option value="websocket">websocket</option>
-            </select>
-          </div>
-          <div className="actions">
-            <Button onClick={handleRequestMic}>マイク許可を取得</Button>
-            <Button onClick={handleStartSession} disabled={isConnected}>
-              セッション開始
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleEndSession}
-              disabled={!isConnected}
-            >
-              セッション終了
-            </Button>
-          </div>
-          <div className="meta">
-            <div>
-              <span className="meta-label">Conversation ID</span>
-              <span className="meta-value">{conversationId || "未接続"}</span>
-            </div>
-            <div>
-              <span className="meta-label">Mic Ready</span>
-              <span className="meta-value">
-                {micReady ? "取得済み" : "未取得"}
-              </span>
-            </div>
-          </div>
-          {errorText && <div className="error">{errorText}</div>}
-        </div>
-
-        <div className="card glass">
-          <h2>音量とミュート</h2>
-          <div className="field">
-            <label htmlFor="volume-rate">Volume</label>
-            <input
-              id="volume-rate"
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={volumeRate}
-              onChange={(event) =>
-                handleChangeVolumeRate(Number(event.target.value))
-              }
-            />
-            <span className="range-value">{volumeRate.toFixed(2)}</span>
-          </div>
-          <div className="actions">
-            <Button variant="secondary" onClick={handleToggleMute}>
-              {micMuted ? "ミュート解除" : "ミュート"}
-            </Button>
-          </div>
-          <div className="field">
-            <label htmlFor="text-message">テキスト送信</label>
-            <div className="input-row">
-              <input
-                id="text-message"
-                type="text"
-                value={inputText}
-                placeholder="メッセージを入力"
-                onChange={(event) => handleChangeInputText(event.target.value)}
-              />
-              <Button onClick={handleSendMessage}>送信</Button>
-            </div>
-          </div>
-          <div className="actions">
-            <Button
-              variant="ghost"
-              onClick={() => handleSendFeedback(true)}
-              disabled={!canSendFeedback}
-            >
-              👍 良い
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => handleSendFeedback(false)}
-              disabled={!canSendFeedback}
-            >
-              👎 改善
-            </Button>
-          </div>
-        </div>
-      </motion.section>
-
-      <motion.section className="card log glass" variants={PAGE_STAGGER.item}>
-        <div className="log-header">
-          <h2>会話ログ</h2>
-          <Button
-            variant="ghost"
-            onClick={() => setMessages([])}
-            disabled={messages.length === 0}
-          >
-            クリア
-          </Button>
-        </div>
-        <MessageLog messages={messages} />
+        {errorText ? <div className="floating-error">{errorText}</div> : null}
       </motion.section>
     </motion.div>
   );

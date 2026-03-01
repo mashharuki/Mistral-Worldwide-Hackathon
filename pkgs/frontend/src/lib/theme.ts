@@ -17,13 +17,14 @@ export const APP_THEME = {
 } as const;
 
 export const APP_THEME_CSS_VARIABLES = {
-  "--brand-primary": "#ff5a36",
-  "--brand-secondary": "#1278ff",
-  "--brand-accent": "#00d1b2",
+  "--brand-primary": "#e27d60",
+  "--brand-secondary": "#8e8d8a",
+  "--brand-accent": "#859b8e",
   "--surface-base": "#f5f2ed",
-  "--surface-muted": "#ebe6df",
-  "--ink-primary": "#181512",
-  "--ink-subtle": "#574f49",
+  "--surface-muted": "#ece8e2",
+  "--ink-primary": "#413f3d",
+  "--ink-subtle": "#8e8d8a",
+  "--card-bg": "#ffffffb3",
 } as const;
 
 export const PAGE_STAGGER = {

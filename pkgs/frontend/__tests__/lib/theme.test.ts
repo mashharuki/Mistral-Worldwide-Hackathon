@@ -24,8 +24,8 @@ describe("APP_THEME", () => {
 
 describe("theme CSS variables", () => {
   it("contains bold brand and accent colors", () => {
-    expect(APP_THEME_CSS_VARIABLES["--brand-primary"]).toBe("#ff5a36");
-    expect(APP_THEME_CSS_VARIABLES["--brand-accent"]).toBe("#00d1b2");
+    expect(APP_THEME_CSS_VARIABLES["--brand-primary"]).toBe("#e27d60");
+    expect(APP_THEME_CSS_VARIABLES["--brand-accent"]).toBe("#859b8e");
   });
 });
 
