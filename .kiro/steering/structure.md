@@ -17,9 +17,9 @@
 **Pattern**: Vite + React 19 + TypeScript。`src/` 配下にコンポーネントとエントリポイント
 
 ### Smart Contract (`pkgs/contract/`)
-**Location**: `pkgs/contract/contracts/`（未作成）, `pkgs/contract/tasks/`
+**Location**: `pkgs/contract/contracts/`, `pkgs/contract/tasks/`
 **Purpose**: Solidity スマートコントラクト + Hardhat タスク
-**Pattern**: Hardhat 標準構成（contracts/, test/, ignition/）
+**Pattern**: Hardhat 標準構成（contracts/, test/, ignition/）。コントラクト: `VoiceWallet.sol`（ERC-4337 AA ウォレット）, `VoiceWalletFactory.sol`（決定論的アドレス生成）, `VoiceCommitmentVerifier.sol` / `VoiceOwnershipVerifier.sol`（ZK 検証）。`contracts/interfaces/` にインターフェース, `contracts/mocks/` にテスト用モック
 
 ### ZK Circuit (`pkgs/circuit/`)
 **Location**: `pkgs/circuit/src/`
@@ -28,13 +28,13 @@
 
 ### MCP Server (`pkgs/mcpserver/`)
 **Location**: `pkgs/mcpserver/src/`
-**Purpose**: Hono ベースの API サーバー
-**Pattern**: `src/index.ts` がエントリポイント。TypeScript → `dist/` にビルド
+**Purpose**: Hono + MCP SDK ベースの MCP サーバー（6 ツール公開）
+**Pattern**: `src/index.ts` がエントリポイント（Hono + `@hono/node-server`）、`src/app.ts` が `McpServer` と全ツールを登録。`src/tools/` に各ツールハンドラ（`extractVoiceFeatures.ts`, `generateZkWallet.ts`, `getWalletAddress.ts`, `getWalletBalance.ts`, `showWalletQrcode.ts`, `transferTokens.ts`）、`src/lib/` に共有スキーマ・ユーティリティ。TypeScript → `dist/` にビルド。テストは `vitest`
 
 ### Backend (`pkgs/backend/`)
-**Location**: `pkgs/backend/`
-**Purpose**: バックエンドサービス（初期段階）
-**Pattern**: 未構築
+**Location**: `pkgs/backend/src/`
+**Purpose**: 音声特徴量抽出・ZK 証明生成 REST API（Python / Flask）
+**Pattern**: `src/app.py` が Flask アプリエントリポイント（`create_app()` ファクトリパターン）。`src/feature_extraction.py` で pyannote.audio による話者特徴量抽出（バイナリベクトル化）、`src/proof_generation.py` で snarkjs を呼び出し Groth16 証明を生成。エンドポイント: `GET /health`, `POST /extract-features`, `POST /generate-proof`。Docker コンテナ化済み、Cloud Run デプロイ対応。ZK 成果物は `zk/` 配下（`pnpm --filter backend zk:copy` でコピー）
 
 ## Naming Conventions
 

@@ -6,20 +6,23 @@ pnpm workspace によるモノレポ構成。フロントエンド、スマー�
 
 ## Core Technologies
 
-- **Language**: TypeScript (フロントエンド, MCP サーバー), Solidity (コントラクト), Circom (ZK 回路)
-- **Framework**: React 19 + Vite 7 (フロントエンド), Hardhat (コントラクト), Hono (MCP サーバー)
-- **Runtime**: Node.js 23+ (コントラクト), pnpm 10.20.0 (パッケージマネージャー)
+- **Language**: TypeScript (フロントエンド, MCP サーバー), Python 3.9+ (バックエンド), Solidity (コントラクト), Circom (ZK 回路)
+- **Framework**: React 19 + Vite 7 (フロントエンド), Flask 3.0 (バックエンド), Hardhat (コントラクト), Hono (MCP サーバー)
+- **Runtime**: Node.js 23+ (コントラクト, MCP サーバー), pnpm 10.20.0 (パッケージマネージャー)
 - **Blockchain**: Base Sepolia (テストネット), ERC-4337 Account Abstraction
 - **ZK**: Circom 2.0 + snarkjs 0.6.9 + Poseidon ハッシュ
 
 ## Key Libraries
 
-- `@elevenlabs/react` - AI 音声エージェント対話
+- `@elevenlabs/react` - AI 音声エージェント対話（フロントエンド）
 - `@openzeppelin/contracts` - スマートコントラクト標準実装
 - `@account-abstraction/contracts` - ERC-4337 AA
 - `circomlib` - ZK 回路ライブラリ（Poseidon 等）
 - `snarkjs` - Groth16 証明生成/検証
-- `viem` / `ethers` - ブロックチェーン接続
+- `viem` - ブロックチェーン接続（MCP サーバー）
+- `@modelcontextprotocol/sdk` + `@hono/mcp` - Streamable HTTP MCP サーバー実装
+- `pyannote.audio` + `torch` - 話者特徴量抽出（バックエンド ML）
+- `flask-cors` - バックエンド CORS 設定
 
 ## Development Standards
 
@@ -37,12 +40,16 @@ pnpm workspace によるモノレポ構成。フロントエンド、スマー�
 ### Testing
 - Hardhat test（コントラクト）
 - circom_tester / chai（ZK 回路テスト）
+- vitest（MCP サーバー）
+- pytest（バックエンド）
 
 ## Development Environment
 
 ### Required Tools
 - pnpm 10.20.0
 - Node.js 23+
+- Python 3.9+（バックエンド）
+- pip / `requirements.txt`（`pyannote.audio`, `torch`, `flask` 等）
 - Circom 2.0 コンパイラ（ZK 回路ビルド時）
 
 ### Common Commands
@@ -50,6 +57,13 @@ pnpm workspace によるモノレポ構成。フロントエンド、スマー�
 # フロントエンド
 pnpm frontend dev        # 開発サーバー起動
 pnpm frontend build      # ビルド
+
+# バックエンド（Python / Flask）
+pip3 install -r pkgs/backend/requirements.txt
+pnpm --filter backend zk:copy      # ZK 成果物をコピー
+pnpm --filter backend test         # pytest 実行
+pnpm --filter backend docker:build # Docker イメージビルド
+pnpm --filter backend cloudrun:deploy  # Cloud Run デプロイ
 
 # コントラクト
 pnpm contract compile    # コンパイル
@@ -61,6 +75,8 @@ pnpm circuit executeGroth16  # Groth16 証明実行
 
 # MCP サーバー
 cd pkgs/mcpserver && pnpm dev  # 開発サーバー起動
+pnpm mcpserver run build       # TypeScript ビルド
+pnpm mcpserver run test        # vitest 実行
 
 # コード品質
 pnpm format              # Biome フォーマット
