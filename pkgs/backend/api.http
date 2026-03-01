@@ -1,4 +1,4 @@
-@base_url = http://0.0.0.0:8080
+@base_url = http://localhost:8080
 
 ### Health check
 GET {{base_url}}/health

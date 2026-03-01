@@ -1,4 +1,15 @@
-@base_url = http://localhost:3000
+@base_url = http://localhost:8080
+@sample_audio_base64_file = ../backend/samples/sample_audio_1_2s.base64.txt
+@extract_voice_features_payload_file = ./samples/extract_voice_features.sample.json
+@packed_features = [18302056934822304000,17172690338334046000,443563990184964540,14924257178045160000,16735866738626656000,2490419190134313500,15564766690002702000,335281076914032200]
+@reference_packed_features = [18302056934822304000,17172690338334046000,443563990184964540,14924257178045160000,16735866738626656000,2490419190134313500,15564766690002702000,335281076914032200]
+@current_packed_features = [18302056934822304000,17172690338334046000,443563990184964540,14924257178045160000,16735866738626656000,2490419190134313500,15564766690002702000,335281076914032200]
+@wallet_commitment = 4664253849417957484181210409485290140182780278517271918522768968296494677097
+@wallet_salt = 0xec4f4a9e75fae46a6311eeae858dc6b76f31105428bb4582444f37d09440e93e
+@wallet_address = 0x259a527248762f5bf172ec9c1019637db50A3813
+@recipient_address = 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072
+@transfer_eth_payload_file = ./samples/transfer_tokens_eth.sample.json
+@transfer_usdc_payload_file = ./samples/transfer_tokens_usdc.sample.json
 
 # ============================================================
 # Health Check
@@ -57,21 +68,15 @@ Accept: application/json, text/event-stream
 
 ### extract_voice_features - 音声から特徴量を抽出
 # ※ Backend Server (BACKEND_URL) が起動している必要あり
+# ※ 1秒以上の音声が必要です。
+# ※ payload は {{extract_voice_features_payload_file}} から読み込みます。
+# ※ 音声ソース: {{sample_audio_base64_file}}
+# @name extract_voice_features
 POST {{base_url}}/mcp
 Content-Type: application/json
 Accept: application/json, text/event-stream
 
-{
-  "jsonrpc": "2.0",
-  "id": 10,
-  "method": "tools/call",
-  "params": {
-    "name": "extract_voice_features",
-    "arguments": {
-      "audio": "UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA="
-    }
-  }
-}
+< {{extract_voice_features_payload_file}}
 
 # ============================================================
 # Tool 2: generate_zk_wallet
@@ -79,6 +84,8 @@ Accept: application/json, text/event-stream
 
 ### generate_zk_wallet - 特徴量からウォレットアドレスを算出 (salt 自動生成)
 # ※ Backend Server が起動している必要あり
+# ※ 直前の extract_voice_features を実行済みなら {{packed_features}} が自動更新されます
+# @name generate_zk_wallet
 POST {{base_url}}/mcp
 Content-Type: application/json
 Accept: application/json, text/event-stream
@@ -90,7 +97,29 @@ Accept: application/json, text/event-stream
   "params": {
     "name": "generate_zk_wallet",
     "arguments": {
-      "features": [123456789, 987654321, 111111111, 222222222, 333333333, 444444444, 555555555, 666666666]
+      "features": {{packed_features}}
+    }
+  }
+}
+
+# ============================================================
+# Tool 3: create_wallet
+# ============================================================
+
+### create_wallet - generate_zk_wallet の結果(commitment/salt)でウォレットを実デプロイ
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 22,
+  "method": "tools/call",
+  "params": {
+    "name": "create_wallet",
+    "arguments": {
+      "commitment": "{{wallet_commitment}}",
+      "salt": "{{wallet_salt}}"
     }
   }
 }
@@ -114,7 +143,32 @@ Accept: application/json, text/event-stream
 }
 
 # ============================================================
-# Tool 3: get_wallet_balance
+# Tool 4: generate_zk_proof
+# ============================================================
+
+### generate_zk_proof - 登録時特徴量(reference)と現在特徴量(current)から送金用proofを生成
+# ※ reference_packed_features は登録時に保存した値を利用してください
+# @name generate_zk_proof
+POST {{base_url}}/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 23,
+  "method": "tools/call",
+  "params": {
+    "name": "generate_zk_proof",
+    "arguments": {
+      "referenceFeatures": {{reference_packed_features}},
+      "currentFeatures": {{current_packed_features}},
+      "salt": "{{wallet_salt}}"
+    }
+  }
+}
+
+# ============================================================
+# Tool 5: get_wallet_balance
 # ============================================================
 
 ### get_wallet_balance - ウォレット残高を取得
@@ -130,13 +184,13 @@ Accept: application/json, text/event-stream
   "params": {
     "name": "get_wallet_balance",
     "arguments": {
-      "walletAddress": "0x1234567890123456789012345678901234567890"
+      "walletAddress": "{{wallet_address}}"
     }
   }
 }
 
 # ============================================================
-# Tool 4: get_wallet_address
+# Tool 6: get_wallet_address
 # ============================================================
 
 ### get_wallet_address - コミットメントからウォレットアドレスを算出
@@ -151,13 +205,13 @@ Accept: application/json, text/event-stream
   "params": {
     "name": "get_wallet_address",
     "arguments": {
-      "commitment": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+      "commitment": "{{wallet_commitment}}"
     }
   }
 }
 
 # ============================================================
-# Tool 5: show_wallet_qrcode
+# Tool 7: show_wallet_qrcode
 # ============================================================
 
 ### show_wallet_qrcode - EIP-681 QR コードデータを生成
@@ -172,54 +226,28 @@ Accept: application/json, text/event-stream
   "params": {
     "name": "show_wallet_qrcode",
     "arguments": {
-      "walletAddress": "0x1234567890123456789012345678901234567890"
+      "walletAddress": "{{wallet_address}}"
     }
   }
 }
 
 # ============================================================
-# Tool 6: transfer_tokens
+# Tool 8: transfer_tokens
 # ============================================================
 
 ### transfer_tokens - ETH を送金
 # ※ RELAYER_PRIVATE_KEY の設定と、from ウォレットのデプロイ・残高が必要
+# ※ リクエスト本文は {{transfer_eth_payload_file}} を読み込み
 POST {{base_url}}/mcp
 Content-Type: application/json
 Accept: application/json, text/event-stream
 
-{
-  "jsonrpc": "2.0",
-  "id": 60,
-  "method": "tools/call",
-  "params": {
-    "name": "transfer_tokens",
-    "arguments": {
-      "from": "0x1234567890123456789012345678901234567890",
-      "to": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
-      "amount": "0.001",
-      "token": "ETH",
-      "proof": "{\"proof\":{\"a\":[\"1\",\"2\"],\"b\":[[\"3\",\"4\"],[\"5\",\"6\"]],\"c\":[\"7\",\"8\"]},\"publicSignals\":[\"12345\"]}"
-    }
-  }
-}
+< {{transfer_eth_payload_file}}
 
 ### transfer_tokens - USDC を送金
+# ※ リクエスト本文は {{transfer_usdc_payload_file}} を読み込み
 POST {{base_url}}/mcp
 Content-Type: application/json
 Accept: application/json, text/event-stream
 
-{
-  "jsonrpc": "2.0",
-  "id": 61,
-  "method": "tools/call",
-  "params": {
-    "name": "transfer_tokens",
-    "arguments": {
-      "from": "0x1234567890123456789012345678901234567890",
-      "to": "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
-      "amount": "10",
-      "token": "USDC",
-      "proof": "{\"proof\":{\"a\":[\"1\",\"2\"],\"b\":[[\"3\",\"4\"],[\"5\",\"6\"]],\"c\":[\"7\",\"8\"]},\"publicSignals\":[\"12345\"]}"
-    }
-  }
-}
+< {{transfer_usdc_payload_file}}

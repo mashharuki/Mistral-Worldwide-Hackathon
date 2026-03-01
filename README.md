@@ -6,6 +6,10 @@ Repository for Mistral Worldwide Hackathon. https://luma.com/mistralhack-tokyo?t
 
 https://mistral-worldwide-hackathon-fronten.vercel.app
 
+## Pitch Slide
+
+![PDF版](./docs/en/pitch.html)
+
 ## Overview
 
 A privacy-preserving system for operating blockchain wallets using your voice.
