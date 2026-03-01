@@ -6,10 +6,6 @@ Mistral-Worldwide-Hackathon用のリポジトリ。 https://luma.com/mistralhack
 
 https://mistral-worldwide-hackathon-fronten.vercel.app
 
-## プレゼンスライド
-
-![PDF版](./docs/ja/pitch.html)
-
 ## 概要
 
 声でブロックチェーンウォレットを操作するプライバシー保護型システム。

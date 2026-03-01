@@ -6,10 +6,6 @@ Repository for Mistral Worldwide Hackathon. https://luma.com/mistralhack-tokyo?t
 
 https://mistral-worldwide-hackathon-fronten.vercel.app
 
-## Pitch Slide
-
-![PDF版](./docs/en/pitch.html)
-
 ## Overview
 
 A privacy-preserving system for operating blockchain wallets using your voice.
@@ -52,7 +48,7 @@ graph TB
         Voice["🎙️ Voice Input"]
     end
 
-    subgraph Frontend["Frontend<br/>(React 19 + Vite)"]
+    subgraph Frontend["Frontend"]
         UI["Voice Chat UI"]
         EL["ElevenLabs SDK<br/>(WebRTC / WebSocket)"]
         VoiceOrb["Voice Orb<br/>Animation"]
@@ -62,12 +58,12 @@ graph TB
         Agent["Conversation Engine +<br/>MCP Tool Invocation"]
     end
 
-    subgraph MCPServer["MCP Server<br/>(Hono + TypeScript)"]
+    subgraph MCPServer["MCP Server"]
         MCP["MCP Streamable HTTP<br/>/mcp Endpoint"]
         Tools["8 MCP Tools"]
     end
 
-    subgraph Backend["Backend<br/>(Flask + Python)"]
+    subgraph Backend["Backend"]
         FE["Voice Feature Extraction<br/>(pyannote)"]
         ZKProof["ZK Proof Generation<br/>(snarkjs / Groth16)"]
     end
@@ -80,7 +76,7 @@ graph TB
         USDC["MockERC20<br/>(USDC)"]
     end
 
-    subgraph ZKCircuit["ZK Circuit<br/>(Circom 2.0)"]
+    subgraph ZKCircuit["ZK Circuit"]
         VC["VoiceCommitment<br/>(Poseidon Hash)"]
         VO["VoiceOwnership<br/>(Hamming Distance)"]
     end
