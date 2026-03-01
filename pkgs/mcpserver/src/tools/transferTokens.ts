@@ -308,9 +308,9 @@ export async function handleTransferTokens({
     })) as bigint;
 
     // 6. PackedUserOperation を構築 (ZK 検証を考慮して安全側に設定)
-    const verificationGasLimit = 2000000n;
-    const callGasLimit = 700000n;
-    const preVerificationGas = 150000n;
+    const verificationGasLimit = 8000000n;
+    const callGasLimit = 1500000n;
+    const preVerificationGas = 300000n;
     const maxPriorityFeePerGas = 1000000000n; // 1 gwei
     const maxFeePerGas = 2000000000n; // 2 gwei
 
