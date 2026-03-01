@@ -533,3 +533,8 @@ Set the following in `pkgs/contract/.env` at a minimum:
   ```bash
   pnpm frontend run dev
   ```
+  
+## Tx Histroy
+
+- [Send ETH](https://sepolia.basescan.org/tx/0x5ee46c874e71fc574c492881ea9a148360dca0d355c36d3a95e6fc9e2cb7dd0f)
+- [Send USDC](https://sepolia.basescan.org/tx/0x8012874a2b858feb5cb70d8f0510c72f2e8e874b907c60ee597a93443b301d88)
