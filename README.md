@@ -2,6 +2,10 @@
 
 Mistral-Worldwide-Hackathon用のリポジトリ。 https://luma.com/mistralhack-tokyo?tk=y0lkUf
 
+## Live Demo
+
+https://mistral-worldwide-hackathon-fronten.vercel.app
+
 ## 概要
 
 声でブロックチェーンウォレットを操作するプライバシー保護型システム。
@@ -22,9 +26,17 @@ ERC-4337 Account Abstraction に準拠したスマートウォレットを決定
 
 本プロジェクトは、「声」という究極の生体認証とゼロ知識証明を組み合わせることで、プライバシーを守りながら、AIと会話するだけで安全に資産を操作できる未来を実現します。
 
-## Live Demo
+## 特に苦労した点
 
-https://mistral-worldwide-hackathon-fronten.vercel.app
+まず声の特徴量を秘匿化するZKサーキットの設計・開発に苦労しました。
+
+そこからHugging face上のモデルを使って音声データから特徴量を抽出し、ZKProofを生成するバックエンドサーバーとの接続も苦労しました。
+
+バックエンドサーバーとブロックチェーンとの接続にはゼロ知識証明用のVerifierコントラクトを用意し、音声データからウォレットを生成することができるようになっています。
+
+最後に苦労した点としてこれらの機能をMCPサーバー化し、11Eleven Labs SDKを使ってAI Agentから呼び出す部分の調整に大変苦労しました。
+
+しかし、これにより音声による操作で簡潔するプロダクトが完成しました！
 
 ## システムアーキテクチャ
 
