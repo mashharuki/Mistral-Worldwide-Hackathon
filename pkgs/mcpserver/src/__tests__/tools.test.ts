@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createMcpServer } from "../app.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { encodeErrorResult } from "viem";
 
 // backendClient をモック
 vi.mock("../lib/backendClient.js", () => ({
@@ -773,6 +774,61 @@ describe("transfer_tokens tool", () => {
       text: string;
     }>;
     expect(textContent[0].text).toContain("Transaction reverted");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should decode FailedOpWithRevert inner wallet error", async () => {
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    vi.mocked(viemClient.getBalance).mockResolvedValue(1000000000000000000n);
+    vi.mocked(viemClient.readContract).mockResolvedValue(0n);
+
+    const inner = encodeErrorResult({
+      abi: [{ type: "error", name: "InvalidPublicSignal", inputs: [] }],
+      errorName: "InvalidPublicSignal",
+    });
+
+    const outer = encodeErrorResult({
+      abi: [
+        {
+          type: "error",
+          name: "FailedOpWithRevert",
+          inputs: [
+            { type: "uint256", name: "opIndex" },
+            { type: "string", name: "reason" },
+            { type: "bytes", name: "inner" },
+          ],
+        },
+      ],
+      errorName: "FailedOpWithRevert",
+      args: [0n, "AA23 reverted", inner],
+    });
+
+    const revertError = Object.assign(new Error("handleOps reverted"), {
+      data: outer,
+    });
+    vi.mocked(relayerClientMock.writeContract).mockRejectedValue(revertError);
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "0.1",
+        token: "ETH",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("FailedOpWithRevert");
+    expect(textContent[0].text).toContain("InvalidPublicSignal");
 
     await client.close();
     await server.close();

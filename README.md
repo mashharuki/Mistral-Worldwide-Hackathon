@@ -1,71 +1,71 @@
 # Mistral-Worldwide-Hackathon
 
-Mistral-Worldwide-Hackathon用のリポジトリ。 https://luma.com/mistralhack-tokyo?tk=y0lkUf
+Repository for Mistral Worldwide Hackathon. https://luma.com/mistralhack-tokyo?tk=y0lkUf
 
 ## Live Demo
 
 https://mistral-worldwide-hackathon-fronten.vercel.app
 
-## 概要
+## Overview
 
-声でブロックチェーンウォレットを操作するプライバシー保護型システム。
+A privacy-preserving system for operating blockchain wallets using your voice.
 
-ユーザーの声の特徴量をゼロ知識証明（ZK-SNARK / Groth16）でコミットメント化し、声紋そのものをオンチェーンに公開することなく本人認証を実現します。
+Voice features are committed via zero-knowledge proofs (ZK-SNARK / Groth16), enabling identity verification without ever exposing raw voiceprints on-chain.
 
-ERC-4337 Account Abstraction に準拠したスマートウォレットを決定論的に生成し、AI エージェント（ElevenLabs）との音声対話だけで残高確認・送金・受取が完結します。
+The system deterministically generates ERC-4337 Account Abstraction-compliant smart wallets, allowing users to check balances, send tokens, and receive payments entirely through voice conversations with an AI agent (ElevenLabs).
 
-## 背景
+## Background
 
-従来のウォレットは秘密鍵の管理が難しく、UXがWeb3普及の壁となっています。人間経済ではまだ既存の決済手段の方が主流ですが、OpenClawやMoltbookが登場し、急速にAIAgent経済圏でのステーブルコイン決済の量が増加しています。
+Traditional wallets require complex private key management, making UX a major barrier to Web3 adoption. While conventional payment methods still dominate the human economy, the emergence of platforms like OpenClaw and Moltbook is rapidly increasing the volume of stablecoin payments within the AI Agent economy.
 
-これにより今後AIとやりとりしながらステーブルコイン決済が求められる機会が増加すると想定しています。
+We expect this trend to drive growing demand for stablecoin payments conducted through AI interactions.
 
-しかし、上述した通りWeb3ウォレットのUXには課題が多くあり、すぐにオンボーディングすることが難しいです。ましてはAIAgentとのやりとりを想定したUXにもなっています。
+However, as noted above, Web3 wallet UX has many challenges that make immediate onboarding difficult — let alone providing a UX designed for interactions with AI agents.
 
-そこで今回のハッカソンではその課題を解決するプロダクトを開発しました。
+At this hackathon, we built a product to solve this problem.
 
-本プロジェクトは、「声」という究極の生体認証とゼロ知識証明を組み合わせることで、プライバシーを守りながら、AIと会話するだけで安全に資産を操作できる未来を実現します。
+This project combines voice — the ultimate biometric — with zero-knowledge proofs, enabling a future where users can safely manage their assets simply by talking to an AI, all while preserving privacy.
 
-## 特に苦労した点
+## Key Challenges
 
-まず声の特徴量を秘匿化するZKサーキットの設計・開発に苦労しました。
+First, designing and developing the ZK circuit to keep voice features private was a major challenge.
 
-そこからHugging face上のモデルを使って音声データから特徴量を抽出し、ZKProofを生成するバックエンドサーバーとの接続も苦労しました。
+Connecting the backend server — which extracts features from audio using a Hugging Face model and generates ZK proofs — was also difficult.
 
-バックエンドサーバーとブロックチェーンとの接続にはゼロ知識証明用のVerifierコントラクトを用意し、音声データからウォレットを生成することができるようになっています。
+For the connection between the backend and the blockchain, we prepared a Verifier contract for zero-knowledge proofs, enabling wallet generation directly from voice data.
 
-最後に苦労した点としてこれらの機能をMCPサーバー化し、11Eleven Labs SDKを使ってAI Agentから呼び出す部分の調整に大変苦労しました。
+Finally, turning all of these features into an MCP server and fine-tuning the integration so that the AI agent can invoke them via the ElevenLabs SDK was extremely challenging.
 
-しかし、これにより音声による操作で簡潔するプロダクトが完成しました！
+However, as a result, we completed a product where everything can be done through voice interaction!
 
-## システムアーキテクチャ
+## System Architecture
 
-### 全体構成
+### Overall Structure
 
 ```mermaid
 graph TB
-    subgraph User["👤 ユーザー"]
-        Voice["🎙️ 音声入力"]
+    subgraph User["👤 User"]
+        Voice["🎙️ Voice Input"]
     end
 
-    subgraph Frontend["フロントエンド"]
-        UI["音声対話 UI"]
+    subgraph Frontend["Frontend<br/>(React 19 + Vite)"]
+        UI["Voice Chat UI"]
         EL["ElevenLabs SDK<br/>(WebRTC / WebSocket)"]
-        VoiceOrb["Voice Orb<br/>アニメーション"]
+        VoiceOrb["Voice Orb<br/>Animation"]
     end
 
     subgraph ElevenLabsAgent["ElevenLabs<br/>AI Agent"]
-        Agent["会話エンジン +<br/>MCP Tool 呼び出し"]
+        Agent["Conversation Engine +<br/>MCP Tool Invocation"]
     end
 
-    subgraph MCPServer["MCP サーバー"]
-        MCP["MCP Streamable HTTP<br/>/mcp エンドポイント"]
-        Tools["8 つの MCP Tools"]
+    subgraph MCPServer["MCP Server<br/>(Hono + TypeScript)"]
+        MCP["MCP Streamable HTTP<br/>/mcp Endpoint"]
+        Tools["8 MCP Tools"]
     end
 
-    subgraph Backend["バックエンド"]
-        FE["音声特徴量抽出<br/>(pyannote)"]
-        ZKProof["ZK 証明生成<br/>(snarkjs / Groth16)"]
+    subgraph Backend["Backend<br/>(Flask + Python)"]
+        FE["Voice Feature Extraction<br/>(pyannote)"]
+        ZKProof["ZK Proof Generation<br/>(snarkjs / Groth16)"]
     end
 
     subgraph Blockchain["Base Sepolia"]
@@ -76,76 +76,76 @@ graph TB
         USDC["MockERC20<br/>(USDC)"]
     end
 
-    subgraph ZKCircuit["ZK 回路"]
+    subgraph ZKCircuit["ZK Circuit<br/>(Circom 2.0)"]
         VC["VoiceCommitment<br/>(Poseidon Hash)"]
         VO["VoiceOwnership<br/>(Hamming Distance)"]
     end
 
     Voice --> UI
     UI --> EL
-    EL <-->|音声ストリーム| Agent
+    EL <-->|Audio Stream| Agent
     Agent -->|Tool Call| MCP
     MCP --> Tools
     Tools -->|REST API| FE
     Tools -->|REST API| ZKProof
     Tools -->|RPC / Tx| EP
     Tools -->|Read| Factory
-    FE -.->|特徴量| ZKProof
-    ZKProof -.->|回路実行| VC
-    ZKProof -.->|回路実行| VO
+    FE -.->|Features| ZKProof
+    ZKProof -.->|Circuit Execution| VC
+    ZKProof -.->|Circuit Execution| VO
     EP --> Wallet
     Factory -->|Proxy Deploy| Wallet
-    Wallet -->|証明検証| Verifier
-    Wallet -->|送金| USDC
+    Wallet -->|Proof Verification| Verifier
+    Wallet -->|Transfer| USDC
 ```
 
-### パッケージ構成
+### Package Structure
 
 ```
 Mistral-Worldwide-Hackathon/
 ├── pkgs/
-│   ├── frontend/    # React 19 + Vite — 音声対話 UI (ElevenLabs)
-│   ├── mcpserver/   # Hono — MCP サーバー (8 Tools)
-│   ├── backend/     # Flask — 音声特徴量抽出 & ZK 証明生成
+│   ├── frontend/    # React 19 + Vite — Voice chat UI (ElevenLabs)
+│   ├── mcpserver/   # Hono — MCP server (8 Tools)
+│   ├── backend/     # Flask — Voice feature extraction & ZK proof generation
 │   ├── contract/    # Hardhat — VoiceWallet (ERC-4337) & Verifier
-│   └── circuit/     # Circom 2.0 — VoiceCommitment & VoiceOwnership 回路
+│   └── circuit/     # Circom 2.0 — VoiceCommitment & VoiceOwnership circuits
 └── pnpm-workspace.yaml
 ```
 
-## 機能一覧表
+## Feature List
 
-| # | 機能名 | 説明 | MCP Tool 名 | 関連パッケージ |
-|---|--------|------|-------------|---------------|
-| 1 | 音声特徴量抽出 | 音声データから 512 次元の話者埋め込みを抽出し、8 個の 64bit 整数にパック | `extract_voice_features` | backend, mcpserver |
-| 2 | ZK ウォレット生成 | 声の特徴量から Poseidon コミットメントを計算し、決定論的にウォレットアドレスを導出 | `generate_zk_wallet` | backend, mcpserver, contract |
-| 3 | ウォレットデプロイ | Factory 経由で ERC-4337 準拠の VoiceWallet プロキシをオンチェーンにデプロイ | `create_wallet` | mcpserver, contract |
-| 4 | ZK 証明生成 | 登録時と現在の声を比較し、Hamming 距離 ≤ 128 を満たす Groth16 証明を生成 | `generate_zk_proof` | backend, mcpserver, circuit |
-| 5 | 残高照会 | ウォレットの ETH / USDC 残高を取得し表示 | `get_wallet_balance` | mcpserver |
-| 6 | ウォレットアドレス取得 | コミットメント値から決定論的にウォレットアドレスを計算 | `get_wallet_address` | mcpserver, contract |
-| 7 | QR コード表示 | EIP-681 形式の支払いリンク QR コードデータを生成 | `show_wallet_qrcode` | mcpserver, frontend |
-| 8 | トークン送金 | ZK 証明付き UserOperation で ETH / USDC を送金 | `transfer_tokens` | mcpserver, contract |
+| # | Feature | Description | MCP Tool | Related Packages |
+|---|---------|-------------|----------|-----------------|
+| 1 | Voice Feature Extraction | Extracts a 512-dimensional speaker embedding from audio and packs it into 8 x 64-bit integers | `extract_voice_features` | backend, mcpserver |
+| 2 | ZK Wallet Generation | Computes a Poseidon commitment from voice features and deterministically derives a wallet address | `generate_zk_wallet` | backend, mcpserver, contract |
+| 3 | Wallet Deployment | Deploys an ERC-4337 compliant VoiceWallet proxy on-chain via Factory | `create_wallet` | mcpserver, contract |
+| 4 | ZK Proof Generation | Compares enrolled and current voice features, generates a Groth16 proof if Hamming distance ≤ 128 | `generate_zk_proof` | backend, mcpserver, circuit |
+| 5 | Balance Inquiry | Retrieves and displays the wallet's ETH / USDC balance | `get_wallet_balance` | mcpserver |
+| 6 | Wallet Address Lookup | Deterministically computes a wallet address from a commitment value | `get_wallet_address` | mcpserver, contract |
+| 7 | QR Code Display | Generates EIP-681 payment link QR code data | `show_wallet_qrcode` | mcpserver, frontend |
+| 8 | Token Transfer | Sends ETH / USDC via a UserOperation with a ZK proof | `transfer_tokens` | mcpserver, contract |
 
-## 機能ごとの処理シーケンス図
+## Processing Sequence Diagrams
 
-### 1. ウォレット登録フロー（初回セットアップ）
+### 1. Wallet Registration Flow (Initial Setup)
 
 ```mermaid
 sequenceDiagram
-    actor User as ユーザー
-    participant FE as フロントエンド
+    actor User as User
+    participant FE as Frontend
     participant Agent as ElevenLabs Agent
-    participant MCP as MCP サーバー
-    participant BE as バックエンド
+    participant MCP as MCP Server
+    participant BE as Backend
     participant Chain as Base Sepolia
 
-    User->>FE: 🎙️ 「ウォレットを作りたい」
-    FE->>Agent: 音声ストリーム (WebRTC)
+    User->>FE: 🎙️ "I want to create a wallet"
+    FE->>Agent: Audio stream (WebRTC)
     Agent->>MCP: extract_voice_features(audio)
     MCP->>BE: POST /extract-features
-    BE->>BE: pyannote 埋め込み抽出 (512dim)
-    BE->>BE: 二値化 → 8×64bit パック
+    BE->>BE: pyannote embedding extraction (512dim)
+    BE->>BE: Binarize → Pack into 8×64bit
     BE-->>MCP: features, packedFeatures
-    MCP-->>Agent: 特徴量結果
+    MCP-->>Agent: Feature result
 
     Agent->>MCP: generate_zk_wallet(features, salt?)
     MCP->>BE: POST /generate-commitment
@@ -157,269 +157,269 @@ sequenceDiagram
 
     Agent->>MCP: create_wallet(commitment, salt)
     MCP->>Chain: Factory.createWallet() via Relayer
-    Chain->>Chain: ERC1967Proxy デプロイ
+    Chain->>Chain: Deploy ERC1967Proxy
     Chain->>Chain: VoiceWallet.initialize()
     Chain-->>MCP: txHash, walletAddress
-    MCP-->>Agent: デプロイ完了
-    Agent-->>FE: 「ウォレットが作成されました」
-    FE-->>User: ✅ アドレス表示
+    MCP-->>Agent: Deployment complete
+    Agent-->>FE: "Your wallet has been created"
+    FE-->>User: ✅ Display address
 ```
 
-### 2. 残高確認フロー
+### 2. Balance Check Flow
 
 ```mermaid
 sequenceDiagram
-    actor User as ユーザー
-    participant FE as フロントエンド
+    actor User as User
+    participant FE as Frontend
     participant Agent as ElevenLabs Agent
-    participant MCP as MCP サーバー
+    participant MCP as MCP Server
     participant Chain as Base Sepolia
 
-    User->>FE: 🎙️ 「残高を教えて」
-    FE->>Agent: 音声ストリーム
+    User->>FE: 🎙️ "What's my balance?"
+    FE->>Agent: Audio stream
     Agent->>MCP: get_wallet_balance(walletAddress)
     MCP->>Chain: getBalance(wallet)
-    Chain-->>MCP: ETH 残高 (wei)
+    Chain-->>MCP: ETH balance (wei)
     MCP->>Chain: USDC.balanceOf(wallet)
-    Chain-->>MCP: USDC 残高
+    Chain-->>MCP: USDC balance
     MCP-->>Agent: { eth: "0.05", usdc: "100.0" }
-    Agent-->>FE: 「ETH は 0.05、USDC は 100 です」
-    FE-->>User: 💰 残高カード表示
+    Agent-->>FE: "You have 0.05 ETH and 100 USDC"
+    FE-->>User: 💰 Display balance card
 ```
 
-### 3. トークン送金フロー（ZK 証明付き）
+### 3. Token Transfer Flow (with ZK Proof)
 
 ```mermaid
 sequenceDiagram
-    actor User as ユーザー
-    participant FE as フロントエンド
+    actor User as User
+    participant FE as Frontend
     participant Agent as ElevenLabs Agent
-    participant MCP as MCP サーバー
-    participant BE as バックエンド
+    participant MCP as MCP Server
+    participant BE as Backend
     participant Chain as Base Sepolia
 
-    User->>FE: 🎙️ 「0x...に 0.01 ETH 送って」
-    FE->>Agent: 音声ストリーム
+    User->>FE: 🎙️ "Send 0.01 ETH to 0x..."
+    FE->>Agent: Audio stream
 
-    Note over Agent, BE: Step 1: 現在の声を特徴量化
+    Note over Agent, BE: Step 1: Extract current voice features
     Agent->>MCP: extract_voice_features(audio)
     MCP->>BE: POST /extract-features
     BE-->>MCP: currentFeatures
 
-    Note over Agent, BE: Step 2: ZK 証明を生成
+    Note over Agent, BE: Step 2: Generate ZK proof
     Agent->>MCP: generate_zk_proof(refFeatures, currentFeatures, salt)
     MCP->>BE: POST /generate-proof
-    BE->>BE: Hamming 距離チェック (≤128)
+    BE->>BE: Hamming distance check (≤128)
     BE->>BE: snarkjs groth16 fullprove
     BE-->>MCP: proof (π_a, π_b, π_c), publicSignals
 
-    Note over Agent, Chain: Step 3: UserOperation で送金
+    Note over Agent, Chain: Step 3: Send via UserOperation
     Agent->>MCP: transfer_tokens(from, to, amount, token, proof)
-    MCP->>MCP: PackedUserOperation 構築
-    MCP->>MCP: proof → signature にエンコード
+    MCP->>MCP: Build PackedUserOperation
+    MCP->>MCP: Encode proof → signature
     MCP->>Chain: EntryPoint.handleOps([userOp]) via Relayer
     Chain->>Chain: VoiceWallet._validateSignature()
     Chain->>Chain: Verifier.verifyProof(a, b, c, input)
     Chain->>Chain: commitment == voiceCommitment ✓
     Chain->>Chain: execute(dest, value, data)
     Chain-->>MCP: txHash
-    MCP-->>Agent: 送金完了
-    Agent-->>FE: 「送金が完了しました」
-    FE-->>User: ✅ 成功画面 + Basescan リンク
+    MCP-->>Agent: Transfer complete
+    Agent-->>FE: "Transfer completed successfully"
+    FE-->>User: ✅ Success screen + Basescan link
 ```
 
-### 4. QR コード受取フロー
+### 4. QR Code Receive Flow
 
 ```mermaid
 sequenceDiagram
-    actor User as ユーザー
-    participant FE as フロントエンド
+    actor User as User
+    participant FE as Frontend
     participant Agent as ElevenLabs Agent
-    participant MCP as MCP サーバー
+    participant MCP as MCP Server
 
-    User->>FE: 🎙️ 「受取用 QR コードを見せて」
-    FE->>Agent: 音声ストリーム
+    User->>FE: 🎙️ "Show me a QR code to receive"
+    FE->>Agent: Audio stream
     Agent->>MCP: show_wallet_qrcode(walletAddress)
-    MCP->>MCP: EIP-681 URI 生成<br/>ethereum:{address}@84532
+    MCP->>MCP: Generate EIP-681 URI<br/>ethereum:{address}@84532
     MCP-->>Agent: eip681Uri, qrData
-    Agent-->>FE: QR コードデータ
-    FE-->>User: 📱 QR コード表示 + アドレスコピー
+    Agent-->>FE: QR code data
+    FE-->>User: 📱 Display QR code + Copy address
 ```
 
-## 技術スタック
+## Tech Stack
 
-| カテゴリ | 技術 | バージョン | 用途 |
-|----------|------|-----------|------|
-| **フロントエンド** | React | 19.2 | UI フレームワーク |
-| | Vite | 7.x | ビルドツール |
-| | TypeScript | 5.9 | 型安全な開発 |
-| | Tailwind CSS | 4.x | スタイリング |
-| | Framer Motion | — | アニメーション |
-| | @elevenlabs/react | 0.14.0 | AI 音声エージェント統合 |
-| | qrcode.react | 4.2.0 | QR コード生成 |
-| **MCP サーバー** | Hono | 4.12.3 | HTTP フレームワーク |
-| | @hono/mcp | — | MCP Streamable HTTP トランスポート |
-| | Viem | 2.46.3 | ブロックチェーン RPC クライアント |
-| | Zod | 4.3.6 | スキーマバリデーション |
-| **バックエンド** | Flask | 3.0.3 | REST API フレームワーク |
-| | pyannote.audio | 3.3.2 | 話者埋め込みモデル |
-| | PyTorch | 2.5.1 | ML 推論ランタイム |
-| | NumPy | 2.1.3 | 数値計算 |
-| | snarkjs | 0.6.9 | Groth16 証明生成 (Node.js) |
-| **スマートコントラクト** | Solidity | 0.8.28 | コントラクト言語 |
-| | Hardhat | 2.26.1 | 開発フレームワーク |
-| | @account-abstraction/contracts | 0.7.0 | ERC-4337 ベースアカウント |
+| Category | Technology | Version | Purpose |
+|----------|-----------|---------|---------|
+| **Frontend** | React | 19.2 | UI framework |
+| | Vite | 7.x | Build tool |
+| | TypeScript | 5.9 | Type-safe development |
+| | Tailwind CSS | 4.x | Styling |
+| | Framer Motion | — | Animations |
+| | @elevenlabs/react | 0.14.0 | AI voice agent integration |
+| | qrcode.react | 4.2.0 | QR code generation |
+| **MCP Server** | Hono | 4.12.3 | HTTP framework |
+| | @hono/mcp | — | MCP Streamable HTTP transport |
+| | Viem | 2.46.3 | Blockchain RPC client |
+| | Zod | 4.3.6 | Schema validation |
+| **Backend** | Flask | 3.0.3 | REST API framework |
+| | pyannote.audio | 3.3.2 | Speaker embedding model |
+| | PyTorch | 2.5.1 | ML inference runtime |
+| | NumPy | 2.1.3 | Numerical computation |
+| | snarkjs | 0.6.9 | Groth16 proof generation (Node.js) |
+| **Smart Contracts** | Solidity | 0.8.28 | Contract language |
+| | Hardhat | 2.26.1 | Development framework |
+| | @account-abstraction/contracts | 0.7.0 | ERC-4337 base account |
 | | @openzeppelin/contracts | 5.x | ERC1967Proxy, ERC20 |
-| **ZK 回路** | Circom | 2.0 | 算術回路言語 |
+| **ZK Circuits** | Circom | 2.0 | Arithmetic circuit language |
 | | circomlib | 2.0.5 | Poseidon, Num2Bits, LessThan |
-| | snarkjs | 0.6.9 | Groth16 証明システム |
-| **ブロックチェーン** | Base Sepolia | — | L2 テストネット |
+| | snarkjs | 0.6.9 | Groth16 proof system |
+| **Blockchain** | Base Sepolia | — | L2 testnet |
 | | ERC-4337 (EntryPoint v0.7) | — | Account Abstraction |
-| **インフラ** | Google Cloud Run | — | バックエンド / MCP デプロイ |
-| | Vercel | — | フロントエンドデプロイ |
-| | Docker | — | コンテナ化 |
-| | pnpm | 10.20.0 | モノレポ・パッケージ管理 |
+| **Infrastructure** | Google Cloud Run | — | Backend / MCP deployment |
+| | Vercel | — | Frontend deployment |
+| | Docker | — | Containerization |
+| | pnpm | 10.20.0 | Monorepo package management |
 
-## 動かし方
+## Getting Started
 
-### セットアップ
+### Setup
 
-- 依存関係インストール
+- Install dependencies
 
   ```bash
   pnpm install
   pip3 install -r pkgs/backend/requirements.txt
   ```
 
-- 環境変数のセットアップ
+- Set up environment variables
 
   ```bash
   cp pkgs/backend/.env.example pkgs/backend/.env
   cp pkgs/contract/.env.example pkgs/contract/.env
   ```
 
-`pkgs/contract/.env` には最低限以下を設定:
+Set the following in `pkgs/contract/.env` at a minimum:
 - `PRIVATE_KEY`
 - `ALCHMEY_API_KEY`
 - `BASESCAN_API_KEY`
 
-### ZKサーキット
+### ZK Circuit
 
-- ビルド
+- Build
 
   ```bash
   pnpm --filter circuit compile
   ```
 
-- Inputデータを生成する
+- Generate input data
 
   ```bash
   pnpm --filter circuit generateInput
   ```
 
-- ウィットネス生成
+- Generate witness
 
   ```bash
   pnpm --filter circuit generateWitness
   ```
 
-- Groth16による一連の動作が機能するかをテスト
+- Test that the full Groth16 pipeline works
 
   ```bash
   pnpm --filter circuit executeGroth16
   ```
 
-- テスト
+- Run tests
 
   ```bash
   pnpm --filter circuit test
   ```
 
-### バックエンド
+### Backend
 
-- ビルド（ZK成果物を backend に同期）
+- Build (sync ZK artifacts to backend)
 
   ```bash
   pnpm --filter backend zk:copy
   ```
 
-- テスト
+- Run tests
 
   ```bash
   pnpm --filter backend test
   ```
 
-- Dockerコンテナをビルド
+- Build Docker container
 
   ```bash
   pnpm --filter backend docker:build
   ```
 
-- ローカルでDockerコンテナ起動
+- Run Docker container locally
 
   ```bash
   pnpm --filter backend docker:run
   ```
 
-- Cloud Runにデプロイ
+- Deploy to Cloud Run
 
   ```bash
   pnpm --filter backend cloudrun:deploy
   ```
 
-- Cloud Runから削除
+- Remove from Cloud Run
 
   ```bash
   pnpm --filter backend cloudrun:cleanup
   ```
 
-### スマートコントラクト
+### Smart Contracts
 
-- ビルド
+- Build
 
   ```bash
   pnpm --filter contract run compile
   ```
 
-- テスト
+- Run tests
 
   ```bash
   pnpm --filter contract run test
   ```
 
-- デプロイ（Hardhat Ignition）
+- Deploy (Hardhat Ignition)
 
   ```bash
-  # Verifier + WalletFactory を一括デプロイ
+  # Deploy Verifier + WalletFactory together
   pnpm --filter contract run deploy --network base-sepolia
 
-  # VoiceCommitmentVerifier を単体デプロイ
+  # Deploy VoiceCommitmentVerifier standalone
   pnpm --filter contract run deploy:commitmentVerifier --network base-sepolia
 
-  # VoiceWallet（Proxy 初期化込み）デプロイ
-  # VoiceWalletDeployment の Verifier を自動参照し、未デプロイなら同時にデプロイ
+  # Deploy VoiceWallet (with Proxy initialization)
+  # Automatically references the Verifier from VoiceWalletDeployment; deploys it if not yet deployed
   pnpm --filter contract run deploy:walletProxy \
     --network base-sepolia \
     --parameters '{"VoiceWalletProxyDeployment": {"owner": "0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072", "commitment": "0x9f4d6e3b8c2a7d1e5f0b3a9c4e8d2f6a7b1c0d3e5f9a2b4c6d8e1f3a5b7c9d00"}}'
 
-  # MockERC20 をデプロイ（テスト用）
+  # Deploy MockERC20 (for testing)
   pnpm --filter contract run deploy:mockERC20 --network base-sepolia
   ```
 
-- タスク（Hardhat Task）を使う
+- Hardhat Tasks
 
-  > `--verifier` は省略可能です。省略時は `ignition/deployments/chain-{chainId}/deployed_addresses.json` から `contractJsonHelper` が自動解決します。明示的に指定すればそちらが優先されます。
+  > `--verifier` is optional. When omitted, `contractJsonHelper` automatically resolves the address from `ignition/deployments/chain-{chainId}/deployed_addresses.json`. An explicitly specified address takes precedence.
 
   ```bash
-  # チェーン情報 / 残高確認
+  # Chain info / balance check
   pnpm --filter contract run getChainInfo --network base-sepolia
   pnpm --filter contract run getBalance --network base-sepolia
 
-  # Wallet 情報取得（walletは deployed_addresses.json から自動解決）
+  # Get wallet info (wallet address auto-resolved from deployed_addresses.json)
   pnpm --filter contract exec hardhat walletInfo \
     --network base-sepolia
 
-  # ETH / ERC20 送金（wallet / token は deployed_addresses.json から自動解決）
+  # ETH / ERC20 transfer (wallet / token auto-resolved from deployed_addresses.json)
   pnpm --filter contract exec hardhat walletEthTransfer \
     --to 0x51908F598A5e0d8F1A3bAbFa6DF76F9704daD072 \
     --amount 0.001 \
@@ -430,7 +430,7 @@ sequenceDiagram
     --amount 1 \
     --network base-sepolia
 
-  # EntryPoint への deposit 入出金
+  # EntryPoint deposit / withdrawal
   pnpm --filter contract exec hardhat walletAddDeposit \
     --amount 0.01 \
     --network base-sepolia
@@ -440,95 +440,95 @@ sequenceDiagram
     --amount 0.005 \
     --network base-sepolia
 
-  # 必要なら手動アドレスを上書き可能
+  # You can manually override addresses if needed
   # --wallet 0x... / --token 0x...
 
-  # 証明検証（proof は JSON 文字列）
-  # --verifier 省略時は deployed_addresses.json から自動取得
+  # Verify proof (proof as JSON string)
+  # --verifier auto-resolved from deployed_addresses.json when omitted
   pnpm --filter contract exec hardhat verifyProof \
     --proof '{"a":["1","2"],"b":[["3","4"],["5","6"]],"c":["7","8"],"input":["9"]}' \
     --network base-sepolia
 
-  # または snarkjs の出力ファイルを直接指定（推奨）
+  # Or specify snarkjs output files directly (recommended)
   pnpm --filter contract exec hardhat verifyProof \
     --proof-file ../circuit/data/VoiceOwnership_proof.json \
     --public-file ../circuit/data/VoiceOwnership_public.json \
     --network base-sepolia
 
-  # 引数省略時は既定ファイルを自動使用
+  # When arguments are omitted, default files are used automatically
   # ../circuit/data/VoiceOwnership_proof.json
   # ../circuit/data/VoiceOwnership_public.json
   pnpm --filter contract exec hardhat verifyProof --network base-sepolia
 
-  # テストネットE2E検証（Verifier は自動解決、見つからない場合は MockVerifier をデプロイ）
+  # Testnet E2E verification (Verifier auto-resolved; deploys MockVerifier if not found)
   pnpm --filter contract exec hardhat verifyTestnet --network base-sepolia
   ```
 
-### MCPサーバー
+### MCP Server
 
-- ビルド
+- Build
 
   ```bash
   pnpm mcpserver run build
   ```
 
-- テスト
+- Run tests
 
   ```bash
   pnpm mcpserver run test
   ```
 
-- ローカルで起動
+- Run locally
 
   ```bash
   pnpm mcpserver run dev
   ```
 
-  MCPインスペクターを使ったテストは以下の通り
+  To test with the MCP Inspector:
 
   ```bash
   npx @modelcontextprotocol/inspector
   ```
 
-- Dockerコンテナイメージのビルド
+- Build Docker container image
 
   ```bash
   pnpm mcpserver run docker:build
   ```
 
-- ローカルでのDockerコンテナ起動
+- Run Docker container locally
 
   ```bash
   pnpm mcpserver run docker:run
   ```
 
-  もしローカルでMCPサーバーのチェックをしたいなら追加で以下のコマンドを実行
+  To test the MCP server locally, also run:
 
   ```bash
   ngrok http 3000
   ```
 
-- Cloud Runにデプロイ
+- Deploy to Cloud Run
 
   ```bash
   pnpm mcpserver run cloudrun:deploy
   ```
 
-- Cloud Runから削除
+- Remove from Cloud Run
 
   ```bash
   pnpm mcpserver run cloudrun:cleanup
   ```
 
-### フロントエンド
+### Frontend
 
-- ビルド
+- Build
 
   ```bash
   pnpm frontend run build
   ```
 
-- ローカル起動
+- Run locally
 
   ```bash
   pnpm frontend run dev

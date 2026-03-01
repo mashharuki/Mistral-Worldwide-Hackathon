@@ -1,10 +1,13 @@
 import {
+  decodeErrorResult,
   encodeFunctionData,
   encodeAbiParameters,
   formatEther,
   formatUnits,
   parseEther,
   parseUnits,
+  type Abi,
+  type Hex,
 } from "viem";
 import { viemClient } from "../lib/viemClient.js";
 import { relayerClient } from "../lib/relayerClient.js";
@@ -21,6 +24,103 @@ import {
  */
 function packUint128s(high: bigint, low: bigint): `0x${string}` {
   return `0x${high.toString(16).padStart(32, "0")}${low.toString(16).padStart(32, "0")}` as `0x${string}`;
+}
+
+const entryPointErrorAbi = [
+  {
+    type: "error",
+    name: "FailedOp",
+    inputs: [
+      { type: "uint256", name: "opIndex" },
+      { type: "string", name: "reason" },
+    ],
+  },
+  {
+    type: "error",
+    name: "FailedOpWithRevert",
+    inputs: [
+      { type: "uint256", name: "opIndex" },
+      { type: "string", name: "reason" },
+      { type: "bytes", name: "inner" },
+    ],
+  },
+] as const satisfies Abi;
+
+const voiceWalletErrorAbi = [
+  { type: "error", name: "InvalidVerifier", inputs: [] },
+  { type: "error", name: "InvalidEntryPoint", inputs: [] },
+  { type: "error", name: "InvalidProof", inputs: [] },
+  { type: "error", name: "InvalidPublicSignal", inputs: [] },
+  { type: "error", name: "ERC20TransferFailed", inputs: [] },
+] as const satisfies Abi;
+
+function isHexString(value: unknown): value is Hex {
+  return typeof value === "string" && /^0x[0-9a-fA-F]*$/.test(value);
+}
+
+function collectHexStrings(value: unknown): Hex[] {
+  const results: Hex[] = [];
+  const visited = new WeakSet<object>();
+
+  const walk = (v: unknown) => {
+    if (isHexString(v)) {
+      results.push(v);
+      return;
+    }
+    if (!v || typeof v !== "object") return;
+    if (visited.has(v)) return;
+    visited.add(v);
+
+    if (Array.isArray(v)) {
+      for (const item of v) walk(item);
+      return;
+    }
+    for (const child of Object.values(v)) walk(child);
+  };
+
+  walk(value);
+  return Array.from(new Set(results));
+}
+
+function decodeTransferFailure(error: unknown): string | null {
+  const hexCandidates = collectHexStrings(error);
+
+  for (const data of hexCandidates) {
+    try {
+      const decoded = decodeErrorResult({
+        abi: entryPointErrorAbi,
+        data,
+      });
+
+      if (decoded.errorName === "FailedOp") {
+        const [opIndex, reason] = decoded.args as [bigint, string];
+        return `EntryPoint FailedOp(opIndex=${opIndex.toString()}): ${reason}`;
+      }
+
+      if (decoded.errorName === "FailedOpWithRevert") {
+        const [opIndex, reason, inner] = decoded.args as [bigint, string, Hex];
+        let detail = `EntryPoint FailedOpWithRevert(opIndex=${opIndex.toString()}): ${reason}`;
+
+        if (isHexString(inner) && inner !== "0x") {
+          try {
+            const innerDecoded = decodeErrorResult({
+              abi: voiceWalletErrorAbi,
+              data: inner,
+            });
+            detail += ` | inner=${innerDecoded.errorName}`;
+          } catch {
+            detail += ` | inner=${inner}`;
+          }
+        }
+
+        return detail;
+      }
+    } catch {
+      // continue
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -215,7 +315,10 @@ export async function handleTransferTokens({
       ],
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
+    const decoded = decodeTransferFailure(error);
+    const message =
+      decoded ??
+      (error instanceof Error ? error.message : "Unknown error");
     return {
       content: [{ type: "text" as const, text: message }],
       isError: true,
