@@ -19,8 +19,8 @@ fi
 
 PROJECT_ID="${PROJECT_ID:-${GOOGLE_CLOUD_PROJECT:-}}"
 REGION="${REGION:-${GOOGLE_CLOUD_LOCATION:-us-central1}}"
-SERVICE_NAME="${SERVICE_NAME:-voice-zk-wallet-mcp}"
-RUNTIME_SA_NAME="${RUNTIME_SA_NAME:-voice-zk-wallet-mcp-sa}"
+SERVICE_NAME="${SERVICE_NAME:-=voice-zk-wallet-mcpserver}"
+RUNTIME_SA_NAME="${RUNTIME_SA_NAME:-=voice-zk-wallet-mcpserver-sa}"
 RUNTIME_SA="${RUNTIME_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 ALLOW_UNAUTHENTICATED="${ALLOW_UNAUTHENTICATED:-true}"
 
