@@ -4,7 +4,6 @@ import { VoiceOrb } from "../voice-orb";
 import type { VoiceActivityState, VoiceConnectionState } from "@/utils/types";
 
 type MainStateScreenProps = {
-  instruction: string;
   enrollmentPhrase: string;
   totalBalance: string;
   displayAddress: string;
@@ -18,7 +17,6 @@ type MainStateScreenProps = {
 };
 
 export const MainStateScreen = ({
-  instruction,
   enrollmentPhrase,
   totalBalance,
   displayAddress,
@@ -55,8 +53,6 @@ export const MainStateScreen = ({
         </button>
         <p className="tap-hint">Tap to Speak</p>
       </div>
-
-      <p className="instruction">{instruction}</p>
 
       <section className="phrase-card-main" aria-label="registration phrase">
         <p className="phrase-card-label">REGISTRATION PHRASE</p>

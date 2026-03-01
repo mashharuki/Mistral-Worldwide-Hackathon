@@ -163,13 +163,6 @@ function App() {
     return "main" as const;
   }, [hasProcessingTx, hasSuccessTx, viewMode]);
 
-  const instructionText =
-    latestToolSnapshot.walletAddress
-      ? latestToolSnapshot.txTo && latestToolSnapshot.txAmount
-        ? `Say "Send ${latestToolSnapshot.txAmount} ${latestToolSnapshot.txToken} to ${latestToolSnapshot.txTo}"`
-        : 'Say "Send 1.5 ETH to Alice"'
-      : `For first enrollment, read exactly: "${ENROLLMENT_PHRASE}"`;
-
   const displayAddress = useMemo(() => {
     const rawAddress = latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D";
     if (rawAddress.length <= 14) {
@@ -335,7 +328,6 @@ function App() {
 
         {currentScreen === "main" ? (
           <MainStateScreen
-            instruction={instructionText}
             enrollmentPhrase={ENROLLMENT_PHRASE}
             totalBalance={totalBalance}
             displayAddress={displayAddress}
