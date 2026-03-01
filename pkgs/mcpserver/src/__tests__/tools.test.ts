@@ -20,6 +20,7 @@ vi.mock("../lib/viemClient.js", () => ({
   viemClient: {
     chain: { id: 84532, name: "Base Sepolia" },
     readContract: vi.fn(),
+    call: vi.fn(),
     getBalance: vi.fn(),
     getBytecode: vi.fn(),
     waitForTransactionReceipt: vi.fn(),
@@ -842,6 +843,86 @@ describe("transfer_tokens tool", () => {
     }>;
     expect(textContent[0].text).toContain("FailedOpWithRevert");
     expect(textContent[0].text).toContain("InvalidPublicSignal");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should run simulateValidation when AA23 has no inner revert reason", async () => {
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    vi.mocked(viemClient.getBalance).mockResolvedValue(1000000000000000000n);
+    vi.mocked(viemClient.readContract)
+      .mockResolvedValueOnce(
+        "0x0000000000000000000000000000000000000000000000000000000000003039",
+      )
+      .mockResolvedValueOnce(0n);
+
+    const aa23NoInner = encodeErrorResult({
+      abi: [
+        {
+          type: "error",
+          name: "FailedOpWithRevert",
+          inputs: [
+            { type: "uint256", name: "opIndex" },
+            { type: "string", name: "reason" },
+            { type: "bytes", name: "inner" },
+          ],
+        },
+      ],
+      errorName: "FailedOpWithRevert",
+      args: [0n, "AA23 reverted", "0x"],
+    });
+
+    const simInner = encodeErrorResult({
+      abi: [{ type: "error", name: "InvalidProof", inputs: [] }],
+      errorName: "InvalidProof",
+    });
+    const simWithInner = encodeErrorResult({
+      abi: [
+        {
+          type: "error",
+          name: "FailedOpWithRevert",
+          inputs: [
+            { type: "uint256", name: "opIndex" },
+            { type: "string", name: "reason" },
+            { type: "bytes", name: "inner" },
+          ],
+        },
+      ],
+      errorName: "FailedOpWithRevert",
+      args: [0n, "AA23 reverted", simInner],
+    });
+
+    vi.mocked(relayerClientMock.writeContract).mockRejectedValue(
+      Object.assign(new Error("handleOps reverted"), { data: aa23NoInner }),
+    );
+    vi.mocked(viemClient.call).mockRejectedValue(
+      Object.assign(new Error("simulateValidation reverted"), {
+        data: simWithInner,
+      }),
+    );
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "0.1",
+        token: "ETH",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("AA23 reverted");
+    expect(textContent[0].text).toContain("simulateValidation =>");
+    expect(textContent[0].text).toContain("InvalidProof");
+    expect(viemClient.call).toHaveBeenCalledTimes(1);
 
     await client.close();
     await server.close();

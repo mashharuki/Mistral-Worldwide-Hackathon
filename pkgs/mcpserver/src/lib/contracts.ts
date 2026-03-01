@@ -143,6 +143,42 @@ export const entryPointAbi = [
   },
   {
     inputs: [
+      {
+        components: [
+          { internalType: "address", name: "sender", type: "address" },
+          { internalType: "uint256", name: "nonce", type: "uint256" },
+          { internalType: "bytes", name: "initCode", type: "bytes" },
+          { internalType: "bytes", name: "callData", type: "bytes" },
+          {
+            internalType: "bytes32",
+            name: "accountGasLimits",
+            type: "bytes32",
+          },
+          {
+            internalType: "uint256",
+            name: "preVerificationGas",
+            type: "uint256",
+          },
+          { internalType: "bytes32", name: "gasFees", type: "bytes32" },
+          {
+            internalType: "bytes",
+            name: "paymasterAndData",
+            type: "bytes",
+          },
+          { internalType: "bytes", name: "signature", type: "bytes" },
+        ],
+        internalType: "struct PackedUserOperation",
+        name: "userOp",
+        type: "tuple",
+      },
+    ],
+    name: "simulateValidation",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
       { internalType: "address", name: "sender", type: "address" },
       { internalType: "uint192", name: "key", type: "uint192" },
     ],

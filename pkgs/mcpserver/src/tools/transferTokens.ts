@@ -123,6 +123,10 @@ function decodeTransferFailure(error: unknown): string | null {
   return null;
 }
 
+function unknownErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unknown error";
+}
+
 function normalizeGroth16Proof(proofObj: any): {
   a: [string, string];
   b: [[string, string], [string, string]];
@@ -339,12 +343,55 @@ export async function handleTransferTokens({
       };
     }
 
-    const txHash = await relayerClient.writeContract({
-      address: ENTRYPOINT_ADDRESS,
-      abi: entryPointAbi,
-      functionName: "handleOps",
-      args: [[userOp], relayerClient.account.address],
-    });
+    let txHash: `0x${string}`;
+    try {
+      txHash = await relayerClient.writeContract({
+        address: ENTRYPOINT_ADDRESS,
+        abi: entryPointAbi,
+        functionName: "handleOps",
+        args: [[userOp], relayerClient.account.address],
+      });
+    } catch (writeError) {
+      const decodedWrite = decodeTransferFailure(writeError);
+      const needsSimulation =
+        !!decodedWrite &&
+        decodedWrite.includes("FailedOpWithRevert") &&
+        decodedWrite.includes("AA23") &&
+        !decodedWrite.includes("| inner=");
+
+      let simulationDetail: string | null = null;
+      if (needsSimulation) {
+        try {
+          await viemClient.call({
+            to: ENTRYPOINT_ADDRESS,
+            data: encodeFunctionData({
+              abi: entryPointAbi,
+              functionName: "simulateValidation",
+              args: [userOp],
+            }),
+          });
+          simulationDetail =
+            "simulateValidation did not revert (unexpected for EntryPoint simulation)";
+        } catch (simulationError) {
+          const decodedSimulation = decodeTransferFailure(simulationError);
+          simulationDetail = decodedSimulation
+            ? `simulateValidation => ${decodedSimulation}`
+            : `simulateValidation => ${unknownErrorMessage(simulationError)}`;
+        }
+      }
+
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: [decodedWrite ?? unknownErrorMessage(writeError), simulationDetail]
+              .filter(Boolean)
+              .join(" | "),
+          },
+        ],
+        isError: true,
+      };
+    }
 
     // 8. Receipt を待機
     const receipt = await viemClient.waitForTransactionReceipt({
@@ -370,8 +417,7 @@ export async function handleTransferTokens({
     };
   } catch (error) {
     const decoded = decodeTransferFailure(error);
-    const message =
-      decoded ?? (error instanceof Error ? error.message : "Unknown error");
+    const message = decoded ?? unknownErrorMessage(error);
     return {
       content: [{ type: "text" as const, text: message }],
       isError: true,
