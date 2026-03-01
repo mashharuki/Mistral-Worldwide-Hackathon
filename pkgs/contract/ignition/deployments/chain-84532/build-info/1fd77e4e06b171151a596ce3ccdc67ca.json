@@ -41,9 +41,7 @@
             "evm.methodIdentifiers",
             "metadata"
           ],
-          "": [
-            "ast"
-          ]
+          "": ["ast"]
         }
       }
     }
@@ -54,15 +52,9 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
           "exportedSymbols": {
-            "IERC1155Errors": [
-              136
-            ],
-            "IERC20Errors": [
-              41
-            ],
-            "IERC721Errors": [
-              89
-            ]
+            "IERC1155Errors": [136],
+            "IERC20Errors": [41],
+            "IERC721Errors": [89]
           },
           "id": 137,
           "license": "MIT",
@@ -70,12 +62,7 @@
           "nodes": [
             {
               "id": 1,
-              "literals": [
-                "solidity",
-                ">=",
-                "0.8",
-                ".4"
-              ],
+              "literals": ["solidity", ">=", "0.8", ".4"],
               "nodeType": "PragmaDirective",
               "src": "113:24:0"
             },
@@ -93,9 +80,7 @@
               },
               "fullyImplemented": true,
               "id": 41,
-              "linearizedBaseContracts": [
-                41
-              ],
+              "linearizedBaseContracts": [41],
               "name": "IERC20Errors",
               "nameLocation": "291:12:0",
               "nodeType": "ContractDefinition",
@@ -505,14 +490,7 @@
               ],
               "scope": 137,
               "src": "281:1764:0",
-              "usedErrors": [
-                11,
-                16,
-                21,
-                30,
-                35,
-                40
-              ],
+              "usedErrors": [11, 16, 21, 30, 35, 40],
               "usedEvents": []
             },
             {
@@ -529,9 +507,7 @@
               },
               "fullyImplemented": true,
               "id": 89,
-              "linearizedBaseContracts": [
-                89
-              ],
+              "linearizedBaseContracts": [89],
               "name": "IERC721Errors",
               "nameLocation": "2201:13:0",
               "nodeType": "ContractDefinition",
@@ -1012,16 +988,7 @@
               ],
               "scope": 137,
               "src": "2191:2093:0",
-              "usedErrors": [
-                47,
-                52,
-                61,
-                66,
-                71,
-                78,
-                83,
-                88
-              ],
+              "usedErrors": [47, 52, 61, 66, 71, 78, 83, 88],
               "usedEvents": []
             },
             {
@@ -1038,9 +1005,7 @@
               },
               "fullyImplemented": true,
               "id": 136,
-              "linearizedBaseContracts": [
-                136
-              ],
+              "linearizedBaseContracts": [136],
               "name": "IERC1155Errors",
               "nameLocation": "4442:14:0",
               "nodeType": "ContractDefinition",
@@ -1526,15 +1491,7 @@
               ],
               "scope": 137,
               "src": "4432:2107:0",
-              "usedErrors": [
-                101,
-                106,
-                111,
-                118,
-                123,
-                128,
-                135
-              ],
+              "usedErrors": [101, 106, 111, 118, 123, 128, 135],
               "usedEvents": []
             }
           ],
@@ -1546,21 +1503,11 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
           "exportedSymbols": {
-            "Context": [
-              785
-            ],
-            "ERC20": [
-              651
-            ],
-            "IERC20": [
-              729
-            ],
-            "IERC20Errors": [
-              41
-            ],
-            "IERC20Metadata": [
-              755
-            ]
+            "Context": [785],
+            "ERC20": [651],
+            "IERC20": [729],
+            "IERC20Errors": [41],
+            "IERC20Metadata": [755]
           },
           "id": 652,
           "license": "MIT",
@@ -1568,12 +1515,7 @@
           "nodes": [
             {
               "id": 138,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".20"
-              ],
+              "literals": ["solidity", "^", "0.8", ".20"],
               "nodeType": "PragmaDirective",
               "src": "105:24:1"
             },
@@ -1684,9 +1626,7 @@
                   "baseName": {
                     "id": 148,
                     "name": "Context",
-                    "nameLocations": [
-                      "1133:7:1"
-                    ],
+                    "nameLocations": ["1133:7:1"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 785,
                     "src": "1133:7:1"
@@ -1699,9 +1639,7 @@
                   "baseName": {
                     "id": 150,
                     "name": "IERC20",
-                    "nameLocations": [
-                      "1142:6:1"
-                    ],
+                    "nameLocations": ["1142:6:1"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 729,
                     "src": "1142:6:1"
@@ -1714,9 +1652,7 @@
                   "baseName": {
                     "id": 152,
                     "name": "IERC20Metadata",
-                    "nameLocations": [
-                      "1150:14:1"
-                    ],
+                    "nameLocations": ["1150:14:1"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 755,
                     "src": "1150:14:1"
@@ -1729,9 +1665,7 @@
                   "baseName": {
                     "id": 154,
                     "name": "IERC20Errors",
-                    "nameLocations": [
-                      "1166:12:1"
-                    ],
+                    "nameLocations": ["1166:12:1"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 41,
                     "src": "1166:12:1"
@@ -1752,13 +1686,7 @@
               },
               "fullyImplemented": true,
               "id": 651,
-              "linearizedBaseContracts": [
-                651,
-                41,
-                755,
-                729,
-                785
-              ],
+              "linearizedBaseContracts": [651, 41, 755, 729, 785],
               "name": "ERC20",
               "nameLocation": "1124:5:1",
               "nodeType": "ContractDefinition",
@@ -2148,9 +2076,7 @@
                   "visibility": "internal"
                 },
                 {
-                  "baseFunctions": [
-                    742
-                  ],
+                  "baseFunctions": [742],
                   "body": {
                     "id": 196,
                     "nodeType": "Block",
@@ -2237,9 +2163,7 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    748
-                  ],
+                  "baseFunctions": [748],
                   "body": {
                     "id": 205,
                     "nodeType": "Block",
@@ -2326,9 +2250,7 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    754
-                  ],
+                  "baseFunctions": [754],
                   "body": {
                     "id": 214,
                     "nodeType": "Block",
@@ -2419,9 +2341,7 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    678
-                  ],
+                  "baseFunctions": [678],
                   "body": {
                     "id": 223,
                     "nodeType": "Block",
@@ -2508,9 +2428,7 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    686
-                  ],
+                  "baseFunctions": [686],
                   "body": {
                     "id": 236,
                     "nodeType": "Block",
@@ -2651,18 +2569,14 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    696
-                  ],
+                  "baseFunctions": [696],
                   "body": {
                     "id": 260,
                     "nodeType": "Block",
                     "src": "3319:103:1",
                     "statements": [
                       {
-                        "assignments": [
-                          248
-                        ],
+                        "assignments": [248],
                         "declarations": [
                           {
                             "constant": false,
@@ -2955,9 +2869,7 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    706
-                  ],
+                  "baseFunctions": [706],
                   "body": {
                     "id": 277,
                     "nodeType": "Block",
@@ -3151,18 +3063,14 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    716
-                  ],
+                  "baseFunctions": [716],
                   "body": {
                     "id": 301,
                     "nodeType": "Block",
                     "src": "3981:107:1",
                     "statements": [
                       {
-                        "assignments": [
-                          289
-                        ],
+                        "assignments": [289],
                         "declarations": [
                           {
                             "constant": false,
@@ -3286,10 +3194,7 @@
                             "id": 293,
                             "name": "_approve",
                             "nodeType": "Identifier",
-                            "overloadedDeclarations": [
-                              542,
-                              602
-                            ],
+                            "overloadedDeclarations": [542, 602],
                             "referencedDeclaration": 542,
                             "src": "4029:8:1",
                             "typeDescriptions": {
@@ -3458,18 +3363,14 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    728
-                  ],
+                  "baseFunctions": [728],
                   "body": {
                     "id": 333,
                     "nodeType": "Block",
                     "src": "4773:151:1",
                     "statements": [
                       {
-                        "assignments": [
-                          315
-                        ],
+                        "assignments": [315],
                         "declarations": [
                           {
                             "constant": false,
@@ -4600,9 +4501,7 @@
                           "src": "6175:362:1",
                           "statements": [
                             {
-                              "assignments": [
-                                403
-                              ],
+                              "assignments": [403],
                               "declarations": [
                                 {
                                   "constant": false,
@@ -6368,10 +6267,7 @@
                             "id": 534,
                             "name": "_approve",
                             "nodeType": "Identifier",
-                            "overloadedDeclarations": [
-                              542,
-                              602
-                            ],
+                            "overloadedDeclarations": [542, 602],
                             "referencedDeclaration": 602,
                             "src": "8714:8:1",
                             "typeDescriptions": {
@@ -7288,9 +7184,7 @@
                     "src": "10410:387:1",
                     "statements": [
                       {
-                        "assignments": [
-                          613
-                        ],
+                        "assignments": [613],
                         "declarations": [
                           {
                             "constant": false,
@@ -7753,10 +7647,7 @@
                                       "id": 637,
                                       "name": "_approve",
                                       "nodeType": "Identifier",
-                                      "overloadedDeclarations": [
-                                        542,
-                                        602
-                                      ],
+                                      "overloadedDeclarations": [542, 602],
                                       "referencedDeclaration": 602,
                                       "src": "10709:8:1",
                                       "typeDescriptions": {
@@ -7909,18 +7800,8 @@
               ],
               "scope": 652,
               "src": "1106:9693:1",
-              "usedErrors": [
-                11,
-                16,
-                21,
-                30,
-                35,
-                40
-              ],
-              "usedEvents": [
-                663,
-                672
-              ]
+              "usedErrors": [11, 16, 21, 30, 35, 40],
+              "usedEvents": [663, 672]
             }
           ],
           "src": "105:10695:1"
@@ -7931,9 +7812,7 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
           "exportedSymbols": {
-            "IERC20": [
-              729
-            ]
+            "IERC20": [729]
           },
           "id": 730,
           "license": "MIT",
@@ -7941,12 +7820,7 @@
           "nodes": [
             {
               "id": 653,
-              "literals": [
-                "solidity",
-                ">=",
-                "0.4",
-                ".16"
-              ],
+              "literals": ["solidity", ">=", "0.4", ".16"],
               "nodeType": "PragmaDirective",
               "src": "106:25:2"
             },
@@ -7964,9 +7838,7 @@
               },
               "fullyImplemented": false,
               "id": 729,
-              "linearizedBaseContracts": [
-                729
-              ],
+              "linearizedBaseContracts": [729],
               "name": "IERC20",
               "nameLocation": "215:6:2",
               "nodeType": "ContractDefinition",
@@ -8839,10 +8711,7 @@
               "scope": 730,
               "src": "205:2575:2",
               "usedErrors": [],
-              "usedEvents": [
-                663,
-                672
-              ]
+              "usedEvents": [663, 672]
             }
           ],
           "src": "106:2675:2"
@@ -8853,12 +8722,8 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
           "exportedSymbols": {
-            "IERC20": [
-              729
-            ],
-            "IERC20Metadata": [
-              755
-            ]
+            "IERC20": [729],
+            "IERC20Metadata": [755]
           },
           "id": 756,
           "license": "MIT",
@@ -8866,12 +8731,7 @@
           "nodes": [
             {
               "id": 731,
-              "literals": [
-                "solidity",
-                ">=",
-                "0.6",
-                ".2"
-              ],
+              "literals": ["solidity", ">=", "0.6", ".2"],
               "nodeType": "PragmaDirective",
               "src": "125:24:3"
             },
@@ -8907,9 +8767,7 @@
                   "baseName": {
                     "id": 735,
                     "name": "IERC20",
-                    "nameLocations": [
-                      "306:6:3"
-                    ],
+                    "nameLocations": ["306:6:3"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 729,
                     "src": "306:6:3"
@@ -8930,10 +8788,7 @@
               },
               "fullyImplemented": false,
               "id": 755,
-              "linearizedBaseContracts": [
-                755,
-                729
-              ],
+              "linearizedBaseContracts": [755, 729],
               "name": "IERC20Metadata",
               "nameLocation": "288:14:3",
               "nodeType": "ContractDefinition",
@@ -9125,10 +8980,7 @@
               "scope": 756,
               "src": "278:405:3",
               "usedErrors": [],
-              "usedEvents": [
-                663,
-                672
-              ]
+              "usedEvents": [663, 672]
             }
           ],
           "src": "125:559:3"
@@ -9139,9 +8991,7 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/utils/Context.sol",
           "exportedSymbols": {
-            "Context": [
-              785
-            ]
+            "Context": [785]
           },
           "id": 786,
           "license": "MIT",
@@ -9149,12 +8999,7 @@
           "nodes": [
             {
               "id": 757,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".20"
-              ],
+              "literals": ["solidity", "^", "0.8", ".20"],
               "nodeType": "PragmaDirective",
               "src": "101:24:4"
             },
@@ -9172,9 +9017,7 @@
               },
               "fullyImplemented": true,
               "id": 785,
-              "linearizedBaseContracts": [
-                785
-              ],
+              "linearizedBaseContracts": [785],
               "name": "Context",
               "nameLocation": "642:7:4",
               "nodeType": "ContractDefinition",
@@ -9466,24 +9309,12 @@
         "ast": {
           "absolutePath": "contracts/mocks/MockERC20.sol",
           "exportedSymbols": {
-            "Context": [
-              785
-            ],
-            "ERC20": [
-              651
-            ],
-            "IERC20": [
-              729
-            ],
-            "IERC20Errors": [
-              41
-            ],
-            "IERC20Metadata": [
-              755
-            ],
-            "MockERC20": [
-              827
-            ]
+            "Context": [785],
+            "ERC20": [651],
+            "IERC20": [729],
+            "IERC20Errors": [41],
+            "IERC20Metadata": [755],
+            "MockERC20": [827]
           },
           "id": 828,
           "license": "MIT",
@@ -9491,12 +9322,7 @@
           "nodes": [
             {
               "id": 787,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".28"
-              ],
+              "literals": ["solidity", "^", "0.8", ".28"],
               "nodeType": "PragmaDirective",
               "src": "32:24:5"
             },
@@ -9519,9 +9345,7 @@
                   "baseName": {
                     "id": 790,
                     "name": "ERC20",
-                    "nameLocations": [
-                      "199:5:5"
-                    ],
+                    "nameLocations": ["199:5:5"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 651,
                     "src": "199:5:5"
@@ -9542,14 +9366,7 @@
               },
               "fullyImplemented": true,
               "id": 827,
-              "linearizedBaseContracts": [
-                827,
-                651,
-                41,
-                755,
-                729,
-                785
-              ],
+              "linearizedBaseContracts": [827, 651, 41, 755, 729, 785],
               "name": "MockERC20",
               "nameLocation": "186:9:5",
               "nodeType": "ContractDefinition",
@@ -9803,9 +9620,7 @@
                       "modifierName": {
                         "id": 800,
                         "name": "ERC20",
-                        "nameLocations": [
-                          "293:5:5"
-                        ],
+                        "nameLocations": ["293:5:5"],
                         "nodeType": "IdentifierPath",
                         "referencedDeclaration": 651,
                         "src": "293:5:5"
@@ -10004,18 +9819,8 @@
               ],
               "scope": 828,
               "src": "177:426:5",
-              "usedErrors": [
-                11,
-                16,
-                21,
-                30,
-                35,
-                40
-              ],
-              "usedEvents": [
-                663,
-                672
-              ]
+              "usedErrors": [11, 16, 21, 30, 35, 40],
+              "usedEvents": [663, 672]
             }
           ],
           "src": "32:572:5"

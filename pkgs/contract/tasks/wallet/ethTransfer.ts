@@ -9,7 +9,12 @@ import {
  * 【Task】Execute ETH transfer from VoiceWallet
  */
 task("walletEthTransfer", "Send ETH from VoiceWallet")
-  .addOptionalParam("wallet", "VoiceWallet proxy address", undefined, types.string)
+  .addOptionalParam(
+    "wallet",
+    "VoiceWallet proxy address",
+    undefined,
+    types.string,
+  )
   .addParam("to", "Recipient address")
   .addParam("amount", "Amount in ETH (e.g. '0.01')")
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {

@@ -1,17 +1,10 @@
+import { asString } from "@/utils/helpers";
+import type { LogMessage, MessageLogProps } from "@/utils/types";
 import { motion } from "framer-motion";
 import { QRCodeCard } from "./qrcode-card";
 import { TransactionCard } from "./transaction-card";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { WalletCard } from "./wallet-card";
-import type { LogMessage } from "./wallet-ui-types";
-
-const asString = (value: unknown): string => {
-  return typeof value === "string" ? value : "";
-};
-
-type MessageLogProps = {
-  messages: LogMessage[];
-};
 
 const InlineToolResult = ({ message }: { message: LogMessage }) => {
   if (!message.toolResult) {
@@ -82,7 +75,9 @@ export const MessageLog = ({ messages }: MessageLogProps) => {
       </CardHeader>
       <CardContent>
         {messages.length === 0 ? (
-          <p className="text-sm text-(--ink-subtle)">まだメッセージがありません。</p>
+          <p className="text-sm text-(--ink-subtle)">
+            まだメッセージがありません。
+          </p>
         ) : (
           <ul className="space-y-3">
             {messages.map((message) => (
@@ -101,7 +96,9 @@ export const MessageLog = ({ messages }: MessageLogProps) => {
                     {new Date(message.timestamp).toLocaleTimeString("ja-JP")}
                   </span>
                 </div>
-                <p className="mb-2 text-sm text-(--ink-primary)">{message.content}</p>
+                <p className="mb-2 text-sm text-(--ink-primary)">
+                  {message.content}
+                </p>
                 <InlineToolResult message={message} />
               </motion.li>
             ))}

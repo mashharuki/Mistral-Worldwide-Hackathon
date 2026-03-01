@@ -1,14 +1,6 @@
+import type { TransactionCardProps } from "@/utils/types";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import type { TxStatus } from "./wallet-ui-types";
-
-type TransactionCardProps = {
-  to: string;
-  amount: string;
-  token: "ETH" | "USDC";
-  status: TxStatus;
-  txHash?: string;
-};
 
 export const TransactionCard = ({
   to,
@@ -33,7 +25,8 @@ export const TransactionCard = ({
           </div>
           <div className="space-y-1 text-sm">
             <p>
-              <span className="text-(--ink-subtle)">Amount:</span> {amount} {token}
+              <span className="text-(--ink-subtle)">Amount:</span> {amount}{" "}
+              {token}
             </p>
             <p className="break-all">
               <span className="text-(--ink-subtle)">To:</span> {to}

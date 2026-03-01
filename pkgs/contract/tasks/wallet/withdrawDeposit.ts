@@ -12,7 +12,12 @@ task(
   "walletWithdrawDeposit",
   "Withdraw ETH deposit from EntryPoint for VoiceWallet",
 )
-  .addOptionalParam("wallet", "VoiceWallet proxy address", undefined, types.string)
+  .addOptionalParam(
+    "wallet",
+    "VoiceWallet proxy address",
+    undefined,
+    types.string,
+  )
   .addParam("to", "Withdrawal recipient address")
   .addParam("amount", "Amount in ETH to withdraw (e.g. '0.01')")
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {

@@ -53,9 +53,7 @@
             "evm.methodIdentifiers",
             "metadata"
           ],
-          "": [
-            "ast"
-          ]
+          "": ["ast"]
         }
       }
     }
@@ -66,9 +64,7 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/interfaces/IERC1967.sol",
           "exportedSymbols": {
-            "IERC1967": [
-              20
-            ]
+            "IERC1967": [20]
           },
           "id": 21,
           "license": "MIT",
@@ -76,12 +72,7 @@
           "nodes": [
             {
               "id": 1,
-              "literals": [
-                "solidity",
-                ">=",
-                "0.4",
-                ".11"
-              ],
+              "literals": ["solidity", ">=", "0.4", ".11"],
               "nodeType": "PragmaDirective",
               "src": "107:25:0"
             },
@@ -99,9 +90,7 @@
               },
               "fullyImplemented": true,
               "id": 20,
-              "linearizedBaseContracts": [
-                20
-              ],
+              "linearizedBaseContracts": [20],
               "name": "IERC1967",
               "nameLocation": "246:8:0",
               "nodeType": "ContractDefinition",
@@ -292,11 +281,7 @@
               "scope": 21,
               "src": "236:400:0",
               "usedErrors": [],
-              "usedEvents": [
-                7,
-                14,
-                19
-              ]
+              "usedEvents": [7, 14, 19]
             }
           ],
           "src": "107:530:0"
@@ -307,15 +292,9 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol",
           "exportedSymbols": {
-            "ERC1967Proxy": [
-              83
-            ],
-            "ERC1967Utils": [
-              377
-            ],
-            "Proxy": [
-              413
-            ]
+            "ERC1967Proxy": [83],
+            "ERC1967Utils": [377],
+            "Proxy": [413]
           },
           "id": 84,
           "license": "MIT",
@@ -323,12 +302,7 @@
           "nodes": [
             {
               "id": 22,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".22"
-              ],
+              "literals": ["solidity", "^", "0.8", ".22"],
               "nodeType": "PragmaDirective",
               "src": "114:24:1"
             },
@@ -389,9 +363,7 @@
                   "baseName": {
                     "id": 28,
                     "name": "Proxy",
-                    "nameLocations": [
-                      "625:5:1"
-                    ],
+                    "nameLocations": ["625:5:1"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 413,
                     "src": "625:5:1"
@@ -412,10 +384,7 @@
               },
               "fullyImplemented": true,
               "id": 83,
-              "linearizedBaseContracts": [
-                83,
-                413
-              ],
+              "linearizedBaseContracts": [83, 413],
               "name": "ERC1967Proxy",
               "nameLocation": "609:12:1",
               "nodeType": "ContractDefinition",
@@ -795,9 +764,7 @@
                   "visibility": "public"
                 },
                 {
-                  "baseFunctions": [
-                    394
-                  ],
+                  "baseFunctions": [394],
                   "body": {
                     "id": 72,
                     "nodeType": "Block",
@@ -1016,16 +983,8 @@
               ],
               "scope": 84,
               "src": "600:2035:1",
-              "usedErrors": [
-                32,
-                103,
-                116,
-                435,
-                826
-              ],
-              "usedEvents": [
-                7
-              ]
+              "usedErrors": [32, 103, 116, 435, 826],
+              "usedEvents": [7]
             }
           ],
           "src": "114:2522:1"
@@ -1036,21 +995,11 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol",
           "exportedSymbols": {
-            "Address": [
-              813
-            ],
-            "ERC1967Utils": [
-              377
-            ],
-            "IBeacon": [
-              423
-            ],
-            "IERC1967": [
-              20
-            ],
-            "StorageSlot": [
-              1118
-            ]
+            "Address": [813],
+            "ERC1967Utils": [377],
+            "IBeacon": [423],
+            "IERC1967": [20],
+            "StorageSlot": [1118]
           },
           "id": 378,
           "license": "MIT",
@@ -1058,12 +1007,7 @@
           "nodes": [
             {
               "id": 85,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".21"
-              ],
+              "literals": ["solidity", "^", "0.8", ".21"],
               "nodeType": "PragmaDirective",
               "src": "114:24:2"
             },
@@ -1181,9 +1125,7 @@
               },
               "fullyImplemented": true,
               "id": 377,
-              "linearizedBaseContracts": [
-                377
-              ],
+              "linearizedBaseContracts": [377],
               "name": "ERC1967Utils",
               "nameLocation": "504:12:2",
               "nodeType": "ContractDefinition",
@@ -3584,9 +3526,7 @@
                         "src": "4804:57:2"
                       },
                       {
-                        "assignments": [
-                          303
-                        ],
+                        "assignments": [303],
                         "declarations": [
                           {
                             "constant": false,
@@ -4553,12 +4493,7 @@
               ],
               "scope": 378,
               "src": "496:5763:2",
-              "usedErrors": [
-                103,
-                108,
-                113,
-                116
-              ],
+              "usedErrors": [103, 108, 113, 116],
               "usedEvents": []
             }
           ],
@@ -4570,9 +4505,7 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/proxy/Proxy.sol",
           "exportedSymbols": {
-            "Proxy": [
-              413
-            ]
+            "Proxy": [413]
           },
           "id": 414,
           "license": "MIT",
@@ -4580,12 +4513,7 @@
           "nodes": [
             {
               "id": 379,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".20"
-              ],
+              "literals": ["solidity", "^", "0.8", ".20"],
               "nodeType": "PragmaDirective",
               "src": "99:24:3"
             },
@@ -4603,9 +4531,7 @@
               },
               "fullyImplemented": false,
               "id": 413,
-              "linearizedBaseContracts": [
-                413
-              ],
+              "linearizedBaseContracts": [413],
               "name": "Proxy",
               "nameLocation": "742:5:3",
               "nodeType": "ContractDefinition",
@@ -5258,9 +5184,7 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
           "exportedSymbols": {
-            "IBeacon": [
-              423
-            ]
+            "IBeacon": [423]
           },
           "id": 424,
           "license": "MIT",
@@ -5268,12 +5192,7 @@
           "nodes": [
             {
               "id": 415,
-              "literals": [
-                "solidity",
-                ">=",
-                "0.4",
-                ".16"
-              ],
+              "literals": ["solidity", ">=", "0.4", ".16"],
               "nodeType": "PragmaDirective",
               "src": "108:25:4"
             },
@@ -5291,9 +5210,7 @@
               },
               "fullyImplemented": false,
               "id": 423,
-              "linearizedBaseContracts": [
-                423
-              ],
+              "linearizedBaseContracts": [423],
               "name": "IBeacon",
               "nameLocation": "225:7:4",
               "nodeType": "ContractDefinition",
@@ -5375,15 +5292,9 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/utils/Address.sol",
           "exportedSymbols": {
-            "Address": [
-              813
-            ],
-            "Errors": [
-              835
-            ],
-            "LowLevelCall": [
-              994
-            ]
+            "Address": [813],
+            "Errors": [835],
+            "LowLevelCall": [994]
           },
           "id": 814,
           "license": "MIT",
@@ -5391,12 +5302,7 @@
           "nodes": [
             {
               "id": 425,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".20"
-              ],
+              "literals": ["solidity", "^", "0.8", ".20"],
               "nodeType": "PragmaDirective",
               "src": "101:24:5"
             },
@@ -5464,9 +5370,7 @@
               },
               "fullyImplemented": true,
               "id": 813,
-              "linearizedBaseContracts": [
-                813
-              ],
+              "linearizedBaseContracts": [813],
               "name": "Address",
               "nameLocation": "290:7:5",
               "nodeType": "ContractDefinition",
@@ -6679,9 +6583,7 @@
                         }
                       },
                       {
-                        "assignments": [
-                          541
-                        ],
+                        "assignments": [541],
                         "declarations": [
                           {
                             "constant": false,
@@ -7531,9 +7433,7 @@
                     "src": "4100:450:5",
                     "statements": [
                       {
-                        "assignments": [
-                          606
-                        ],
+                        "assignments": [606],
                         "declarations": [
                           {
                             "constant": false,
@@ -8340,9 +8240,7 @@
                     "src": "4788:452:5",
                     "statements": [
                       {
-                        "assignments": [
-                          670
-                        ],
+                        "assignments": [670],
                         "declarations": [
                           {
                             "constant": false,
@@ -10172,9 +10070,7 @@
               ],
               "scope": 814,
               "src": "282:6520:5",
-              "usedErrors": [
-                435
-              ],
+              "usedErrors": [435],
               "usedEvents": []
             }
           ],
@@ -10186,9 +10082,7 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/utils/Errors.sol",
           "exportedSymbols": {
-            "Errors": [
-              835
-            ]
+            "Errors": [835]
           },
           "id": 836,
           "license": "MIT",
@@ -10196,12 +10090,7 @@
           "nodes": [
             {
               "id": 815,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".20"
-              ],
+              "literals": ["solidity", "^", "0.8", ".20"],
               "nodeType": "PragmaDirective",
               "src": "100:24:6"
             },
@@ -10219,9 +10108,7 @@
               },
               "fullyImplemented": true,
               "id": 835,
-              "linearizedBaseContracts": [
-                835
-              ],
+              "linearizedBaseContracts": [835],
               "name": "Errors",
               "nameLocation": "419:6:6",
               "nodeType": "ContractDefinition",
@@ -10393,12 +10280,7 @@
               ],
               "scope": 836,
               "src": "411:484:6",
-              "usedErrors": [
-                823,
-                826,
-                829,
-                834
-              ],
+              "usedErrors": [823, 826, 829, 834],
               "usedEvents": []
             }
           ],
@@ -10410,9 +10292,7 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/utils/LowLevelCall.sol",
           "exportedSymbols": {
-            "LowLevelCall": [
-              994
-            ]
+            "LowLevelCall": [994]
           },
           "id": 995,
           "license": "MIT",
@@ -10420,12 +10300,7 @@
           "nodes": [
             {
               "id": 837,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".20"
-              ],
+              "literals": ["solidity", "^", "0.8", ".20"],
               "nodeType": "PragmaDirective",
               "src": "106:24:7"
             },
@@ -10443,9 +10318,7 @@
               },
               "fullyImplemented": true,
               "id": 994,
-              "linearizedBaseContracts": [
-                994
-              ],
+              "linearizedBaseContracts": [994],
               "name": "LowLevelCall",
               "nameLocation": "429:12:7",
               "nodeType": "ContractDefinition",
@@ -10518,10 +10391,7 @@
                             "id": 848,
                             "name": "callNoReturn",
                             "nodeType": "Identifier",
-                            "overloadedDeclarations": [
-                              855,
-                              869
-                            ],
+                            "overloadedDeclarations": [855, 869],
                             "referencedDeclaration": 869,
                             "src": "656:12:7",
                             "typeDescriptions": {
@@ -10831,9 +10701,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 867,
                         "nodeType": "InlineAssembly",
                         "src": "919:128:7"
@@ -11050,10 +10918,7 @@
                             "id": 883,
                             "name": "callReturn64Bytes",
                             "nodeType": "Identifier",
-                            "overloadedDeclarations": [
-                              890,
-                              908
-                            ],
+                            "overloadedDeclarations": [890, 908],
                             "referencedDeclaration": 908,
                             "src": "1620:17:7",
                             "typeDescriptions": {
@@ -11499,9 +11364,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 906,
                         "nodeType": "InlineAssembly",
                         "src": "1962:198:7"
@@ -11855,9 +11718,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 918,
                         "nodeType": "InlineAssembly",
                         "src": "2390:127:7"
@@ -12212,9 +12073,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 934,
                         "nodeType": "InlineAssembly",
                         "src": "3100:197:7"
@@ -12541,9 +12400,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 946,
                         "nodeType": "InlineAssembly",
                         "src": "3526:129:7"
@@ -12898,9 +12755,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 962,
                         "nodeType": "InlineAssembly",
                         "src": "4237:199:7"
@@ -13125,9 +12980,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 970,
                         "nodeType": "InlineAssembly",
                         "src": "4578:73:7"
@@ -13451,9 +13304,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 978,
                         "nodeType": "InlineAssembly",
                         "src": "4816:252:7"
@@ -13650,9 +13501,7 @@
                         },
                         "evmVersion": "cancun",
                         "externalReferences": [],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 984,
                         "nodeType": "InlineAssembly",
                         "src": "5189:169:7"
@@ -13785,9 +13634,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 991,
                         "nodeType": "InlineAssembly",
                         "src": "5441:97:7"
@@ -13862,9 +13709,7 @@
         "ast": {
           "absolutePath": "@openzeppelin/contracts/utils/StorageSlot.sol",
           "exportedSymbols": {
-            "StorageSlot": [
-              1118
-            ]
+            "StorageSlot": [1118]
           },
           "id": 1119,
           "license": "MIT",
@@ -13872,12 +13717,7 @@
           "nodes": [
             {
               "id": 996,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".20"
-              ],
+              "literals": ["solidity", "^", "0.8", ".20"],
               "nodeType": "PragmaDirective",
               "src": "193:24:8"
             },
@@ -13895,9 +13735,7 @@
               },
               "fullyImplemented": true,
               "id": 1118,
-              "linearizedBaseContracts": [
-                1118
-              ],
+              "linearizedBaseContracts": [1118],
               "name": "StorageSlot",
               "nameLocation": "1415:11:8",
               "nodeType": "ContractDefinition",
@@ -14227,9 +14065,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1027,
                         "nodeType": "InlineAssembly",
                         "src": "1993:63:8"
@@ -14308,9 +14144,7 @@
                           "pathNode": {
                             "id": 1023,
                             "name": "AddressSlot",
-                            "nameLocations": [
-                              "1960:11:8"
-                            ],
+                            "nameLocations": ["1960:11:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1000,
                             "src": "1960:11:8"
@@ -14384,9 +14218,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1038,
                         "nodeType": "InlineAssembly",
                         "src": "2253:63:8"
@@ -14465,9 +14297,7 @@
                           "pathNode": {
                             "id": 1034,
                             "name": "BooleanSlot",
-                            "nameLocations": [
-                              "2220:11:8"
-                            ],
+                            "nameLocations": ["2220:11:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1003,
                             "src": "2220:11:8"
@@ -14541,9 +14371,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1049,
                         "nodeType": "InlineAssembly",
                         "src": "2513:63:8"
@@ -14622,9 +14450,7 @@
                           "pathNode": {
                             "id": 1045,
                             "name": "Bytes32Slot",
-                            "nameLocations": [
-                              "2480:11:8"
-                            ],
+                            "nameLocations": ["2480:11:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1006,
                             "src": "2480:11:8"
@@ -14698,9 +14524,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1060,
                         "nodeType": "InlineAssembly",
                         "src": "2773:63:8"
@@ -14779,9 +14603,7 @@
                           "pathNode": {
                             "id": 1056,
                             "name": "Uint256Slot",
-                            "nameLocations": [
-                              "2740:11:8"
-                            ],
+                            "nameLocations": ["2740:11:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1009,
                             "src": "2740:11:8"
@@ -14855,9 +14677,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1071,
                         "nodeType": "InlineAssembly",
                         "src": "3030:63:8"
@@ -14936,9 +14756,7 @@
                           "pathNode": {
                             "id": 1067,
                             "name": "Int256Slot",
-                            "nameLocations": [
-                              "2998:10:8"
-                            ],
+                            "nameLocations": ["2998:10:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1012,
                             "src": "2998:10:8"
@@ -15012,9 +14830,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1082,
                         "nodeType": "InlineAssembly",
                         "src": "3287:63:8"
@@ -15093,9 +14909,7 @@
                           "pathNode": {
                             "id": 1078,
                             "name": "StringSlot",
-                            "nameLocations": [
-                              "3255:10:8"
-                            ],
+                            "nameLocations": ["3255:10:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1015,
                             "src": "3255:10:8"
@@ -15170,9 +14984,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1093,
                         "nodeType": "InlineAssembly",
                         "src": "3568:69:8"
@@ -15251,9 +15063,7 @@
                           "pathNode": {
                             "id": 1089,
                             "name": "StringSlot",
-                            "nameLocations": [
-                              "3536:10:8"
-                            ],
+                            "nameLocations": ["3536:10:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1015,
                             "src": "3536:10:8"
@@ -15327,9 +15137,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1104,
                         "nodeType": "InlineAssembly",
                         "src": "3828:63:8"
@@ -15408,9 +15216,7 @@
                           "pathNode": {
                             "id": 1100,
                             "name": "BytesSlot",
-                            "nameLocations": [
-                              "3797:9:8"
-                            ],
+                            "nameLocations": ["3797:9:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1018,
                             "src": "3797:9:8"
@@ -15485,9 +15291,7 @@
                             "valueSize": 1
                           }
                         ],
-                        "flags": [
-                          "memory-safe"
-                        ],
+                        "flags": ["memory-safe"],
                         "id": 1115,
                         "nodeType": "InlineAssembly",
                         "src": "4104:69:8"
@@ -15566,9 +15370,7 @@
                           "pathNode": {
                             "id": 1111,
                             "name": "BytesSlot",
-                            "nameLocations": [
-                              "4073:9:8"
-                            ],
+                            "nameLocations": ["4073:9:8"],
                             "nodeType": "IdentifierPath",
                             "referencedDeclaration": 1018,
                             "src": "4073:9:8"
@@ -15606,18 +15408,10 @@
         "ast": {
           "absolutePath": "contracts/mocks/TestERC1967Proxy.sol",
           "exportedSymbols": {
-            "ERC1967Proxy": [
-              83
-            ],
-            "ERC1967Utils": [
-              377
-            ],
-            "Proxy": [
-              413
-            ],
-            "TestERC1967Proxy": [
-              1136
-            ]
+            "ERC1967Proxy": [83],
+            "ERC1967Utils": [377],
+            "Proxy": [413],
+            "TestERC1967Proxy": [1136]
           },
           "id": 1137,
           "license": "MIT",
@@ -15625,12 +15419,7 @@
           "nodes": [
             {
               "id": 1120,
-              "literals": [
-                "solidity",
-                "^",
-                "0.8",
-                ".28"
-              ],
+              "literals": ["solidity", "^", "0.8", ".28"],
               "nodeType": "PragmaDirective",
               "src": "32:24:9"
             },
@@ -15653,9 +15442,7 @@
                   "baseName": {
                     "id": 1122,
                     "name": "ERC1967Proxy",
-                    "nameLocations": [
-                      "153:12:9"
-                    ],
+                    "nameLocations": ["153:12:9"],
                     "nodeType": "IdentifierPath",
                     "referencedDeclaration": 83,
                     "src": "153:12:9"
@@ -15670,11 +15457,7 @@
               "contractKind": "contract",
               "fullyImplemented": true,
               "id": 1136,
-              "linearizedBaseContracts": [
-                1136,
-                83,
-                413
-              ],
+              "linearizedBaseContracts": [1136, 83, 413],
               "name": "TestERC1967Proxy",
               "nameLocation": "133:16:9",
               "nodeType": "ContractDefinition",
@@ -15722,9 +15505,7 @@
                       "modifierName": {
                         "id": 1129,
                         "name": "ERC1967Proxy",
-                        "nameLocations": [
-                          "249:12:9"
-                        ],
+                        "nameLocations": ["249:12:9"],
                         "nodeType": "IdentifierPath",
                         "referencedDeclaration": 83,
                         "src": "249:12:9"
@@ -15813,16 +15594,8 @@
               ],
               "scope": 1137,
               "src": "124:164:9",
-              "usedErrors": [
-                32,
-                103,
-                116,
-                435,
-                826
-              ],
-              "usedEvents": [
-                7
-              ]
+              "usedErrors": [32, 103, 116, 435, 826],
+              "usedEvents": [7]
             }
           ],
           "src": "32:257:9"

@@ -1,11 +1,6 @@
+import type { WalletCardProps } from "@/utils/types";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-
-type WalletCardProps = {
-  walletAddress: string;
-  ethBalance: string;
-  usdcBalance: string;
-};
 
 export const WalletCard = ({
   walletAddress,

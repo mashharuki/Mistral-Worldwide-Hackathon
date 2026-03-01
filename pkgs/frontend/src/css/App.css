@@ -72,7 +72,8 @@
   background: color-mix(in srgb, white 72%, transparent);
   border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 12px 30px color-mix(in srgb, var(--ink-primary) 11%, transparent);
+  box-shadow: 0 12px 30px
+    color-mix(in srgb, var(--ink-primary) 11%, transparent);
   display: flex;
   flex-direction: column;
   gap: 16px;

@@ -26,7 +26,10 @@ export function VoiceOrb({
         className="voice-orb__core"
         animate={{
           scale: [1, pulseScale, 1],
-          opacity: connectionState === "disconnected" ? [0.55, 0.65, 0.55] : [0.72, 1, 0.72],
+          opacity:
+            connectionState === "disconnected"
+              ? [0.55, 0.65, 0.55]
+              : [0.72, 1, 0.72],
         }}
         transition={{
           duration: activityState === "speaking" ? 0.45 : 1.2,

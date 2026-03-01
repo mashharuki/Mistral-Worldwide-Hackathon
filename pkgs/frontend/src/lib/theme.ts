@@ -1,7 +1,7 @@
 export const APP_THEME = {
   fonts: {
-    display: "\"Space Grotesk\", \"Noto Sans JP\", sans-serif",
-    mono: "\"JetBrains Mono\", \"Noto Sans JP\", monospace",
+    display: '"Space Grotesk", "Noto Sans JP", sans-serif',
+    mono: '"JetBrains Mono", "Noto Sans JP", monospace',
   },
   breakpoints: {
     sm: 640,

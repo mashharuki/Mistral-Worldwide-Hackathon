@@ -18,7 +18,12 @@ export type MessageItem = {
 };
 
 // Wallet UI types
-export type ToolResultType = "balance" | "address" | "qrcode" | "transaction" | "error";
+export type ToolResultType =
+  | "balance"
+  | "address"
+  | "qrcode"
+  | "transaction"
+  | "error";
 
 export type ToolResultCard = {
   type: ToolResultType;
@@ -34,7 +39,12 @@ export type LogMessage = {
 };
 
 // Transaction types
-export type TxStatus = "confirming" | "submitting" | "pending" | "confirmed" | "failed";
+export type TxStatus =
+  | "confirming"
+  | "submitting"
+  | "pending"
+  | "confirmed"
+  | "failed";
 
 // Component props types
 export type VoiceOrbProps = {

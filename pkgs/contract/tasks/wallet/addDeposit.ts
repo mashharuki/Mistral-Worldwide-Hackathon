@@ -9,7 +9,12 @@ import {
  * 【Task】Add deposit to EntryPoint for VoiceWallet
  */
 task("walletAddDeposit", "Add ETH deposit to EntryPoint for VoiceWallet")
-  .addOptionalParam("wallet", "VoiceWallet proxy address", undefined, types.string)
+  .addOptionalParam(
+    "wallet",
+    "VoiceWallet proxy address",
+    undefined,
+    types.string,
+  )
   .addParam("amount", "Amount in ETH to deposit (e.g. '0.01')")
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
     console.log(

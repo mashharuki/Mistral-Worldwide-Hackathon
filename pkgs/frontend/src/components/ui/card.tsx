@@ -1,7 +1,10 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "../../lib/utils";
 
-export const Card = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => {
+export const Card = ({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
       className={cn(
@@ -17,7 +20,9 @@ export const CardHeader = ({
   className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => {
-  return <div className={cn("mb-4 flex flex-col gap-1", className)} {...props} />;
+  return (
+    <div className={cn("mb-4 flex flex-col gap-1", className)} {...props} />
+  );
 };
 
 export const CardTitle = ({
@@ -26,7 +31,10 @@ export const CardTitle = ({
 }: HTMLAttributes<HTMLHeadingElement>) => {
   return (
     <h3
-      className={cn("text-base font-bold tracking-tight text-(--ink-primary)", className)}
+      className={cn(
+        "text-base font-bold tracking-tight text-(--ink-primary)",
+        className,
+      )}
       {...props}
     />
   );

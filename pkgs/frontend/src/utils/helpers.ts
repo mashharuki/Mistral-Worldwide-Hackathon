@@ -1,6 +1,10 @@
 // Helper functions for the application
-import { type MessageRole, type MessageItem } from "./types";
-import { type VoiceConnectionState, type VoiceActivityState } from "./types";
+import {
+  type MessageItem,
+  type MessageRole,
+  type VoiceActivityState,
+  type VoiceConnectionState,
+} from "./types";
 
 /**
  * Generates a random ID string
@@ -104,7 +108,9 @@ export const buildErrorText = (error: unknown): string => {
  * @param statusText - Status text
  * @returns VoiceConnectionState
  */
-export const buildConnectionState = (statusText: string): VoiceConnectionState => {
+export const buildConnectionState = (
+  statusText: string,
+): VoiceConnectionState => {
   if (statusText === "connected") {
     return "connected";
   }
@@ -172,4 +178,8 @@ export const getPulseScale = (
     return 1.02 + voiceLevel * 0.08;
   }
   return 1.0;
+};
+
+export const asString = (value: unknown): string => {
+  return typeof value === "string" ? value : "";
 };

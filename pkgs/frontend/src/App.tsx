@@ -214,13 +214,8 @@ function App() {
             </select>
           </div>
           <div className="actions">
-            <Button onClick={handleRequestMic}>
-              マイク許可を取得
-            </Button>
-            <Button
-              onClick={handleStartSession}
-              disabled={isConnected}
-            >
+            <Button onClick={handleRequestMic}>マイク許可を取得</Button>
+            <Button onClick={handleStartSession} disabled={isConnected}>
               セッション開始
             </Button>
             <Button
@@ -278,9 +273,7 @@ function App() {
                 placeholder="メッセージを入力"
                 onChange={(event) => handleChangeInputText(event.target.value)}
               />
-              <Button onClick={handleSendMessage}>
-                送信
-              </Button>
+              <Button onClick={handleSendMessage}>送信</Button>
             </div>
           </div>
           <div className="actions">

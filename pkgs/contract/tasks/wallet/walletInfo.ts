@@ -12,7 +12,12 @@ task(
   "walletInfo",
   "Get VoiceWallet info (owner, verifier, commitment, deposit)",
 )
-  .addOptionalParam("wallet", "VoiceWallet proxy address", undefined, types.string)
+  .addOptionalParam(
+    "wallet",
+    "VoiceWallet proxy address",
+    undefined,
+    types.string,
+  )
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {
     console.log(
       "################################### [START] ###################################",
@@ -30,10 +35,7 @@ task(
       );
     }
 
-    const wallet = await hre.ethers.getContractAt(
-      "VoiceWallet",
-      walletAddress,
-    );
+    const wallet = await hre.ethers.getContractAt("VoiceWallet", walletAddress);
 
     const owner = await wallet.owner();
     const verifier = await wallet.verifier();

@@ -10,8 +10,18 @@ import {
  * 【Task】Execute ERC20 transfer from VoiceWallet
  */
 task("walletErc20Transfer", "Send ERC20 tokens from VoiceWallet")
-  .addOptionalParam("wallet", "VoiceWallet proxy address", undefined, types.string)
-  .addOptionalParam("token", "ERC20 token contract address", undefined, types.string)
+  .addOptionalParam(
+    "wallet",
+    "VoiceWallet proxy address",
+    undefined,
+    types.string,
+  )
+  .addOptionalParam(
+    "token",
+    "ERC20 token contract address",
+    undefined,
+    types.string,
+  )
   .addParam("to", "Recipient address")
   .addParam("amount", "Amount in token units (e.g. '100.0')")
   .setAction(async (taskArgs, hre: HardhatRuntimeEnvironment) => {

@@ -1,11 +1,7 @@
+import type { QRCodeCardProps } from "@/utils/types";
 import { motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-
-type QRCodeCardProps = {
-  walletAddress: string;
-  eip681Uri: string;
-};
 
 export const QRCodeCard = ({ walletAddress, eip681Uri }: QRCodeCardProps) => {
   return (
