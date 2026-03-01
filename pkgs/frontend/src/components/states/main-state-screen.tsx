@@ -5,6 +5,7 @@ import type { VoiceActivityState, VoiceConnectionState } from "@/utils/types";
 
 type MainStateScreenProps = {
   instruction: string;
+  enrollmentPhrase: string;
   totalBalance: string;
   displayAddress: string;
   transcript: string;
@@ -18,6 +19,7 @@ type MainStateScreenProps = {
 
 export const MainStateScreen = ({
   instruction,
+  enrollmentPhrase,
   totalBalance,
   displayAddress,
   transcript,
@@ -55,6 +57,11 @@ export const MainStateScreen = ({
       </div>
 
       <p className="instruction">{instruction}</p>
+
+      <section className="phrase-card-main" aria-label="registration phrase">
+        <p className="phrase-card-label">REGISTRATION PHRASE</p>
+        <p className="phrase-card-text">{enrollmentPhrase}</p>
+      </section>
 
       <section className="wallet-card-main">
         <p className="wallet-card-label">TOTAL BALANCE</p>

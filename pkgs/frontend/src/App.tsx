@@ -21,6 +21,7 @@ import {
 import { type LogMessage, type TxStatus } from "./utils/types";
 
 type ViewMode = "auto" | "main" | "receive";
+const ENROLLMENT_PHRASE = "Mistral AI is a world-leading unicorn company.";
 
 function App() {
   const agentIdFromEnv =
@@ -163,9 +164,11 @@ function App() {
   }, [hasProcessingTx, hasSuccessTx, viewMode]);
 
   const instructionText =
-    latestToolSnapshot.txTo && latestToolSnapshot.txAmount
-      ? `Say \"Send ${latestToolSnapshot.txAmount} ${latestToolSnapshot.txToken} to ${latestToolSnapshot.txTo}\"`
-      : 'Say "Send 1.5 ETH to Alice"';
+    latestToolSnapshot.walletAddress
+      ? latestToolSnapshot.txTo && latestToolSnapshot.txAmount
+        ? `Say "Send ${latestToolSnapshot.txAmount} ${latestToolSnapshot.txToken} to ${latestToolSnapshot.txTo}"`
+        : 'Say "Send 1.5 ETH to Alice"'
+      : `For first enrollment, read exactly: "${ENROLLMENT_PHRASE}"`;
 
   const displayAddress = useMemo(() => {
     const rawAddress = latestToolSnapshot.walletAddress || "0x71C24f3D71C24f3D";
@@ -333,6 +336,7 @@ function App() {
         {currentScreen === "main" ? (
           <MainStateScreen
             instruction={instructionText}
+            enrollmentPhrase={ENROLLMENT_PHRASE}
             totalBalance={totalBalance}
             displayAddress={displayAddress}
             transcript={latestTranscript}
