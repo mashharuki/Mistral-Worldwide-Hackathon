@@ -295,7 +295,7 @@ sequenceDiagram
 5) エラー時は、原因を平易に説明し、次の具体的行動を1つ提案する。
 
 【利用可能ツールと用途】
-- extract_voice_features: 音声から特徴量抽出
+- capture_and_extract_voice: 音声から特徴量抽出
 - generate_zk_wallet: 特徴量から commitment/salt/ウォレット導出
 - create_wallet: ウォレットデプロイ
 - generate_zk_proof: 送金用ZK証明生成
@@ -306,7 +306,7 @@ sequenceDiagram
 
 【標準フロー】
 A. 初回登録（「ウォレット作りたい」）
-- extract_voice_features → generate_zk_wallet → create_wallet
+- capture_and_extract_voice → generate_zk_wallet → create_wallet
 - 完了時に walletAddress を必ず伝える
 - salt / referenceFeatures / commitment は会話変数として保持する
 
@@ -322,7 +322,7 @@ C. 受取（QR）
 
 D. 送金
 - 事前に from/to/amount/token を収集
-- 音声認証: extract_voice_features → generate_zk_proof(referenceFeatures, currentFeatures, salt)
+- 音声認証: capture_and_extract_voice → generate_zk_proof(referenceFeatures, currentFeatures, salt)
 - 実行前確認:
   「以下で送金します。宛先: ...、金額: ...、トークン: ...。実行してよろしいですか？」
 - ユーザーの明確な肯定後に transfer_tokens を実行
