@@ -1,7 +1,10 @@
 // Helper functions for the application
 import {
+  type LogMessage,
   type MessageItem,
   type MessageRole,
+  type ToolResultCard,
+  type ToolResultType,
   type VoiceActivityState,
   type VoiceConnectionState,
 } from "./types";
@@ -182,4 +185,117 @@ export const getPulseScale = (
 
 export const asString = (value: unknown): string => {
   return typeof value === "string" ? value : "";
+};
+
+const asToolResultType = (value: unknown): ToolResultType | undefined => {
+  const typeText = asString(value).toLowerCase();
+  if (
+    typeText === "balance" ||
+    typeText === "address" ||
+    typeText === "qrcode" ||
+    typeText === "transaction" ||
+    typeText === "error"
+  ) {
+    return typeText;
+  }
+  return undefined;
+};
+
+const mapToolNameToType = (toolName: string): ToolResultType | undefined => {
+  if (toolName === "get_wallet_balance") {
+    return "balance";
+  }
+  if (toolName === "get_wallet_address" || toolName === "generate_zk_wallet") {
+    return "address";
+  }
+  if (toolName === "show_wallet_qrcode") {
+    return "qrcode";
+  }
+  if (toolName === "transfer_tokens") {
+    return "transaction";
+  }
+  return undefined;
+};
+
+const buildToolResult = (message: Record<string, unknown>): ToolResultCard | undefined => {
+  const directToolResult = message.toolResult;
+  if (isRecord(directToolResult)) {
+    const directType = asToolResultType(directToolResult.type);
+    const directData = isRecord(directToolResult.data)
+      ? directToolResult.data
+      : {};
+    if (directType) {
+      return {
+        type: directType,
+        data: directData,
+      };
+    }
+  }
+
+  const toolName =
+    asString(message.toolName) ||
+    asString(message.tool_name) ||
+    asString(message.name);
+  const normalizedToolName = toolName.toLowerCase();
+  const mappedType = mapToolNameToType(normalizedToolName);
+  const toolData =
+    (isRecord(message.result) && message.result) ||
+    (isRecord(message.data) && message.data) ||
+    (isRecord(message.output) && message.output) ||
+    undefined;
+
+  if (mappedType && toolData) {
+    return {
+      type: mappedType,
+      data: toolData,
+    };
+  }
+
+  if (asString(message.type).toLowerCase() === "error") {
+    return {
+      type: "error",
+      data: {
+        message: asString(message.message) || asString(message.text),
+      },
+    };
+  }
+
+  return undefined;
+};
+
+const getLogMessageRole = (value: unknown): "user" | "agent" | "system" => {
+  const roleValue = asString(value).toLowerCase();
+  if (roleValue === "user" || roleValue === "agent") {
+    return roleValue;
+  }
+  return "system";
+};
+
+export const buildLogMessage = (message: unknown): LogMessage => {
+  if (isRecord(message)) {
+    const contentValue =
+      asString(message.content) ||
+      asString(message.text) ||
+      asString(message.message) ||
+      JSON.stringify(message);
+    const roleText =
+      asString(message.role) ||
+      asString(message.source) ||
+      asString(message.type);
+
+    return {
+      id: getRandomId(),
+      role: getLogMessageRole(roleText),
+      content: contentValue,
+      timestamp: Date.now(),
+      toolResult: buildToolResult(message),
+    };
+  }
+
+  return {
+    id: getRandomId(),
+    role: "system",
+    content: asString(message) || String(message),
+    timestamp: Date.now(),
+  };
 };

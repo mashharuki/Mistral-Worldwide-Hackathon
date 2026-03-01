@@ -140,7 +140,7 @@
   - 全カードコンポーネントに shadcn/ui のデザインシステムとアニメーションを適用する
   - _Requirements: 5.2, 5.3, 6.3, 8.3, 8.4, 9.4_
 
-- [ ] 5.4 ElevenLabs Agent 統合とアプリケーション統合
+- [x] 5.4 ElevenLabs Agent 統合とアプリケーション統合
   - 設計デザインファイル(`design/ui_design.pen`)を参照する
   - 既存の App.tsx をリファクタリングし、VoiceOrb・MessageLog・各カードコンポーネントを統合する
   - ElevenLabs useConversation フックの WebRTC/WebSocket 接続を維持しつつ、状態管理を新しいコンポーネント構造に適応させる

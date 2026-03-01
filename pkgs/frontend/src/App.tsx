@@ -1,21 +1,22 @@
 import { useConversation } from "@elevenlabs/react";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
+import { MessageLog } from "./components/message-log";
 import { Button } from "./components/ui/button";
 import { VoiceOrb } from "./components/voice-orb";
 import "./css/App.css";
 import { PAGE_STAGGER } from "./lib/theme";
-import { type ConnectionType, type MessageItem } from "./utils/types";
 import {
-  DEFAULT_VOLUME_RATE,
   DEFAULT_CONNECTION_TYPE,
+  DEFAULT_VOLUME_RATE,
 } from "./utils/constants";
 import {
-  buildMessageItem,
-  buildErrorText,
-  buildConnectionState,
   buildActivityState,
+  buildConnectionState,
+  buildErrorText,
+  buildLogMessage,
 } from "./utils/helpers";
+import { type ConnectionType, type LogMessage } from "./utils/types";
 
 function App() {
   const agentIdFromEnv =
@@ -33,17 +34,14 @@ function App() {
   const [modeText, setModeText] = useState("idle");
   const [errorText, setErrorText] = useState("");
   const [conversationId, setConversationId] = useState("");
-  const [messages, setMessages] = useState<MessageItem[]>([]);
+  const [messages, setMessages] = useState<LogMessage[]>([]);
   const [inputText, setInputText] = useState("");
 
   const conversation = useConversation({
     micMuted,
     volume: volumeRate,
     onMessage: (message: unknown) => {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        buildMessageItem(message),
-      ]);
+      setMessages((prevMessages) => [...prevMessages, buildLogMessage(message)]);
     },
     onError: (error: unknown) => {
       setErrorText(buildErrorText(error));
@@ -306,21 +304,7 @@ function App() {
             クリア
           </Button>
         </div>
-        {messages.length === 0 ? (
-          <p className="empty">まだメッセージがありません。</p>
-        ) : (
-          <ul className="message-list">
-            {messages.map((message) => (
-              <li key={message.id} className={`message ${message.role}`}>
-                <span className="message-role">{message.role}</span>
-                <span className="message-text">{message.text}</span>
-                <span className="message-meta">
-                  {message.isFinal ? "final" : "partial"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        <MessageLog messages={messages} />
       </motion.section>
     </motion.div>
   );
