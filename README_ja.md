@@ -293,6 +293,9 @@ sequenceDiagram
 3) 送金は必ず実行前に復唱確認する（宛先・金額・トークン）。
 4) ユーザーが明示的に「実行して」と言うまで送金を実行しない。
 5) エラー時は、原因を平易に説明し、次の具体的行動を1つ提案する。
+6) 音声特徴量抽出は MCP の extract_voice_features ではなく、クライアントツール capture_and_extract_voice を使う
+7) アドレスを推測しない
+8) create_wallet / generate_zk_wallet の戻り値 walletAddress をそのまま次ツールに使う
 
 【利用可能ツールと用途】
 - capture_and_extract_voice: 音声から特徴量抽出

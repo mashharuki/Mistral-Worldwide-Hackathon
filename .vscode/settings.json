@@ -1,3 +1,4 @@
 {
-  "chat.useAgentSkills": true
+  "chat.useAgentSkills": true,
+  "liveServer.settings.port": 5501
 }
