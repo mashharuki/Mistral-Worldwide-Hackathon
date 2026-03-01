@@ -3,10 +3,10 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { MessageLog } from "../../components/message-log";
-import { QRCodeCard } from "../../components/qrcode-card";
-import { TransactionCard } from "../../components/transaction-card";
-import { WalletCard } from "../../components/wallet-card";
+import { MessageLog } from "../../src/components/message-log";
+import { QRCodeCard } from "../../src/components/qrcode-card";
+import { TransactionCard } from "../../src/components/transaction-card";
+import { WalletCard } from "../../src/components/wallet-card";
 
 afterEach(() => {
   cleanup();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { APP_THEME, APP_THEME_CSS_VARIABLES, PAGE_STAGGER } from "../../lib/theme";
+import { APP_THEME, APP_THEME_CSS_VARIABLES, PAGE_STAGGER } from "../../src/lib/theme";
 
 describe("APP_THEME", () => {
   it("uses required distinctive font families", () => {
