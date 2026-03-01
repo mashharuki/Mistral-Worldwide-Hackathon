@@ -4,10 +4,12 @@ import math
 import struct
 import unittest
 import wave
+from unittest.mock import patch
 
 from src.feature_extraction import (
     AudioFormatError,
     AudioQualityError,
+    EmbeddingModelUnavailableError,
     decode_audio_base64,
     extract_voice_features,
     pack_binary_features,
@@ -37,14 +39,17 @@ class FeatureExtractionTest(unittest.TestCase):
         with self.assertRaises(AudioFormatError):
             decode_audio_base64("not-base64!")
 
-    def test_extract_voice_features_returns_expected_shapes(self):
+    @patch("src.feature_extraction._extract_embedding_with_model")
+    def test_extract_voice_features_returns_expected_shapes(self, mock_extract):
         audio_b64 = generate_wav_base64(1.2)
+        mock_extract.return_value = ([0.25] * 512, "pyannote:pyannote/embedding")
         result = extract_voice_features(audio_b64)
 
         self.assertEqual(result["format"], "wav")
         self.assertEqual(len(result["features"]), 512)
         self.assertEqual(len(result["binaryFeatures"]), 512)
         self.assertEqual(len(result["packedFeatures"]), 8)
+        self.assertEqual(result["modelUsed"], "pyannote:pyannote/embedding")
         self.assertTrue(all(bit in (0, 1) for bit in result["binaryFeatures"]))
 
     def test_extract_voice_features_rejects_too_short_audio(self):
@@ -55,6 +60,13 @@ class FeatureExtractionTest(unittest.TestCase):
     def test_pack_binary_features_requires_exact_512_bits(self):
         with self.assertRaises(ValueError):
             pack_binary_features([0, 1, 1])
+
+    @patch("src.feature_extraction._extract_embedding_with_model")
+    def test_extract_voice_features_raises_when_model_unavailable(self, mock_extract):
+        audio_b64 = generate_wav_base64(1.2)
+        mock_extract.side_effect = EmbeddingModelUnavailableError("model load failed")
+        with self.assertRaises(EmbeddingModelUnavailableError):
+            extract_voice_features(audio_b64)
 
 
 if __name__ == "__main__":

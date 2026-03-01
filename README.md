@@ -260,4 +260,12 @@ https://mistral-worldwide-hackathon-fronten.vercel.app
 
 - ビルド
 
+  ```bash
+  pnpm frontend run build
+  ```
+
 - ローカル起動
+
+  ```bash
+  pnpm frontend run dev
+  ```

@@ -4,6 +4,9 @@ const BACKEND_BASE_URL =
 interface ExtractFeaturesResponse {
   features: number[];
   binaryFeatures: number[];
+  packedFeatures?: number[];
+  format?: string;
+  modelUsed?: string;
 }
 
 interface GenerateProofResponse {

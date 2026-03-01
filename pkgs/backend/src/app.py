@@ -2,7 +2,13 @@ import os
 from pathlib import Path
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from src.feature_extraction import AudioFormatError, AudioQualityError, extract_voice_features
+from src.feature_extraction import (
+    AudioDecodeError,
+    AudioFormatError,
+    AudioQualityError,
+    EmbeddingModelUnavailableError,
+    extract_voice_features,
+)
 from src.proof_generation import (
     ProofGenerationError,
     build_generate_proof_response,
@@ -50,7 +56,7 @@ def create_app() -> Flask:
             # 音声特徴量を抽出
             result = extract_voice_features(audio, mime_type)
             return jsonify(result), 200
-        except (AudioFormatError, AudioQualityError) as error:
+        except (AudioFormatError, AudioQualityError, AudioDecodeError) as error:
             return (
                 jsonify(
                     {
@@ -61,6 +67,18 @@ def create_app() -> Flask:
                     }
                 ),
                 400,
+            )
+        except EmbeddingModelUnavailableError as error:
+            return (
+                jsonify(
+                    {
+                        "error": {
+                            "code": "MODEL_UNAVAILABLE",
+                            "message": str(error),
+                        }
+                    }
+                ),
+                503,
             )
 
     @app.post("/generate-proof")

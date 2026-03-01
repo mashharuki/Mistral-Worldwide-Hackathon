@@ -20,6 +20,7 @@ export async function handleExtractVoiceFeatures({
           text: JSON.stringify({
             features: result.features,
             binaryFeatures: result.binaryFeatures,
+            modelUsed: result.modelUsed,
           }),
         },
       ],
