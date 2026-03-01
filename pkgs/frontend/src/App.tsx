@@ -1,11 +1,12 @@
 import { useConversation } from "@elevenlabs/react";
 import { motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MainStateScreen } from "./components/states/main-state-screen";
 import { ProcessingStateScreen } from "./components/states/processing-state-screen";
 import { ReceiveStateScreen } from "./components/states/receive-state-screen";
 import { SuccessStateScreen } from "./components/states/success-state-screen";
 import "./css/App.css";
+import { useVoiceCapture } from "./hooks/useVoiceCapture";
 import { PAGE_STAGGER } from "./lib/theme";
 import {
   DEFAULT_CONNECTION_TYPE,
@@ -39,10 +40,31 @@ function App() {
   const [errorText, setErrorText] = useState("");
   const [messages, setMessages] = useState<LogMessage[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("auto");
+  const { startBuffering, stopBuffering, captureAndExtract } = useVoiceCapture();
+  const captureRef = useRef(captureAndExtract);
+  captureRef.current = captureAndExtract;
+
+  const captureAndExtractVoice = useCallback(async () => {
+    try {
+      const result = await captureRef.current();
+      return JSON.stringify({
+        packedFeatures: result.packedFeatures,
+        binaryFeatures: result.binaryFeatures,
+        modelUsed: result.modelUsed,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Voice capture failed";
+      return JSON.stringify({ error: message });
+    }
+  }, []);
 
   const conversation = useConversation({
     micMuted,
     volume: volumeRate,
+    clientTools: {
+      capture_and_extract_voice: captureAndExtractVoice,
+    },
     onMessage: (message: unknown) => {
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -60,8 +82,14 @@ function App() {
     },
     onConnect: () => {
       setErrorText("");
+      startBuffering().catch((error: unknown) => {
+        setErrorText(buildErrorText(error));
+      });
     },
-  });
+    onDisconnect: () => {
+      stopBuffering();
+    },
+  } as Parameters<typeof useConversation>[0]);
 
   const isConnected = useMemo(() => statusText === "connected", [statusText]);
   const isSpeaking = useMemo(
@@ -236,6 +264,7 @@ function App() {
         });
       }
     } catch (error: unknown) {
+      stopBuffering();
       const rawMessage = buildErrorText(error);
       if (rawMessage.includes("WebSocket")) {
         setErrorText(
@@ -246,6 +275,12 @@ function App() {
       setErrorText(rawMessage);
     }
   };
+
+  useEffect(() => {
+    if (statusText === "disconnected") {
+      stopBuffering();
+    }
+  }, [statusText, stopBuffering]);
 
   const handleTapSpeak = async (): Promise<void> => {
     if (!isConnected) {
