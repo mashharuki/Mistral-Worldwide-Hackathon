@@ -218,12 +218,28 @@ function App() {
         await navigator.mediaDevices.getUserMedia({ audio: true });
         setMicReady(true);
       }
-      await conversation.startSession({
-        agentId: agentIdFromEnv,
-        connectionType: DEFAULT_CONNECTION_TYPE,
-      });
+
+      try {
+        await conversation.startSession({
+          agentId: agentIdFromEnv,
+          connectionType: DEFAULT_CONNECTION_TYPE,
+        });
+      } catch (firstError: unknown) {
+        console.warn("WebRTC接続に失敗。WebSocketへフォールバックします。", firstError);
+        await conversation.startSession({
+          agentId: agentIdFromEnv,
+          connectionType: "websocket",
+        });
+      }
     } catch (error: unknown) {
-      setErrorText(buildErrorText(error));
+      const rawMessage = buildErrorText(error);
+      if (rawMessage.includes("WebSocket")) {
+        setErrorText(
+          "音声接続に失敗しました。ネットワーク・VPN・ファイアウォール設定と ElevenLabs Agent ID を確認してください。",
+        );
+        return;
+      }
+      setErrorText(rawMessage);
     }
   };
 
