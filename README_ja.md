@@ -578,6 +578,37 @@ D. 送金
   pnpm mcpserver run cloudrun:cleanup
   ```
 
+### 送金検証ランブック（ETH / USDC）
+
+`transfer_tokens` 実行時は、**送金のたびに最新の ZK proof を生成**してください。  
+古い proof の使い回しは `validateUserOp` で `AA23 reverted` の主因になります。
+
+1. 最新 proof を生成する
+
+   - `pkgs/mcpserver/api.http` から `generate_zk_proof` を実行
+   - レスポンスの `transferProof` をコピー
+
+2. 送金サンプル JSON を更新する
+
+   - コピーした `transferProof` 文字列を以下へ貼り付け
+     - `pkgs/mcpserver/samples/transfer_tokens_eth.sample.json`
+     - または `pkgs/mcpserver/samples/transfer_tokens_usdc.sample.json`
+   - `from` はデプロイ済みウォレットアドレスを使用
+
+3. 送金を実行する
+
+   - `pkgs/mcpserver/api.http` の `transfer_tokens - ETH` または `transfer_tokens - USDC` を実行
+
+4. 成功を確認する
+
+   - レスポンスが `{\"txHash\":\"...\",\"status\":\"confirmed\",...}` になることを確認
+   - BaseScan でトランザクションを確認
+
+補足:
+- `generate_zk_proof` の `referenceFeatures` と `salt` は、ウォレット登録時の値と一致させてください。
+- コントラクトアドレスや Verifier を更新した場合は、MCP サーバーを再ビルド・再デプロイしてから再実行してください。  
+  `pnpm mcpserver run build && pnpm mcpserver run cloudrun:deploy`
+
 ### フロントエンド
 
 - ビルド

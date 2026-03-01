@@ -520,6 +520,37 @@ Set the following in `pkgs/contract/.env` at a minimum:
   pnpm mcpserver run cloudrun:cleanup
   ```
 
+### Transfer Verification Runbook (ETH / USDC)
+
+When you execute `transfer_tokens`, always generate a fresh ZK proof right before the transfer.
+Reusing an old proof often causes `AA23 reverted` at `validateUserOp`.
+
+1. Generate fresh proof
+
+   - Call `generate_zk_proof` from `pkgs/mcpserver/api.http`.
+   - Copy `transferProof` from the response.
+
+2. Update transfer sample JSON
+
+   - Paste the copied `transferProof` string into:
+     - `pkgs/mcpserver/samples/transfer_tokens_eth.sample.json` or
+     - `pkgs/mcpserver/samples/transfer_tokens_usdc.sample.json`
+   - Keep `from` as the deployed wallet address.
+
+3. Execute transfer
+
+   - Run `transfer_tokens - ETH` or `transfer_tokens - USDC` request from `pkgs/mcpserver/api.http`.
+
+4. Confirm success
+
+   - Expect response: `{"txHash":"...","status":"confirmed",...}`
+   - Check tx on BaseScan.
+
+Notes:
+- `referenceFeatures` and `salt` used in `generate_zk_proof` must match the wallet registration context.
+- If contract addresses or verifier changed, rebuild and redeploy MCP server before retry:
+  `pnpm mcpserver run build && pnpm mcpserver run cloudrun:deploy`
+
 ### Frontend
 
 - Build
