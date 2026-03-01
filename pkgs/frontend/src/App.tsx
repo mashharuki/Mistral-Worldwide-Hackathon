@@ -2,119 +2,20 @@ import { useConversation } from "@elevenlabs/react";
 import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { Button } from "./components/ui/button";
-import {
-    type VoiceActivityState,
-    type VoiceConnectionState,
-    VoiceOrb,
-} from "./components/voice-orb";
+import { VoiceOrb } from "./components/voice-orb";
 import "./css/App.css";
 import { PAGE_STAGGER } from "./lib/theme";
-
-type ConnectionType = "webrtc" | "websocket";
-type MessageRole = "user" | "agent" | "debug" | "system";
-
-type MessageItem = {
-  id: string;
-  role: MessageRole;
-  text: string;
-  isFinal: boolean;
-};
-
-const DEFAULT_VOLUME_RATE = 0.8;
-const DEFAULT_CONNECTION_TYPE: ConnectionType = "webrtc";
-
-const getRandomId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> => {
-  return typeof value === "object" && value !== null;
-};
-
-const getStringValue = (value: unknown): string => {
-  return typeof value === "string" ? value : "";
-};
-
-const getBooleanValue = (value: unknown): boolean => {
-  return typeof value === "boolean" ? value : false;
-};
-
-const getMessageRole = (value: unknown): MessageRole => {
-  const roleValue = getStringValue(value).toLowerCase();
-  if (roleValue === "user" || roleValue === "agent" || roleValue === "debug") {
-    return roleValue;
-  }
-  return "system";
-};
-
-const buildMessageItem = (message: unknown): MessageItem => {
-  if (isRecord(message)) {
-    const textValue =
-      getStringValue(message.text) ||
-      getStringValue(message.message) ||
-      JSON.stringify(message);
-    const roleText =
-      getStringValue(message.role) ||
-      getStringValue(message.type) ||
-      getStringValue(message.source);
-    const roleValue = getMessageRole(roleText);
-    const isFinalValue =
-      getBooleanValue(message.isFinal) || getBooleanValue(message.final);
-    return {
-      id: getRandomId(),
-      role: roleValue,
-      text: textValue,
-      isFinal: isFinalValue,
-    };
-  }
-
-  return {
-    id: getRandomId(),
-    role: "system",
-    text: getStringValue(message) || String(message),
-    isFinal: true,
-  };
-};
-
-const buildErrorText = (error: unknown): string => {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === "string") {
-    return error;
-  }
-  return JSON.stringify(error);
-};
-
-const buildConnectionState = (statusText: string): VoiceConnectionState => {
-  if (statusText === "connected") {
-    return "connected";
-  }
-  if (statusText === "connecting") {
-    return "connecting";
-  }
-  return "disconnected";
-};
-
-const buildActivityState = (
-  modeText: string,
-  isSpeaking: boolean,
-): VoiceActivityState => {
-  if (isSpeaking) {
-    return "speaking";
-  }
-
-  if (modeText === "speaking") {
-    return "speaking";
-  }
-  if (modeText === "listening") {
-    return "listening";
-  }
-  if (modeText === "thinking") {
-    return "thinking";
-  }
-  return "idle";
-};
+import { type ConnectionType, type MessageItem } from "./utils/types";
+import {
+  DEFAULT_VOLUME_RATE,
+  DEFAULT_CONNECTION_TYPE,
+} from "./utils/constants";
+import {
+  buildMessageItem,
+  buildErrorText,
+  buildConnectionState,
+  buildActivityState,
+} from "./utils/helpers";
 
 function App() {
   const agentIdFromEnv =

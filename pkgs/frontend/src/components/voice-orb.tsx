@@ -1,37 +1,7 @@
 import { motion } from "framer-motion";
 import "../css/voice-orb.css";
-
-export type VoiceConnectionState = "disconnected" | "connecting" | "connected";
-export type VoiceActivityState = "idle" | "listening" | "speaking" | "thinking";
-
-type VoiceOrbProps = {
-  connectionState: VoiceConnectionState;
-  activityState: VoiceActivityState;
-  micLevel: number;
-};
-
-const clampVoiceLevel = (value: number): number => {
-  if (Number.isNaN(value) || !Number.isFinite(value)) {
-    return 0;
-  }
-  return Math.min(1, Math.max(0, value));
-};
-
-const getPulseScale = (
-  activityState: VoiceActivityState,
-  voiceLevel: number,
-): number => {
-  if (activityState === "speaking") {
-    return 1.12 + voiceLevel * 0.25;
-  }
-  if (activityState === "listening") {
-    return 1.05 + voiceLevel * 0.15;
-  }
-  if (activityState === "thinking") {
-    return 1.08;
-  }
-  return 1;
-};
+import { type VoiceOrbProps } from "../utils/types";
+import { clampVoiceLevel, getPulseScale } from "../utils/helpers";
 
 export function VoiceOrb({
   connectionState,
