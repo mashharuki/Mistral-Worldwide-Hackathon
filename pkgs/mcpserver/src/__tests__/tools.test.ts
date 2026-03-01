@@ -588,8 +588,12 @@ describe("transfer_tokens tool", () => {
     vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
     // 1 ETH balance
     vi.mocked(viemClient.getBalance).mockResolvedValue(1000000000000000000n);
-    // readContract: nonce from EntryPoint
-    vi.mocked(viemClient.readContract).mockResolvedValue(0n);
+    // readContract: voiceCommitment, nonce from EntryPoint
+    vi.mocked(viemClient.readContract)
+      .mockResolvedValueOnce(
+        "0x0000000000000000000000000000000000000000000000000000000000003039",
+      )
+      .mockResolvedValueOnce(0n);
     // Relayer sends tx
     const mockTxHash =
       "0xaaaa000000000000000000000000000000000000000000000000000000000001";
@@ -629,9 +633,12 @@ describe("transfer_tokens tool", () => {
 
   it("should transfer USDC successfully", async () => {
     vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
-    // readContract: first call = USDC balanceOf, second call = nonce
+    // readContract: USDC balanceOf, voiceCommitment, nonce
     vi.mocked(viemClient.readContract)
       .mockResolvedValueOnce(100000000n) // 100 USDC
+      .mockResolvedValueOnce(
+        "0x0000000000000000000000000000000000000000000000000000000000003039",
+      ) // voiceCommitment = 12345
       .mockResolvedValueOnce(0n); // nonce
     const mockTxHash =
       "0xbbbb000000000000000000000000000000000000000000000000000000000002";
@@ -751,7 +758,11 @@ describe("transfer_tokens tool", () => {
   it("should return error on transaction failure", async () => {
     vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
     vi.mocked(viemClient.getBalance).mockResolvedValue(1000000000000000000n);
-    vi.mocked(viemClient.readContract).mockResolvedValue(0n);
+    vi.mocked(viemClient.readContract)
+      .mockResolvedValueOnce(
+        "0x0000000000000000000000000000000000000000000000000000000000003039",
+      )
+      .mockResolvedValueOnce(0n);
     vi.mocked(relayerClientMock.writeContract).mockRejectedValue(
       new Error("Transaction reverted"),
     );
@@ -782,7 +793,11 @@ describe("transfer_tokens tool", () => {
   it("should decode FailedOpWithRevert inner wallet error", async () => {
     vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
     vi.mocked(viemClient.getBalance).mockResolvedValue(1000000000000000000n);
-    vi.mocked(viemClient.readContract).mockResolvedValue(0n);
+    vi.mocked(viemClient.readContract)
+      .mockResolvedValueOnce(
+        "0x0000000000000000000000000000000000000000000000000000000000003039",
+      )
+      .mockResolvedValueOnce(0n);
 
     const inner = encodeErrorResult({
       abi: [{ type: "error", name: "InvalidPublicSignal", inputs: [] }],
@@ -829,6 +844,37 @@ describe("transfer_tokens tool", () => {
     }>;
     expect(textContent[0].text).toContain("FailedOpWithRevert");
     expect(textContent[0].text).toContain("InvalidPublicSignal");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should return clear error on commitment mismatch before handleOps", async () => {
+    vi.mocked(viemClient.getBytecode).mockResolvedValue("0x1234");
+    vi.mocked(viemClient.getBalance).mockResolvedValue(1000000000000000000n);
+    vi.mocked(viemClient.readContract).mockResolvedValueOnce(
+      "0x0000000000000000000000000000000000000000000000000000000000000001",
+    );
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "transfer_tokens",
+      arguments: {
+        from: "0x1234567890123456789012345678901234567890",
+        to: "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd",
+        amount: "0.1",
+        token: "ETH",
+        proof: mockProof,
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{
+      type: string;
+      text: string;
+    }>;
+    expect(textContent[0].text).toContain("voiceCommitment");
+    expect(relayerClientMock.writeContract).not.toHaveBeenCalled();
 
     await client.close();
     await server.close();

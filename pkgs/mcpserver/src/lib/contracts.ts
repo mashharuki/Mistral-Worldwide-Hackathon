@@ -68,6 +68,13 @@ export const voiceWalletAbi = [
     stateMutability: "nonpayable",
     type: "function",
   },
+  {
+    inputs: [],
+    name: "voiceCommitment",
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 // ERC-20 ABI fragments

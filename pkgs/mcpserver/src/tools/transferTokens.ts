@@ -123,6 +123,38 @@ function decodeTransferFailure(error: unknown): string | null {
   return null;
 }
 
+function normalizeGroth16Proof(proofObj: any): {
+  a: [string, string];
+  b: [[string, string], [string, string]];
+  c: [string, string];
+} {
+  // Already normalized shape
+  if (proofObj?.a && proofObj?.b && proofObj?.c) {
+    return {
+      a: proofObj.a as [string, string],
+      b: proofObj.b as [[string, string], [string, string]],
+      c: proofObj.c as [string, string],
+    };
+  }
+
+  // snarkjs output shape: pi_a / pi_b / pi_c
+  if (proofObj?.pi_a && proofObj?.pi_b && proofObj?.pi_c) {
+    return {
+      a: [proofObj.pi_a[0], proofObj.pi_a[1]],
+      // snarkjs -> solidity verifier argument conversion
+      b: [
+        [proofObj.pi_b[0][1], proofObj.pi_b[0][0]],
+        [proofObj.pi_b[1][1], proofObj.pi_b[1][0]],
+      ],
+      c: [proofObj.pi_c[0], proofObj.pi_c[1]],
+    };
+  }
+
+  throw new Error(
+    "invalid proof format: expected {a,b,c} or {pi_a,pi_b,pi_c}",
+  );
+}
+
 /**
  * transfer_tokens ツールハンドラー
  *
@@ -227,6 +259,30 @@ export async function handleTransferTokens({
     const proofObj = proofData.proof ?? proofData;
     const publicSignals = proofData.publicSignals ?? proofData.input ?? ["0"];
 
+    const normalizedProof = normalizeGroth16Proof(proofObj);
+    const publicSignal = BigInt(publicSignals[0]);
+
+    // 4.1 Wallet が保持する commitment と proof の public signal が一致しているか事前検証
+    const walletCommitment = (await viemClient.readContract({
+      address: walletAddress,
+      abi: voiceWalletAbi,
+      functionName: "voiceCommitment",
+      args: [],
+    })) as `0x${string}`;
+    const walletCommitmentBigInt = BigInt(walletCommitment);
+
+    if (walletCommitmentBigInt !== publicSignal) {
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: `proof の publicSignals[0] がウォレットの voiceCommitment と一致しません。wallet=${walletCommitmentBigInt.toString()} proof=${publicSignal.toString()}`,
+          },
+        ],
+        isError: true,
+      };
+    }
+
     const signature = encodeAbiParameters(
       [
         { type: "uint256[2]", name: "a" },
@@ -235,13 +291,13 @@ export async function handleTransferTokens({
         { type: "uint256[1]", name: "input" },
       ],
       [
-        proofObj.a.map(BigInt) as [bigint, bigint],
-        proofObj.b.map((row: string[]) => row.map(BigInt)) as [
+        normalizedProof.a.map(BigInt) as [bigint, bigint],
+        normalizedProof.b.map((row: string[]) => row.map(BigInt)) as [
           [bigint, bigint],
           [bigint, bigint],
         ],
-        proofObj.c.map(BigInt) as [bigint, bigint],
-        [BigInt(publicSignals[0])] as [bigint],
+        normalizedProof.c.map(BigInt) as [bigint, bigint],
+        [publicSignal] as [bigint],
       ],
     );
 
