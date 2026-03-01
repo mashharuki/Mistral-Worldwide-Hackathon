@@ -16,6 +16,7 @@ interface GenerateProofResponse {
   };
   publicSignals: string[];
   commitment: string;
+  hammingDistance?: number;
 }
 
 interface GenerateCommitmentResponse {

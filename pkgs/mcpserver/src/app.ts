@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import {
   createWalletInput,
   extractVoiceFeaturesInput,
+  generateZkProofInput,
   generateZkWalletInput,
   getWalletAddressInput,
   getWalletBalanceInput,
@@ -12,6 +13,7 @@ import {
 } from "./lib/schemas.js";
 import { handleCreateWallet } from "./tools/createWallet.js";
 import { handleExtractVoiceFeatures } from "./tools/extractVoiceFeatures.js";
+import { handleGenerateZkProof } from "./tools/generateZkProof.js";
 import { handleGenerateZkWallet } from "./tools/generateZkWallet.js";
 import { handleGetWalletAddress } from "./tools/getWalletAddress.js";
 import { handleGetWalletBalance } from "./tools/getWalletBalance.js";
@@ -19,7 +21,7 @@ import { handleShowWalletQrcode } from "./tools/showWalletQrcode.js";
 import { handleTransferTokens } from "./tools/transferTokens.js";
 
 /**
- * 7 ツールを登録した McpServer を生成する
+ * 8 ツールを登録した McpServer を生成する
  */
 export function createMcpServer(): McpServer {
   const server = new McpServer({
@@ -65,7 +67,20 @@ export function createMcpServer(): McpServer {
     async ({ commitment, salt }) => handleCreateWallet({ commitment, salt }),
   );
 
-  // --- Tool 4: get_wallet_balance ---
+  // --- Tool 4: generate_zk_proof ---
+  server.registerTool(
+    "generate_zk_proof",
+    {
+      title: "ZK 証明生成",
+      description:
+        "登録時特徴量と現在特徴量・salt から送金用の ZK proof を生成します",
+      inputSchema: generateZkProofInput,
+    },
+    async ({ referenceFeatures, currentFeatures, salt }) =>
+      handleGenerateZkProof({ referenceFeatures, currentFeatures, salt }),
+  );
+
+  // --- Tool 5: get_wallet_balance ---
   server.registerTool(
     "get_wallet_balance",
     {
@@ -77,7 +92,7 @@ export function createMcpServer(): McpServer {
     async ({ walletAddress }) => handleGetWalletBalance({ walletAddress }),
   );
 
-  // --- Tool 5: get_wallet_address ---
+  // --- Tool 6: get_wallet_address ---
   server.registerTool(
     "get_wallet_address",
     {
@@ -89,7 +104,7 @@ export function createMcpServer(): McpServer {
     async ({ commitment }) => handleGetWalletAddress({ commitment }),
   );
 
-  // --- Tool 6: show_wallet_qrcode ---
+  // --- Tool 7: show_wallet_qrcode ---
   server.registerTool(
     "show_wallet_qrcode",
     {
@@ -101,7 +116,7 @@ export function createMcpServer(): McpServer {
     async ({ walletAddress }) => handleShowWalletQrcode({ walletAddress }),
   );
 
-  // --- Tool 7: transfer_tokens ---
+  // --- Tool 8: transfer_tokens ---
   server.registerTool(
     "transfer_tokens",
     {

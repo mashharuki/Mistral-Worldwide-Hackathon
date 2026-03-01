@@ -312,6 +312,81 @@ describe("create_wallet tool", () => {
   });
 });
 
+describe("generate_zk_proof tool", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should call backend generateProof and return transfer-ready payload", async () => {
+    const mockResponse = {
+      proof: {
+        a: ["1", "2"],
+        b: [
+          ["3", "4"],
+          ["5", "6"],
+        ],
+        c: ["7", "8"],
+      },
+      publicSignals: ["123456789"],
+      commitment: "123456789",
+      hammingDistance: 12,
+    };
+    vi.mocked(backendClient.generateProof).mockResolvedValue(
+      mockResponse,
+    );
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "generate_zk_proof",
+      arguments: {
+        referenceFeatures: [1, 2, 3, 4, 5, 6, 7, 8],
+        currentFeatures: [1, 2, 3, 4, 5, 6, 7, 8],
+        salt: "42",
+      },
+    });
+
+    expect(backendClient.generateProof).toHaveBeenCalledWith({
+      referenceFeatures: [1, 2, 3, 4, 5, 6, 7, 8],
+      currentFeatures: [1, 2, 3, 4, 5, 6, 7, 8],
+      salt: "42",
+    });
+    expect(result.isError).toBeFalsy();
+
+    const textContent = result.content as Array<{ type: string; text: string }>;
+    const parsed = JSON.parse(textContent[0].text);
+    expect(parsed.proof).toEqual(mockResponse.proof);
+    expect(parsed.publicSignals).toEqual(mockResponse.publicSignals);
+    expect(parsed.commitment).toBe(mockResponse.commitment);
+    expect(typeof parsed.transferProof).toBe("string");
+
+    await client.close();
+    await server.close();
+  });
+
+  it("should return structured error on backend failure", async () => {
+    vi.mocked(backendClient.generateProof).mockRejectedValue(
+      new Error("Backend 400: proof generation failed"),
+    );
+
+    const { server, client } = await createTestClient();
+    const result = await client.callTool({
+      name: "generate_zk_proof",
+      arguments: {
+        referenceFeatures: [1, 2, 3, 4, 5, 6, 7, 8],
+        currentFeatures: [1, 2, 3, 4, 5, 6, 7, 8],
+        salt: "42",
+      },
+    });
+
+    expect(result.isError).toBe(true);
+    const textContent = result.content as Array<{ type: string; text: string }>;
+    expect(textContent[0].text).toContain("proof generation failed");
+
+    await client.close();
+    await server.close();
+  });
+});
+
 // ============================================================
 // Task 4.3: get_wallet_balance, get_wallet_address, show_wallet_qrcode
 // ============================================================

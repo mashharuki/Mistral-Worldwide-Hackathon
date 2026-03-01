@@ -16,6 +16,16 @@ export const createWalletInput = {
   salt: z.string().describe("Salt (10進または0x16進)"),
 };
 
+export const generateZkProofInput = {
+  referenceFeatures: z
+    .array(z.number())
+    .describe("登録時に保存した packed features (8要素)"),
+  currentFeatures: z
+    .array(z.number())
+    .describe("今回の音声から抽出した packed features (8要素)"),
+  salt: z.string().describe("generate_zk_wallet/create_wallet で使用した salt"),
+};
+
 export const getWalletBalanceInput = {
   walletAddress: z
     .string()
